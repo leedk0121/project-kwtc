@@ -1,0 +1,76 @@
+.modal-info-item {
+    margin-bottom: 8px;
+}
+.modal-cancel-btn {
+    background: #fff;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    border-radius: 8px;
+    padding: 6px 32px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.modal-cancel-btn:hover {
+    background: #ffdada;
+    color: #b71c1c;
+    border-color: #b71c1c;
+}
+.modal-bottom-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+}
+
+.modal-participate-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 32px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: background 0.2s;
+}
+.modal-participate-btn:hover {
+    background: #1565c0;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 32px 32px 16px 32px;
+    border-radius: 12px;
+    min-width: 320px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.modal-date {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}

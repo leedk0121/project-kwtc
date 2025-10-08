@@ -1,0 +1,235 @@
+.Rankedit-ctn{
+    font-family: 'Pretendard', sans-serif;
+}
+
+.Rankedit-ctn {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px 12px;
+}
+
+.Rankedit-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 60px;
+}
+
+.rankedit-delete-container {
+    display: flex;
+    justify-content: flex-end; 
+    margin: 16px 10px;
+
+}
+
+.rankedit-delete-container button{
+    padding: 5px 10px;
+}
+
+.Rankedit-ctn p {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.Rankedit-ctn .rankedit-btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.rankedit-search-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 8px;
+}
+
+.rankedit-search-row input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 120px; /* 기존 220px → 120px로 변경 */
+}
+
+.rankedit-search-row button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #eee;
+    cursor: pointer;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 16px 0;
+    color: #888;
+}
+
+.member-edit-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    font-weight: bold;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 4px;
+}
+
+.member-edit-header .profile-info {
+    flex: 3;
+}
+.member-edit-header .ranked-checkbox,
+.member-edit-header .current-checkbox,
+.member-edit-header .tier-input,
+.member-edit-header .rank-input,
+.member-edit-header .select-checkbox {
+    width: 80px;
+    text-align: center;
+}
+
+.member-edit-header.ranked .tier-input,
+.member-edit-header.ranked .rank-input {
+    width: 70px;
+}
+.member-edit-header.ranked .select-checkbox {
+    width: 60px;
+}
+
+.member-edit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    max-height: calc(100vh - 260px - 36px);
+    overflow-y: auto;
+}
+
+.member-edit-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    width: 100%;
+}
+
+.member-edit-item .profile-info {
+    flex: 3;
+    display: flex;
+    align-items: center;
+}
+
+.profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.user-name {
+    font-weight: bold;
+}
+.user-major {
+    font-size: 13px;
+    color: #555;
+}
+
+.member-edit-item .ranked-checkbox,
+.member-edit-item .current-checkbox,
+.member-edit-item .tier-input,
+.member-edit-item .rank-input,
+.member-edit-item .select-checkbox {
+    width: 80px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.member-edit-item .tier-input,
+.member-edit-item .rank-input {
+    margin-right: 2px;
+    width: 70px;
+}
+
+.member-edit-item .select-checkbox {
+    width: 60px;
+}
+
+.no-data {
+    text-align: center;
+    padding: 16px 0;
+    color: #888;
+}
+
+/* 랭킹 체크박스 */
+[id^="ranked-checkbox-"] {
+    width: 80px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 현재 유저 체크박스 */
+[id^="current-checkbox-"] {
+    width: 80px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 티어 입력 */
+[id^="tier-input-"] {
+    margin-right: 2px;
+    width: 70px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 랭킹 입력 */
+[id^="rank-input-"] {
+    margin-right: 2px;
+    width: 70px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 선택 체크박스 */
+[id^="select-checkbox-"] {
+    width: 60px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 티어 입력 input에 직접 적용 */
+[id^="tier-input-"] input {
+    width: 30px !important;
+}
+
+/* 랭킹 입력 input에 직접 적용 */
+[id^="rank-input-"] input {
+    width: 30px !important;
+}

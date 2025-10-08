@@ -1,0 +1,35 @@
+{
+  "version": "5",
+  "redirects": {
+    "https://deno.land/std/http/server.ts": "https://deno.land/std@0.224.0/http/server.ts"
+  },
+  "remote": {
+    "https://deno.land/std@0.224.0/async/delay.ts": "f90dd685b97c2f142b8069082993e437b1602b8e2561134827eeb7c12b95c499",
+    "https://deno.land/std@0.224.0/http/server.ts": "f9313804bf6467a1704f45f76cb6cd0a3396a3b31c316035e6a4c2035d1ea514"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@eslint/js@^9.33.0",
+        "npm:@supabase/supabase-js@^2.55.0",
+        "npm:@types/react-big-calendar@^1.16.2",
+        "npm:@types/react-dom@^19.1.7",
+        "npm:@types/react@^19.1.10",
+        "npm:@vitejs/plugin-react-swc@4",
+        "npm:date-fns@^4.1.0",
+        "npm:eslint-plugin-react-hooks@^5.2.0",
+        "npm:eslint-plugin-react-refresh@~0.4.20",
+        "npm:eslint@^9.33.0",
+        "npm:globals@^16.3.0",
+        "npm:react-big-calendar@^1.19.4",
+        "npm:react-calendar@6",
+        "npm:react-dom@^19.1.1",
+        "npm:react-router-dom@^7.8.1",
+        "npm:react@^19.1.1",
+        "npm:typescript-eslint@^8.39.1",
+        "npm:typescript@~5.8.3",
+        "npm:vite@^7.1.2"
+      ]
+    }
+  }
+}

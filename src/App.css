@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-ExtraLight.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
+}
+
+.page_content {
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+    font-family: 'Pretendard', sans-serif;
+}

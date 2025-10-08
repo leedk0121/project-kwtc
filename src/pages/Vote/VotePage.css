@@ -1,0 +1,709 @@
+/* VotePage 달력 스타일 정리 */
+.vote-calendar-container {
+  padding: 0;
+  margin: 0 auto;
+  overflow-x: auto;
+  max-width: 100vw;
+  background: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
+}
+
+/* 페이지 헤더 추가 */
+.vote-page-header {
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.vote-page-title {
+  margin: 0 0 12px 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.title-icon {
+  font-size: 40px;
+  /* animation: bounce 2s infinite; */
+}
+
+/* @keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+} */
+
+.vote-page-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+/* 상단 액션 버튼들 - PostList 스타일 적용 */
+.calendar-action-buttons {
+  background: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e2e8f0;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 16px;
+}
+
+.add-schedule-btn,
+.reserve-court-btn {
+  flex: 1;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.add-schedule-btn {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.add-schedule-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.reserve-court-btn {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.reserve-court-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* 달력 컨테이너 */
+.calendar-container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.vote-calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.current-month {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 30px;
+}
+
+.month-move-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.month-move-button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 달력 스타일은 그대로 유지 */
+.custom-calendar {
+  width: 100%;
+  max-width: 700px;
+  font-size: 1.1rem;
+  background-image: url('/calender_background.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin: 0 auto;
+  overflow: visible;
+  table-layout: fixed;
+  border-spacing: 0;
+  /* border-radius: 16px; */
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.custom-calendar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.6);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.custom-calendar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.custom-calendar th {
+  padding: 4px;
+  background: #f5f5f5;
+}
+
+.custom-calendar td {
+  padding-top: 5px;
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  height: 90px;
+  min-height: 90px;
+  vertical-align: top;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.custom-calendar tr td:last-child {
+  border-right: none;
+}
+
+.custom-calendar td.selected {
+  font-weight: bold;
+}
+
+.custom-calendar thead {
+  display: none;
+}
+
+.custom-calendar td.saturday div {
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+.custom-calendar td.sunday div {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.custom-calendar td div {
+  position: relative;
+  z-index: 2;
+  color: #1e293b;
+  font-weight: bold;
+}
+
+.custom-calendar td div::before {
+  display: none;
+}
+
+.vote-where {
+  max-width: 180px;
+  font-size: 0.8em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  display: block;
+  margin-top: 4px;
+  padding-left: 3px;
+}
+
+.date {
+  padding-left: 5px;
+}
+
+/* 선택된 날짜 정보 영역 개선 */
+.selected-date-info {
+  margin-top: 30px;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.selected-date-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 0; /* 기존 margin-bottom 제거 */
+  color: #1e293b;
+  flex: 1; /* 남은 공간 차지 */
+}
+
+.selected-date-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap; /* 작은 화면에서 줄바꿈 허용 */
+}
+
+.selected-date-votes-boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 일정 박스 개선 */
+.vote-info-box {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border: 1px solid #e1e8f7;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vote-info-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-color, #667eea) 0%, var(--accent-color-dark, #4f7dca) 100%);
+  border-radius: 0 3px 3px 0;
+}
+
+.vote-info-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* 참여중 표시 개선 */
+.participation-badge {
+  position: absolute !important;
+  top: 16px !important;
+  right: 20px !important;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+  color: white !important;
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3) !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.participation-badge::before {
+  content: '✓';
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* 메인 컨텐츠 영역 - info와 버튼을 나란히 배치 */
+.vote-info-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* 일정 정보 그리드 */
+.vote-info-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  padding-left: 16px;
+  margin-bottom: 16px;
+}
+
+/* 참여하기 버튼 컨테이너 */
+.vote-participate-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  /* margin-top: -20px; 제거 */
+}
+
+/* 참여하기 버튼 스타일 */
+.vote-participate-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  margin-top: -35px; /* 버튼 자체를 위로 올림 */
+}
+
+.vote-participate-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.vote-participate-btn:active {
+  transform: translateY(0);
+  background: #1d4ed8;
+}
+
+/* 일정 정보 아이템 */
+.vote-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.3;
+  padding: 3px 0;
+}
+
+.vote-info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border-radius: 6px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.vote-info-label {
+  font-weight: 600;
+  color: #64748b;
+  min-width: 60px;
+  font-size: 13px;
+}
+
+.vote-info-value {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+}
+
+/* 중복된 .vote-info-content 정의 제거하고 위의 정의만 사용 */
+
+/* 특별한 정보들 강조 */
+.vote-info-item:has(.vote-info-label:contains("장소")) .vote-info-value,
+.vote-info-item:has(.vote-info-label:contains("시간")) .vote-info-value {
+  font-weight: 700; /* 장소와 시간은 더 굵게 */
+  color: #0f172a; /* 더 진한 색상 */
+  font-size: 16px; /* 더 크게 */
+}
+
+/* 인원 정보 강조 */
+.vote-info-item:has(.vote-info-label:contains("인원")) .vote-info-value {
+  font-weight: 700;
+  color: #3b82f6; /* 파란색으로 강조 */
+  font-size: 15px;
+}
+
+/* 최소티어 정보 강조 */
+.vote-info-item:has(.vote-info-label:contains("최소티어")) .vote-info-value {
+  font-weight: 700;
+  color: #f59e0b; /* 주황색으로 강조 */
+  font-size: 15px;
+}
+
+/* 내 일정 보기 버튼 스타일 */
+.my-votes-btn {
+    padding: 12px 20px;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    background-color: #667eea;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex-shrink: 0; /* 버튼 크기 고정 */
+}
+
+.my-votes-btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left 0.5s;
+}
+
+.my-votes-btn:hover {
+    transform: translateY(-2px);
+    background-color: #5a67d8;
+    border-color: #5a67d8;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.my-votes-btn:hover:before {
+    left: 100%;
+}
+
+.my-votes-btn:active {
+    transform: translateY(0);
+    background-color: #4c51bf;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+}
+
+/* 내 일정 보기 상태일 때의 스타일 */
+.my-votes-btn.active {
+    background-color: #4ecdc4;
+    border-color: #4ecdc4;
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
+}
+
+.my-votes-btn.active:hover {
+    background-color: #26b5aa;
+    border-color: #26b5aa;
+    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
+}
+
+.my-votes-btn.active:active {
+    background-color: #1a9e96;
+}
+
+/* 버튼 아이콘 스타일 */
+.my-votes-btn-icon {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.my-votes-btn:hover .my-votes-btn-icon {
+    transform: scale(1.1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .vote-page-header {
+    padding: 30px 15px;
+  }
+  
+  .vote-page-title {
+    font-size: 28px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .calendar-action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 15px;
+    gap: 12px;
+  }
+  
+  .add-schedule-btn, .reserve-court-btn {
+    flex: 1;
+    padding: 5px 16px;
+    font-size: 13px;
+  }
+  
+  .calendar-container {
+    padding: 20px 15px;
+  }
+  
+  .vote-calendar-header {
+    padding: 16px;
+  }
+  
+  .current-month {
+    font-size: 20px;
+    margin: 0 20px;
+  }
+  
+  .month-move-button {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  .selected-date-info {
+    padding: 20px;
+  }
+  
+  .selected-date-title {
+    font-size: 22px; /* 모바일에서 제목 크기 조정 */
+    flex: 1;
+  }
+  
+  .selected-date-title-row {
+    flex-direction: row; /* row로 유지 */
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .my-votes-btn {
+    width: auto; /* width: 100% 제거 */
+    max-width: 180px; /* 최대 너비 조정 */
+    justify-content: center;
+    padding: 5px 16px; /* 패딩 조정 */
+    font-size: 13px; /* 폰트 크기 조정 */
+  }
+  
+  .vote-info-box {
+    padding: 16px;
+    min-height: 120px;
+  }
+  
+  .my-votes-date-title {
+    font-size: 16px;
+    padding: 10px 14px;
+  }
+  
+  .vote-info-content {
+    gap: 2px; /* 모바일에서 더 줄임 */
+    padding-left: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .vote-info-item {
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.1; /* 모바일에서 더 줄임 */
+    padding: 1px 0; /* 모바일에서 패딩도 줄임 */
+  }
+  
+  .vote-info-main {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .vote-participate-btn-container {
+    align-self: flex-end;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .vote-page-title {
+    font-size: 28px;
+  }
+  
+  .calendar-container {
+    padding: 15px 10px;
+  }
+  
+  .selected-date-info {
+    padding: 16px;
+  }
+  
+  .vote-info-box {
+    padding: 14px;
+  }
+  
+  .calendar-action-buttons {
+    padding: 15px 10px;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .add-schedule-btn, .reserve-court-btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .vote-info-content {
+    gap: 3px; /* 2px에서 3px로 약간 늘림 */
+    padding-left: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .vote-info-item {
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.2;
+    padding: 2px 0;
+  }
+  
+  .vote-info-value {
+    font-size: 14px; /* 모바일에서도 크기 유지 */
+    font-weight: 600;
+  }
+  
+  .vote-info-label {
+    font-size: 12px; /* 모바일에서 라벨 크기 */
+  }
+  
+  /* 모바일에서도 중요 정보 강조 */
+  .vote-info-item:has(.vote-info-label:contains("장소")) .vote-info-value,
+  .vote-info-item:has(.vote-info-label:contains("시간")) .vote-info-value {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  
+  .vote-info-item:has(.vote-info-label:contains("인원")) .vote-info-value,
+  .vote-info-item:has(.vote-info-label:contains("최소티어")) .vote-info-value {
+    font-size: 14px;
+    font-weight: 700;
+  }
+}

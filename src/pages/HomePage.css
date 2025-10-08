@@ -1,0 +1,78 @@
+.page_home {
+    background-color: brown;
+    height: 100vh;
+}
+
+#Homepage-kwtclogo {
+    width: 340px;
+    height: auto;
+    max-width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+#home_club_name {
+    font-size: 8px;
+    color: white;
+    letter-spacing: 4px;
+    position: absolute;
+    top: calc(50% + 160px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+}
+
+.Home_Link_container {
+    font-family: 'Pretendard', sans-serif;
+    position: absolute;
+    top: calc(50% - 186px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px; /* 원의 지름에 맞게 조절 */
+    height: 350px; /* 곡률 높이 */
+    z-index: 2;
+}
+
+.Home_action_link {
+    position: absolute;
+    width: auto;
+    height: auto;
+    border: none;
+    background: none;
+    color: #F5DEB3;
+    font-size: 14pt;
+    border-radius: 0;
+    pointer-events: auto;
+    white-space: nowrap;
+    z-index: 2;
+    text-align: center;
+    text-decoration: none; /* 추가된 부분 */
+}
+
+.Home_action_link:nth-child(1) {
+    left: 13%;
+    top: 25%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+.Home_action_link:nth-child(2) {
+    letter-spacing: 10pt;
+    left: 35%;
+    top: 11%;
+    transform: translate(-50%, -50%) rotate(-19deg);
+}
+.Home_action_link:nth-child(3) {
+    letter-spacing: 10pt;
+    left: 65%;
+    top: 11%;
+    transform: translate(-50%, -50%) rotate(19deg);
+}
+.Home_action_link:nth-child(4) {
+    letter-spacing: 10pt;
+    left: 87%;
+    top: 25%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}

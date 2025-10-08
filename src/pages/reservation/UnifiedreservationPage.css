@@ -1,0 +1,460 @@
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: auto; /* 페이지 전체에 스크롤바 표시 */
+}
+
+.unified-reservation-container {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
+  position: relative;
+}
+
+.unified-reservation-container h1 {
+  text-align: center;
+  color: #2563eb;
+  margin-top: 60px;
+  margin-bottom: 16px;
+}
+
+.calendar {
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.nav-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #1d4ed8;
+}
+
+.calendar h2 {
+  margin: 0;
+  color: #334155;
+  font-size: 1.2rem;
+}
+
+.calendar table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar th, .calendar td {
+  width: 14.2%;
+  height: 40px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.calendar th {
+  background: #e0e7ff;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.calendar td {
+  background: #f1f5f9;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1rem;
+}
+
+.calendar td:hover {
+  background: #c7d2fe;
+}
+
+.calendar td[style*="background: #e0e7ff"] {
+  background: #6366f1 !important;
+  color: #fff;
+  font-weight: bold;
+}
+
+.calendar td:empty {
+  background: transparent;
+  cursor: default;
+}
+
+.calendar div {
+  text-align: center;
+  color: #2563eb;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: #fff;
+}
+.reservation-table th, .reservation-table td {
+  border: 1px solid #ddd;
+  padding: 2px 2px; /* 좌우 패딩을 2px로 줄임 */
+  text-align: center;
+  min-width: 45px; /* 최소 너비 줄임 */
+  line-height: 1.2; /* 줄 높이 줄임 */
+  height: 28px; /* 고정 높이 설정 */
+}
+.reservation-table td, 
+.reservation-table th {
+  padding: 2px 2px; /* 통일된 패딩 */
+  min-width: 30px; /* 최소 너비 더 줄임 */
+  height: 28px; /* 고정 높이 설정 */
+}
+.reservation-table th {
+  background: #e0e7ff;
+  color: #2563eb;
+  height: 30px; /* 헤더는 조금 더 높게 */
+}
+.reservation-table td {
+  min-width: 28px; /* 데이터 셀 너비 더 줄임 */
+  height: 26px; /* 데이터 셀은 더 낮게 */
+}
+.reservation-table-wrapper {    /* 세로 스크롤 생성 */
+  overflow-x: auto;       /* 가로 스크롤도 유지 */
+}
+
+/* 다락원 코트 칸을 가로로 늘리기 */
+.reservation-table th[data-court="다락원"],
+.reservation-table td[data-court="다락원"] {
+  min-width: 70px; /* 다락원 코트도 조금 줄임 */
+  width: 75px;
+}
+
+.reservation-link-btn {
+  display: inline-block;
+  background: #2563eb;
+  color: #fff;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+  margin-top: 16px;
+  letter-spacing: 1px;
+}
+.reservation-link-btn:hover {
+  background: #1d4ed8;
+}
+.home-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  letter-spacing: 1px;
+  z-index: 10;
+}
+
+.home-btn:hover {
+  background: #1e40af;
+}
+
+.refresh-btn {
+  display: inline-block;
+  background: #10b981;
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+  margin-top: 16px;
+}
+
+.refresh-btn:hover {
+  background: #059669;
+}
+
+.user-info {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 13pt;
+  letter-spacing: 2px;
+  background: #f1f5f9;
+  color: #2563eb;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+  z-index: 10;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  max-width: 520px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.modal-content p {
+  margin: 0 0 24px 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.form-fields {
+  margin-bottom: 28px;
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  background-color: #f9fafb;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.form-field input:hover {
+  border-color: #d1d5db;
+  background-color: white;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+}
+
+.cancel-btn, .save-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 100px;
+}
+
+.cancel-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.save-btn {
+  background-color: #2563eb;
+  color: white;
+  border: 2px solid #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.save-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.save-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cancel-btn:disabled, .save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* 로딩 상태 시각화 */
+.save-btn:disabled::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 600px) {
+  .modal-content {
+    padding: 24px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+  
+  .modal-content h3 {
+    font-size: 20px;
+  }
+  
+  .modal-buttons {
+    flex-direction: column;
+  }
+  
+  .cancel-btn, .save-btn {
+    width: 100%;
+  }
+}
+
+/* 스크롤바 스타일링 */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 입력 필드 아이콘 효과 */
+.form-field {
+  position: relative;
+}
+
+.form-field input[type="password"]::after {
+  content: '🔒';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+/* 모달 제목에 아이콘 추가 */
+.modal-content h3::before {
+  content: '🎾';
+  margin-right: 8px;
+}

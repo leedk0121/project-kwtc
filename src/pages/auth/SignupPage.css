@@ -1,0 +1,214 @@
+/* SignupPage 스타일 개선 */
+.register-info-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
+}
+
+.register-info-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/tennis-bg.jpg') center/cover;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+/* 회원가입 폼 카드 */
+.signup-form-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(165, 42, 42, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 제목 스타일 */
+.register-info-container h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.tennis_player {
+  color: #A52A2A;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(165, 42, 42, 0.2);
+  animation: playerChange 0.5s ease-in-out;
+}
+
+@keyframes playerChange {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 입력 필드 그룹 */
+.input-group {
+  margin-bottom: 24px;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-label::before {
+  content: '▶';
+  color: #A52A2A;
+  font-size: 12px;
+}
+
+/* 입력 필드 공통 스타일 */
+.register-info-container input,
+.register-info-container select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.register-info-container input:focus,
+.register-info-container select:focus {
+  outline: none;
+  border-color: #A52A2A;
+  box-shadow: 0 0 0 3px rgba(165, 42, 42, 0.1);
+  transform: translateY(-2px);
+}
+
+.register-info-container input:hover,
+.register-info-container select:hover {
+  border-color: #9ca3af;
+}
+
+/* 셀렉트 박스 특별 스타일 */
+.register-info-container select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  appearance: none;
+}
+
+/* 플레이스홀더 스타일 */
+.register-info-container input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* 회원가입 버튼 */
+.button-center {
+  margin-top: 32px;
+  text-align: center;
+}
+
+#register_button {
+  background: linear-gradient(135deg, #A52A2A 0%, #8B0000 100%);
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(165, 42, 42, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+#register_button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+#register_button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(165, 42, 42, 0.4);
+  background: linear-gradient(135deg, #8B0000 0%, #A0522D 50%, #8B4513 100%);
+}
+
+#register_button:hover::before {
+  left: 100%;
+}
+
+#register_button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(165, 42, 42, 0.3);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .register-info-container {
+    padding: 20px 16px;
+  }
+  
+  .signup-form-card {
+    padding: 24px 20px;
+  }
+  
+  .register-info-container h2 {
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  .register-info-container input,
+  .register-info-container select {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+  
+  #register_button {
+    padding: 14px 32px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-info-container {
+    padding: 16px 12px;
+  }
+  
+  .signup-form-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  
+  .register-info-container h2 {
+    font-size: 20px;
+  }
+}

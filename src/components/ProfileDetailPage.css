@@ -1,0 +1,579 @@
+/* Reset and Base Styles */
+.profile-detail-container {
+  min-height: auto;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  padding: 16px;
+  border-radius: 16px;
+  /* box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); */
+  overflow: hidden;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Loading & Error States */
+.profile-detail-loading,
+.profile-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  padding: 20px;
+  gap: 12px;
+  background: #ffffff; /* 변경 */
+  color: #000000; /* 변경 */
+}
+
+.profile-detail-loading p,
+.profile-detail-error p {
+  color: #000000; /* 변경 */
+  font-size: 14px;
+  margin: 0;
+}
+
+.profile-detail-error h2 {
+  color: #ffffff; /* 변경 */
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.profile-detail-error-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.profile-detail-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3); /* 변경 */
+  border-top: 3px solid #ffffff; /* 변경 */
+  border-radius: 50%;
+  animation: profile-detail-spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes profile-detail-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Header Section - 레이아웃 변경 */
+.profile-detail-header {
+  /* background: rgba(255, 255, 255, 0.95); 이 줄을 제거하거나 주석처리 */
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  /* padding: 20px 16px; */
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* 정사각형으로 만들기 위한 추가 스타일 */
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 448px; /* 480px - 32px(양쪽 패딩) */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Rank positioned at top left */
+.profile-detail-rank {
+  position: absolute;
+  top: -10px; /* 0 → -10px로 변경하여 위로 올림 */
+  left: 16px;
+  z-index: 10;
+}
+
+.profile-detail-rank-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 80px; /* 60px → 80px로 높이 증가 */
+  background: white;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 75%, 50% 100%, 0% 75%); /* 처음 책갈피 모양으로 복원 */
+}
+
+.profile-detail-rank-label {
+  font-size: 8px; /* 9px → 8px로 원래 크기로 복원 */
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  text-align: center;
+}
+
+.profile-detail-rank-value-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.profile-detail-rank-hash {
+  font-size: 16px; /* 18px → 16px로 원래 크기로 복원 */
+  color: #666;
+  margin-right: 1px;
+}
+
+.profile-detail-rank-value {
+  font-size: 24px; /* 28px → 24px로 원래 크기로 복원 */
+  color: #333;
+  font-weight: 700;
+}
+
+/* 메달 스타일 수정 */
+.profile-detail-rank-medal {
+  font-size: 28px; /* 32px → 28px로 원래 크기로 복원 */
+  display: inline-block;
+  animation: medalShine 2s ease-in-out infinite;
+}
+
+@keyframes medalShine {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg); 
+    /* filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2)); 제거 */
+  }
+  50% { 
+    transform: scale(1.05) rotate(3deg); 
+    /* filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.3)); 제거 */
+  }
+}
+
+/* Profile Image Section - 중앙 정렬 및 크기 증가 */
+.profile-detail-image-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-top: 20px; /* 랭킹과 겹치지 않도록 여백 추가 */
+}
+
+.profile-detail-image-wrapper {
+  width: 180px; /* 120px → 150px로 증가 */
+  height: 180px;
+  border-radius: 50%;
+  padding: 4px;
+
+  position: relative;
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-detail-image {
+  width: calc(100% - 8px); /* padding을 고려한 크기 조정 */
+  height: calc(100% - 8px);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ffffff;
+  display: block;
+}
+
+/* Tier Badge - RankingPage 색상 적용 */
+.profile-detail-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 티어별 배지 색상 - 플래티넘 원래대로 복원 */
+.profile-detail-tier-badge.tier-1 {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.profile-detail-tier-badge.tier-2 {
+  background: linear-gradient(135deg, #B9F2FF, #87CEEB);
+}
+
+.profile-detail-tier-badge.tier-3 {
+  background: linear-gradient(135deg, #00d4aa, #00b894); /* 플래티넘 원래 색상 복원 */
+}
+
+.profile-detail-tier-badge.tier-4 {
+  background: linear-gradient(135deg, #FFE135, #DAA520);
+}
+
+.profile-detail-tier-badge.tier-5 {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+}
+
+.profile-detail-tier-badge.tier-0 {
+  background: linear-gradient(135deg, #98FB98, #90EE90);
+}
+
+.profile-detail-tier-icon {
+  font-size: 14px;
+}
+
+/* Basic Info - 텍스트 색상 더욱 진하게 */
+.profile-detail-basic-info {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.profile-detail-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748 !important; /* 0f0f23 → 2d3748로 더 연하게 */
+  margin: 0 0 6px 0;
+}
+
+.profile-detail-major {
+  font-size: 15px;
+  color: #4a5568 !important; /* 1a1a35 → 4a5568로 더 연하게 */
+  margin: 0 0 2px 0;
+  font-weight: 600; /* 폰트 두께도 증가 */
+}
+
+.profile-detail-student-id {
+  font-size: 13px;
+  color: #718096 !important; /* 262654 → 718096로 더 연하게 */
+  margin: 0 0 12px 0;
+  font-weight: 600; /* 폰트 두께도 증가 */
+}
+
+/* Stats Section - 가로 정렬로 변경 */
+.profile-detail-stats {
+  margin-bottom: 0;
+}
+
+.profile-detail-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.profile-detail-stat-card {
+  background: rgba(255, 255, 255, 0.95); /* 반투명 흰색 */
+  border-radius: 10px;
+  padding: 12px 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-detail-stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-detail-stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.profile-detail-age-card .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #FEF7E0 0%, #F5C842 100%); /* 더 연한 노란색 */
+}
+
+.profile-detail-contact-card .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #E8F2FF 0%, #74A9F0 100%); /* 더 연한 파란색 */
+}
+
+/* 티어별 아이콘 색상 - 플래티넘 원래대로 복원 */
+.profile-detail-tier-card.tier-1 .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #FFF2CC, #FFE066);
+}
+
+.profile-detail-tier-card.tier-2 .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #F0F8FF, #CCE7FF);
+}
+
+.profile-detail-tier-card.tier-3 .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #f0fdfa, #E6E6FA); /* 플래티넘 원래 색상 복원 */
+}
+
+.profile-detail-tier-card.tier-4 .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #FFFACD, #FFF2AA);
+}
+
+.profile-detail-tier-card.tier-5 .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #F5F5F5, #E8E8E8);
+}
+
+.profile-detail-tier-card.tier-0 .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #F0FFF0, #D4F4D4);
+}
+
+.profile-detail-stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.profile-detail-stat-label {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0 0 2px 0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.profile-detail-stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e; /* 더 진한 색상으로 변경 */
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* 반응형 디자인에서 랭킹 원 크기 조정 */
+@media (max-width: 480px) {
+  .profile-detail-rank {
+    top: -8px;
+  }
+  
+  .profile-detail-rank-container {
+    width: 50px;
+    height: 65px; /* 50px → 65px로 높이 증가 */
+    clip-path: polygon(0% 0%, 100% 0%, 100% 75%, 50% 100%, 0% 75%); /* 처음 책갈피 모양으로 복원 */
+  }
+  
+  .profile-detail-rank-value {
+    font-size: 20px;
+  }
+  
+  .profile-detail-rank-medal {
+    font-size: 24px;
+  }
+  
+  .profile-detail-rank-hash {
+    font-size: 14px;
+  }
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .profile-detail-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+  
+  .profile-detail-header {
+    max-width: 368px; /* 400px - 32px(양쪽 패딩) */
+  }
+  
+  .profile-detail-image-wrapper {
+    width: 170px; /* 140px → 170px로 증가 */
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .profile-detail-image {
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+  }
+  
+  .profile-detail_name {
+    font-size: 26px;
+    color: #2d3748 !important; /* 0f0f23 → 2d3748로 더 연하게 */
+  }
+  
+  .profile-detail_major {
+    font-size: 16px;
+    color: #4a5568 !important; /* 1a1a35 → 4a5568로 더 연하게 */
+  }
+  
+  .profile-detail_student-id {
+    font-size: 14px;
+    color: #718096 !important; /* 262654 → 718096로 더 연하게 */
+  }
+  
+  .profile-detail-stats-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .profile-detail-stat-card {
+    padding: 14px 10px;
+  }
+  
+  .profile-detail-stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  
+  .profile-detail-stat-label {
+    font-size: 12px;
+  }
+  
+  .profile-detail-stat-value {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-detail-container {
+    max-width: 420px;
+  }
+  
+  .profile-detail-header {
+    max-width: 388px; /* 420px - 32px(양쪽 패딩) */
+  }
+  
+  .profile-detail-stats-grid {
+    gap: 12px;
+  }
+  
+  .profile-detail-stat-card {
+    padding: 16px 12px;
+  }
+}
+
+/* 작은 화면에서는 더 컴팩트하게 */
+@media (max-width: 480px) {
+  .profile-detail-header {
+    /* padding: 16px 12px; */
+    max-width: calc(100vw - 64px); /* 화면 너비에서 전체 패딩 제외 */
+  }
+  
+  .profile-detail-stats-grid {
+    gap: 6px;
+  }
+  
+  .profile-detail-stat-card {
+    padding: 10px 6px;
+  }
+  
+  .profile-detail-stat-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  
+  .profile-detail-stat-label {
+    font-size: 10px;
+  }
+  
+  .profile-detail-stat-value {
+    font-size: 13px;
+  }
+}
+
+/* Remove decorations and simplify */
+.profile-detail-decorations {
+  display: none;
+}
+
+.profile-detail-image-border {
+  display: none;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .profile-detail-container {
+    background: #ffffff; /* A42A2A 유지 */
+    color: #f1f5f9;
+  }
+  
+  .profile-detail-loading,
+  .profile-detail-error {
+    background: #ffffff; /* A42A2A 유지 */
+  }
+  
+  .profile-detail-header {
+    background: rgba(255, 255, 255, 0.1); /* 반투명 유지 */
+  }
+  
+  .profile-detail-name {
+    color: #ffffff; /* 다크모드에서는 흰색 */
+  }
+  
+  .profile-detail-major,
+  .profile-detail-student-id {
+    color: rgba(255, 255, 255, 0.8); /* 반투명 흰색 */
+  }
+  
+  .profile-detail-rank-container {
+    background: #8B2635; /* A42A2A의 어두운 변형 */
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .profile-detail-rank-value {
+    color: #ffffff;
+  }
+  
+  .profile-detail-stats {
+    background: #ffffff; /* A42A2A 유지 */
+  }
+  
+  .profile-detail-stat-card {
+    background: rgba(255, 255, 255, 0.1); /* 반투명 흰색 */
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .profile-detail-stat-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .profile-detail-stat-label {
+    color: #323B4C;
+  }
+  
+  .profile-detail-stat-value {
+    color: #323B4C;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .profile-detail-decoration-circle,
+  .profile-detail-image-border,
+  .profile-detail-tier-badge,
+  .profile-detail-tier-icon {
+    animation: none;
+  }
+  
+  .profile-detail-stat-card,
+  .profile-detail-image-wrapper {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .profile-detail-container {
+    border: 2px solid #000;
+  }
+  
+  .profile-detail-stat-card {
+    border: 2px solid #333;
+  }
+  
+  .profile-detail-tier-badge {
+    border: 3px solid #000;
+  }
+}
