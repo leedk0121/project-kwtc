@@ -49,6 +49,28 @@ function UnifiedreservationPage() {
     loadUserInfo();
   }, []);
 
+  // 페이지 로드 시 캐시 자동 로드
+  useEffect(() => {
+    const autoLoadCache = async () => {
+      // 사용자 정보가 로드될 때까지 대기
+      if (!tennisAccount.dobong_id || !tennisAccount.nowon_id) return;
+      
+      console.log('📦 페이지 로드 - 캐시 확인 중...');
+      const cached = await getCachedMonthData(year, month);
+      
+      if (cached) {
+        console.log('✅ 캐시에서 데이터 자동 로드');
+        setMonthData(cached.data);
+        setUsingCache(true);
+        setLastUpdated(cached.updatedAt);
+      } else {
+        console.log('캐시 없음 - 수동 로드 필요');
+      }
+    };
+
+    autoLoadCache();
+  }, [year, month, tennisAccount.dobong_id, tennisAccount.nowon_id]);
+
   const loadUserInfo = async () => {
     try {
       const userName = localStorage.getItem('user_name');
@@ -93,17 +115,7 @@ function UnifiedreservationPage() {
       const text = await data.text();
       const cached = JSON.parse(text);
       
-      // 1시간 이내 데이터만 유효
-      const now = Date.now();
-      const cacheAge = now - cached.updatedAt;
-      const maxAge = 60 * 60 * 1000; // 1시간
-      
-      if (cacheAge > maxAge) {
-        console.log('캐시 만료:', fileName, '경과 시간:', Math.floor(cacheAge / 60000), '분');
-        return null;
-      }
-      
-      console.log('✅ 캐시 사용:', fileName, '경과 시간:', Math.floor(cacheAge / 60000), '분');
+      console.log('✅ 캐시 사용:', fileName);
       return cached;
     } catch (error) {
       console.error('캐시 로드 오류:', error);
@@ -176,6 +188,15 @@ function UnifiedreservationPage() {
       
       if (!result.success) {
         console.error('도봉구 크롤링 실패:', result.error);
+        // 로그인 실패인지 체크
+        if (result.error && (
+          result.error.includes('로그인') || 
+          result.error.includes('인증') ||
+          result.error.includes('아이디') ||
+          result.error.includes('비밀번호')
+        )) {
+          throw new Error(`도봉구 로그인 실패: ${result.error}`);
+        }
         return [];
       }
 
@@ -197,9 +218,10 @@ function UnifiedreservationPage() {
           const endTime = `${match[3]}:${match[4]}`;
           
           // 해당 시간대 섹션 추출
-          const sectionStart = match.index! - 300;
-          const sectionEnd = match.index! + 300;
-          const section = htmlx.substring(Math.max(0, sectionStart), sectionEnd);
+          // 더 넓은 범위로 변경
+          const sectionStart = match.index! - 800;
+          const sectionEnd = match.index! + 800;
+          const section = htmlx.substring(Math.max(0, sectionStart), Math.min(htmlx.length, sectionEnd));
           
           // 예약 가능 여부 판단
           const hasCheckbox = section.includes('type="checkbox"') || section.includes("type='checkbox'");
@@ -221,7 +243,7 @@ function UnifiedreservationPage() {
       return reservations;
     } catch (error) {
       console.error('도봉구 크롤링 오류:', error);
-      return [];
+      throw error; // 에러를 상위로 전달
     }
   };
 
@@ -261,7 +283,7 @@ function UnifiedreservationPage() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Edge Function 오류 응답:', errorText);
-        return {};
+        throw new Error(`Edge Function 오류: ${response.status}`);
       }
 
       const result = await response.json();
@@ -271,11 +293,20 @@ function UnifiedreservationPage() {
         return result.data;
       } else {
         console.error('❌ 노원구 크롤링 실패:', result.error);
+        // 로그인 실패 체크
+        if (result.error && (
+          result.error.includes('로그인') || 
+          result.error.includes('인증') ||
+          result.error.includes('아이디') ||
+          result.error.includes('비밀번호')
+        )) {
+          throw new Error(`노원구 로그인 실패: ${result.error}`);
+        }
         return {};
       }
     } catch (error: any) {
       console.error('❌ 노원구 Edge Function 호출 오류:', error);
-      return {};
+      throw error; // 에러를 상위로 전달
     }
   };
 
@@ -298,88 +329,98 @@ function UnifiedreservationPage() {
     const lastDay = new Date(year, month + 1, 0);
     const totalDays = lastDay.getDate();
 
-    // forceRefresh가 false면 캐시 확인
-    if (!forceRefresh) {
-      console.log('📦 캐시 확인 중...');
-      const cached = await getCachedMonthData(year, month);
-      
-      if (cached) {
-        console.log('✅ 캐시에서 데이터 로드');
-        setMonthData(cached.data);
-        setUsingCache(true);
-        setLastUpdated(cached.updatedAt);
-        setLoading(false);
+    try {
+      // forceRefresh가 false면 캐시 확인
+      if (!forceRefresh) {
+        console.log('📦 캐시 확인 중...');
+        const cached = await getCachedMonthData(year, month);
         
-        alert(`${year}년 ${month + 1}월 데이터 로드 완료! (캐시 사용)`);
-        return;
+        if (cached) {
+          console.log('✅ 캐시에서 데이터 로드');
+          setMonthData(cached.data);
+          setUsingCache(true);
+          setLastUpdated(cached.updatedAt);
+          setLoading(false);
+          
+          alert(`${year}년 ${month + 1}월 데이터 로드 완료! (캐시 사용)`);
+          return;
+        }
+        
+        console.log('캐시 없음, 크롤링 시작');
+      } else {
+        console.log('🔄 강제 새로고침 - 캐시 무시');
       }
+
+      setCrawlProgress({ current: 0, total: totalDays });
+      const newMonthData: MonthData = {};
+
+      // === 1. 노원구 전체 크롤링 (불암산, 마들, 초안산) ===
+      console.log('📍 노원구 크롤링 시작 (불암산, 마들, 초안산)...');
+      const nowonDates: string[] = [];
+      for (let day = 1; day <= totalDays; day++) {
+        const currentDate = new Date(year, month, day);
+        const formattedDate = [
+          currentDate.getFullYear(),
+          String(currentDate.getMonth() + 1).padStart(2, "0"),
+          String(currentDate.getDate()).padStart(2, "0"),
+        ].join("-");
+        nowonDates.push(formattedDate);
+      }
+
+      const nowonByDate = await crawlNowon(nowonDates);
+      console.log(`✅ 노원구 크롤링 완료: ${Object.keys(nowonByDate).length}개 날짜`);
+
+      // === 2. 도봉구(다락원) 크롤링 (날짜별) ===
+      console.log('📍 도봉구(다락원) 크롤링 시작...');
+      for (let day = 1; day <= totalDays; day++) {
+        const currentDate = new Date(year, month, day);
+        const formattedDate = [
+          currentDate.getFullYear(),
+          String(currentDate.getMonth() + 1).padStart(2, "0"),
+          String(currentDate.getDate()).padStart(2, "0"),
+        ].join("-");
+
+        // 노원구 데이터 가져오기
+        const dayReservations: Reservation[] = nowonByDate[formattedDate] || [];
+
+        // 도봉구(다락원) 데이터 크롤링
+        const dobongData = await crawlDobong(formattedDate);
+        dayReservations.push(...dobongData);
+
+        newMonthData[formattedDate] = dayReservations;
+
+        // 진행상황 업데이트
+        setCrawlProgress({ current: day, total: totalDays });
+
+        // API 부하 방지 딜레이
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      console.log('✅ 도봉구(다락원) 크롤링 완료');
+
+      // === 3. Storage에 전체 데이터 저장 ===
+      console.log('💾 Storage에 데이터 저장 중...');
+      const saved = await saveMonthDataToStorage(year, month, newMonthData);
       
-      console.log('캐시 없음, 크롤링 시작');
-    } else {
-      console.log('🔄 강제 새로고침 - 캐시 무시');
+      if (saved) {
+        console.log('✅ Storage 저장 완료');
+        setUsingCache(false);
+        setLastUpdated(Date.now());
+      }
+
+      setMonthData(newMonthData);
+      setLoading(false);
+      setCrawlProgress({ current: 0, total: 0 });
+
+      alert(`${year}년 ${month + 1}월 데이터 크롤링 완료!${saved ? '\n(다음부터는 캐시 사용)' : ''}`);
+    } catch (error: any) {
+      setLoading(false);
+      setCrawlProgress({ current: 0, total: 0 });
+      
+      // 로그인 오류 메시지 표시
+      const errorMessage = error.message || '크롤링 중 오류가 발생했습니다.';
+      alert(`❌ ${errorMessage}\n\n계정 정보를 확인해주세요.`);
+      console.error('크롤링 오류:', error);
     }
-
-    setCrawlProgress({ current: 0, total: totalDays });
-    const newMonthData: MonthData = {};
-
-    // === 1. 노원구 전체 크롤링 (불암산, 마들, 초안산) ===
-    console.log('📍 노원구 크롤링 시작 (불암산, 마들, 초안산)...');
-    const nowonDates: string[] = [];
-    for (let day = 1; day <= totalDays; day++) {
-      const currentDate = new Date(year, month, day);
-      const formattedDate = [
-        currentDate.getFullYear(),
-        String(currentDate.getMonth() + 1).padStart(2, "0"),
-        String(currentDate.getDate()).padStart(2, "0"),
-      ].join("-");
-      nowonDates.push(formattedDate);
-    }
-
-    const nowonByDate = await crawlNowon(nowonDates);
-    console.log(`✅ 노원구 크롤링 완료: ${Object.keys(nowonByDate).length}개 날짜`);
-
-    // === 2. 도봉구(다락원) 크롤링 (날짜별) ===
-    console.log('📍 도봉구(다락원) 크롤링 시작...');
-    for (let day = 1; day <= totalDays; day++) {
-      const currentDate = new Date(year, month, day);
-      const formattedDate = [
-        currentDate.getFullYear(),
-        String(currentDate.getMonth() + 1).padStart(2, "0"),
-        String(currentDate.getDate()).padStart(2, "0"),
-      ].join("-");
-
-      // 노원구 데이터 가져오기
-      const dayReservations: Reservation[] = nowonByDate[formattedDate] || [];
-
-      // 도봉구(다락원) 데이터 크롤링
-      const dobongData = await crawlDobong(formattedDate);
-      dayReservations.push(...dobongData);
-
-      newMonthData[formattedDate] = dayReservations;
-
-      // 진행상황 업데이트
-      setCrawlProgress({ current: day, total: totalDays });
-
-      // API 부하 방지 딜레이
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    console.log('✅ 도봉구(다락원) 크롤링 완료');
-
-    // === 3. Storage에 전체 데이터 저장 ===
-    console.log('💾 Storage에 데이터 저장 중...');
-    const saved = await saveMonthDataToStorage(year, month, newMonthData);
-    
-    if (saved) {
-      console.log('✅ Storage 저장 완료');
-      setUsingCache(false);
-      setLastUpdated(Date.now());
-    }
-
-    setMonthData(newMonthData);
-    setLoading(false);
-    setCrawlProgress({ current: 0, total: 0 });
-
-    alert(`${year}년 ${month + 1}월 데이터 크롤링 완료!${saved ? '\n(다음부터는 캐시 사용)' : ''}`);
   };
 
   // ========== 캘린더 날짜 클릭 ==========
@@ -685,11 +726,24 @@ function UnifiedreservationPage() {
     return (
       <div className="reservation-list" style={{ marginTop: "16px" }}>
         <h3>예약 정보</h3>
-        <div style={{ overflowX: "auto" }}>
-          <table className="reservation-table">
+        <div style={{ 
+          overflowX: "auto",
+          position: "relative"
+        }}>
+          <table className="reservation-table" style={{
+            borderCollapse: "separate",
+            borderSpacing: 0
+          }}>
             <thead>
               <tr>
-                <th style={{ minWidth: "70px" }}>시간</th>
+                <th style={{ 
+                  minWidth: "70px",
+                  position: "sticky",
+                  left: 0,
+                  backgroundColor: "#fff",
+                  zIndex: 10,
+                  boxShadow: "2px 0 4px rgba(0,0,0,0.1)"
+                }}>시간</th>
                 {Object.entries(courtGroups).map(([court, nums]) =>
                   nums.map((court_num) => (
                     <th
@@ -711,7 +765,15 @@ function UnifiedreservationPage() {
             <tbody>
               {filteredTimes.map((time) => (
                 <tr key={time}>
-                  <td style={{ fontWeight: "bold", textAlign: "center" }}>
+                  <td style={{ 
+                    fontWeight: "bold", 
+                    textAlign: "center",
+                    position: "sticky",
+                    left: 0,
+                    backgroundColor: "#fff",
+                    zIndex: 9,
+                    boxShadow: "2px 0 4px rgba(0,0,0,0.1)"
+                  }}>
                     {time}
                   </td>
                   {Object.entries(courtGroups).flatMap(([court, nums]) =>
@@ -787,6 +849,13 @@ function UnifiedreservationPage() {
     );
   };
 
+  // ========== 1시간 경과 여부 체크 ==========
+  const isDataStale = () => {
+    if (!lastUpdated) return false;
+    const oneHour = 60 * 60 * 1000;
+    return Date.now() - lastUpdated > oneHour;
+  };
+
   return (
     <div className="unified-reservation-container">
       <button className="home-btn" onClick={() => navigate("/participate")}>
@@ -810,62 +879,44 @@ function UnifiedreservationPage() {
 
       {renderReservationTable()}
 
+      {/* 캐시 정보 표시 */}
+      {lastUpdated && (
+        <div style={{
+          textAlign: "center",
+          marginTop: "16px",
+          fontSize: "13px",
+          color: isDataStale() ? "#dc2626" : "#6b7280",
+          padding: "8px 16px",
+          backgroundColor: isDataStale() ? "#fee2e2" : "#f3f4f6",
+          borderRadius: "6px",
+          fontWeight: isDataStale() ? "bold" : "normal",
+        }}>
+          📅 마지막 새로고침: {new Date(lastUpdated).toLocaleString('ko-KR')}
+          {isDataStale() && (
+            <div style={{ marginTop: "4px", fontSize: "12px" }}>
+              ⚠️ 마지막 새로고침이 1시간 이상 전입니다. 새로고침이 필요합니다.
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 버튼 영역 */}
       <div
         style={{
           textAlign: "center",
-          marginTop: "32px",
+          marginTop: "16px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: "16px",
         }}
       >
-        {/* 캐시 정보 표시 */}
-        {lastUpdated && (
-          <div style={{
-            fontSize: "13px",
-            color: "#6b7280",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "8px 16px",
-            backgroundColor: usingCache ? "#dbeafe" : "#fef3c7",
-            borderRadius: "6px",
-            border: `1px solid ${usingCache ? "#93c5fd" : "#fcd34d"}`
-          }}>
-            <span>{usingCache ? "💾" : "🔄"}</span>
-            <span>
-              마지막 업데이트: {new Date(lastUpdated).toLocaleString('ko-KR')}
-              {usingCache && " (캐시 사용 중)"}
-            </span>
-          </div>
-        )}
-
         <div style={{
           display: "flex",
           flexDirection: "row",
           gap: "12px"
         }}>
-          {/* 일반 새로고침 (캐시 사용) */}
-          <button
-            onClick={() => crawlMonthData(false)}
-            className="refresh-btn"
-            disabled={loading}
-            style={{
-              opacity: loading ? 0.6 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "14px",
-              backgroundColor: "#3b82f6",
-              color: "white",
-            }}
-          >
-            {loading
-              ? `크롤링 중... (${crawlProgress.current}/${crawlProgress.total})`
-              : "📅 한 달 데이터 로드"}
-          </button>
-
-          {/* 강제 새로고침 (캐시 무시) */}
+          {/* 강제 새로고침 */}
           <button
             onClick={() => crawlMonthData(true)}
             className="refresh-btn"
@@ -874,11 +925,38 @@ function UnifiedreservationPage() {
               opacity: loading ? 0.6 : 1,
               cursor: loading ? "not-allowed" : "pointer",
               fontSize: "14px",
-              backgroundColor: "#ef4444",
+              backgroundColor: "#3b82f6",
               color: "white",
+              padding: "12px 24px",
             }}
           >
-            🔄 강제 새로고침
+            {loading
+              ? `크롤링 중... (${crawlProgress.current}/${crawlProgress.total})`
+              : "🔄 새로고침"}
+          </button>
+
+          {/* 예약하기 버튼 */}
+          <button
+            className="refresh-btn"
+            disabled={selectedReservations.length === 0}
+            style={{
+              opacity: selectedReservations.length === 0 ? 0.6 : 1,
+              cursor: selectedReservations.length === 0 ? "not-allowed" : "pointer",
+              fontSize: "14px",
+              backgroundColor: "#10b981",
+              color: "white",
+              padding: "12px 24px",
+            }}
+            onClick={() => {
+              if (selectedReservations.length === 0) {
+                alert('예약할 코트를 선택해주세요.');
+                return;
+              }
+              // TODO: 예약 처리 로직
+              alert(`${selectedReservations.length}개의 예약을 진행합니다.`);
+            }}
+          >
+            📝 예약하기 ({selectedReservations.length})
           </button>
         </div>
 
@@ -889,7 +967,7 @@ function UnifiedreservationPage() {
           </div>
         )}
 
-        {/* 캐시 설명 */}
+        {/* 설명 */}
         {!loading && (
           <div style={{
             fontSize: "11px",
@@ -897,7 +975,7 @@ function UnifiedreservationPage() {
             textAlign: "center",
             maxWidth: "400px"
           }}>
-            💡 Tip: 누군가 크롤링하면 1시간 동안 모든 사용자가 빠르게 데이터를 볼 수 있습니다
+            💡 Tip: 새로고침을 누르면 최신 예약 정보를 불러옵니다
           </div>
         )}
       </div>
