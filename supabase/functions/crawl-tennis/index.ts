@@ -1,13 +1,16 @@
 // supabase/functions/crawl-tennis/index.ts
-// 노원구 테니스장 전용 크롤러 (Edge Function)
-// 도봉구는 클라우드 IP 차단으로 브라우저에서 직접 크롤링
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+// Supabase 클라이언트 생성
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 // ===== 노원 크롤러 =====
 class NowonCrawler {
@@ -29,7 +32,6 @@ class NowonCrawler {
         body: formData.toString()
       })
 
-      // 쿠키 저장
       const setCookie = response.headers.get('set-cookie')
       if (setCookie) {
         this.cookies.push(setCookie)
@@ -44,7 +46,6 @@ class NowonCrawler {
 
   async crawlDate(pickDate: string, cate2: number): Promise<any[]> {
     try {
-      // 시간 정보 가져오기
       const timeFormData = new URLSearchParams()
       timeFormData.append('pickDate', pickDate)
       timeFormData.append('cate2', cate2.toString())
@@ -61,7 +62,6 @@ class NowonCrawler {
 
       const timeResult = await timeResponse.json()
 
-      // 예약 정보 가져오기
       const reservedFormData = new URLSearchParams()
       reservedFormData.append('kd', 'A')
       reservedFormData.append('useDayBegin', pickDate)
@@ -85,7 +85,6 @@ class NowonCrawler {
         console.log('예약 정보 조회 실패, 빈 배열 사용')
       }
 
-      // 예약된 시간 세트
       const reservedSet = new Set<string>()
       const reservedList = reserved.list || []
       
@@ -98,7 +97,6 @@ class NowonCrawler {
         reservedSet.add(`${r.cseq},${beginTime}`)
       }
 
-      // 코트 정보 설정
       let courts: string[], prefix: string, facilityName: string
       if (cate2 === 17) {
         courts = []
@@ -162,17 +160,88 @@ class NowonCrawler {
   }
 }
 
-// ===== 도봉 크롤러 제거 =====
-// 도봉구는 클라우드 서버 IP 차단으로 인해 브라우저에서 직접 크롤링합니다.
+// Storage에서 캐시 데이터 조회
+async function getCachedData(year: number, month: number) {
+  const fileName = `${year}-${String(month + 1).padStart(2, '0')}.json`
+  
+  try {
+    const { data, error } = await supabase.storage
+      .from('crawl-cache')
+      .download(fileName)
+    
+    if (error) {
+      console.log('캐시 파일 없음:', fileName)
+      return null
+    }
+    
+    const text = await data.text()
+    const cached = JSON.parse(text)
+    
+    // 1시간(3600000ms) 이내 데이터만 유효
+    const now = Date.now()
+    const cacheAge = now - cached.updatedAt
+    const maxAge = 60 * 60 * 1000 // 1시간
+    
+    if (cacheAge > maxAge) {
+      console.log('캐시 만료:', fileName)
+      return null
+    }
+    
+    console.log('캐시 사용:', fileName)
+    return cached
+  } catch (error) {
+    console.error('캐시 로드 오류:', error)
+    return null
+  }
+}
+
+// Storage에 크롤링 데이터 저장
+async function saveCachedData(year: number, month: number, data: any) {
+  const fileName = `${year}-${String(month + 1).padStart(2, '0')}.json`
+  
+  const cacheData = {
+    updatedAt: Date.now(),
+    year,
+    month: month + 1,
+    data
+  }
+  
+  try {
+    const jsonData = JSON.stringify(cacheData, null, 2)
+    const blob = new Blob([jsonData], { type: 'application/json' })
+    
+    // 기존 파일 삭제
+    await supabase.storage
+      .from('crawl-cache')
+      .remove([fileName])
+    
+    // 새 파일 업로드
+    const { error } = await supabase.storage
+      .from('crawl-cache')
+      .upload(fileName, blob, {
+        contentType: 'application/json',
+        upsert: true
+      })
+    
+    if (error) {
+      console.error('캐시 저장 오류:', error)
+      return false
+    }
+    
+    console.log('캐시 저장 완료:', fileName)
+    return true
+  } catch (error) {
+    console.error('캐시 저장 오류:', error)
+    return false
+  }
+}
 
 // ===== 메인 핸들러 =====
 serve(async (req) => {
-  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // POST 요청만 허용
   if (req.method !== 'POST') {
     return new Response(
       JSON.stringify({ error: 'Method not allowed. Use POST.' }),
@@ -181,23 +250,17 @@ serve(async (req) => {
   }
 
   try {
-    // 요청 body 확인
     const contentType = req.headers.get('content-type')
-    console.log('Request method:', req.method)
-    console.log('Content-Type:', contentType)
-
     if (!contentType || !contentType.includes('application/json')) {
       throw new Error('Content-Type must be application/json')
     }
 
     const body = await req.text()
-    console.log('Request body:', body)
-
     if (!body) {
       throw new Error('Request body is empty')
     }
 
-    const { nowon_id, nowon_pass, dates } = JSON.parse(body)
+    const { nowon_id, nowon_pass, dates, forceRefresh } = JSON.parse(body)
 
     if (!dates || dates.length === 0) {
       return new Response(
@@ -206,12 +269,32 @@ serve(async (req) => {
       )
     }
 
-    const allResults: any[] = []
+    // 첫 번째 날짜로 년월 확인
+    const firstDate = new Date(dates[0])
+    const year = firstDate.getFullYear()
+    const month = firstDate.getMonth()
 
+    // forceRefresh가 아니면 캐시 확인
+    if (!forceRefresh) {
+      const cached = await getCachedData(year, month)
+      if (cached) {
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            data: cached.data,
+            fromCache: true,
+            updatedAt: cached.updatedAt
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // 캐시가 없거나 forceRefresh면 크롤링 시작
     console.log('노원구 크롤링 시작 - 날짜:', dates)
-    console.log('노원 계정:', nowon_id ? '있음' : '없음')
 
-    // 노원 크롤링
+    const allResultsByDate: { [date: string]: any[] } = {}
+
     if (nowon_id && nowon_pass) {
       console.log('노원 크롤링 시작...')
       const nowonCrawler = new NowonCrawler()
@@ -225,18 +308,34 @@ serve(async (req) => {
             nowonCrawler.crawlDate(date, 16),
             nowonCrawler.crawlDate(date, 17)
           ])
-          allResults.push(...bul, ...ma, ...cho)
+          allResultsByDate[date] = [...bul, ...ma, ...cho]
         }
-        console.log(`노원 크롤링 완료: ${allResults.length}개 항목`)
+        console.log(`노원 크롤링 완료`)
       } else {
         console.error('노원 로그인 실패')
+        return new Response(
+          JSON.stringify({ success: false, error: '노원 로그인 실패' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
       }
     } else {
       console.log('노원 계정 정보 없음')
+      return new Response(
+        JSON.stringify({ success: false, error: '노원 계정 정보 필요' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
+    // Storage에 저장
+    await saveCachedData(year, month, allResultsByDate)
+
     return new Response(
-      JSON.stringify({ success: true, data: allResults }),
+      JSON.stringify({ 
+        success: true, 
+        data: allResultsByDate,
+        fromCache: false,
+        updatedAt: Date.now()
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error: any) {
