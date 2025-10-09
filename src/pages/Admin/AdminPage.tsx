@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { withAdminAuth } from '../../services/adminHOC';
 import './AdminPage.css';
 
 function AdminPage() {
@@ -8,19 +9,19 @@ function AdminPage() {
         {
             title: '📊 랭킹 관리',
             description: '팀 랭킹 정보를 수정하고 관리합니다',
-            path: '/ranking/edit',
+            path: '/admin/rank-edit',
             color: '#3b82f6'
         },
         {
             title: '📝 게시글 관리',
             description: '게시글을 수정하고 관리합니다',
-            path: '/post/edit',
+            path: '/admin/post-edit',
             color: '#10b981'
         },
         {
             title: '👥 리더 관리',
             description: '팀 리더 정보를 수정하고 관리합니다',
-            path: '/leader/edit',
+            path: '/admin/leader-edit',
             color: '#f59e0b'
         },
         {
@@ -68,4 +69,4 @@ function AdminPage() {
     );
 }
 
-export default AdminPage;
+export default withAdminAuth(AdminPage);
