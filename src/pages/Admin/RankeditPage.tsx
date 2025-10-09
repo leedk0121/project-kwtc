@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../auth/supabaseClient.tsx';
-import './RankeditPage.tsx';
+import './RankeditPage.css';
 
 function RankedEditPage() {
     const [listType, setListType] = useState<'ranked' | 'all'>('ranked');
@@ -29,7 +29,7 @@ function RankedEditPage() {
         setCheckedIds([]);
         setTierInputs({});
         setRankInputs({});
-        setLoading(false); // 즉시 false로 변경
+        setLoading(false);
     };
 
     const fetchAllUsers = async () => {
@@ -75,17 +75,25 @@ function RankedEditPage() {
         fetchAllUsers();
     };
 
-    const filteredUsers = users.filter(user => user.tier !== 0)
-        .sort((a, b) => {
-            // 티어 오름차순
+    const filteredUsers = users.filter(user => {
+        if (search) {
+            return user.name?.toLowerCase().includes(search.toLowerCase());
+        }
+        if (listType === 'ranked') {
+            return Number(user.rank_tier ?? 0) !== 0;
+        }
+        return true;
+    }).sort((a, b) => {
+        if (listType === 'ranked') {
             const tierA = Number(a.rank_tier ?? 0);
             const tierB = Number(b.rank_tier ?? 0);
             if (tierA !== tierB) return tierA - tierB;
-            // 티어가 같으면 랭킹 오름차순
             const rankA = Number(a.rank_detail ?? 0);
             const rankB = Number(b.rank_detail ?? 0);
             return rankA - rankB;
-        });
+        }
+        return 0;
+    });
 
     const handleCheck = (id: string) => {
         setCheckedIds(prev =>
@@ -101,10 +109,8 @@ function RankedEditPage() {
         setRankInputs(prev => ({ ...prev, [id]: value }));
     };
 
-    // 추가 버튼 클릭 시 체크된 유저를 랭킹 유저에 추가
     const handleAddUsers = async () => {
         let msg = '';
-        // 랭킹 유저 추가
         if (checkedIds.length > 0) {
             const { data: rankedData, error: rankedError } = await supabase
                 .from('ranked_user')
@@ -134,9 +140,10 @@ function RankedEditPage() {
         setListType('ranked');
     };
 
-    // 삭제 버튼 클릭 시 체크된 유저를 ranked_user에서 삭제
     const handleDeleteRanked = async () => {
-        if (checkedIds.length === 0) return;
+        if (checkedIds.length === 0) return alert('삭제할 유저를 선택하세요.');
+        if (!window.confirm(`선택한 ${checkedIds.length}명을 랭킹에서 삭제하시겠습니까?`)) return;
+        
         const { error } = await supabase
             .from('ranked_user')
             .delete()
@@ -150,7 +157,6 @@ function RankedEditPage() {
         }
     };
 
-    // 랭킹 유저 티어/랭킹 수정 함수: 체크박스와 상관없이 전체 수정
     const handleUpdateRanked = async () => {
         if (filteredUsers.length === 0) return;
         const selectedUsers = filteredUsers.map(user => ({
@@ -167,14 +173,11 @@ function RankedEditPage() {
             alert('랭킹이 수정되었습니다.');
             setCheckedIds([]);
             fetchRankedUsers();
-            // 수정 후 전체 랭킹 자동 저장
             await handleSaveAllRank();
         }
     };
 
-    // 전체 랭킹 저장 함수는 버튼 없이 그대로 사용
     const handleSaveAllRank = async () => {
-        // 티어가 0인 경우 rank_tier를 99로 미리 설정
         const preprocessed = users.map(user => {
             if (Number(user.rank_tier ?? 0) === 0) {
                 return { ...user, rank_tier: 99 };
@@ -185,15 +188,15 @@ function RankedEditPage() {
             .sort((a, b) => {
                 const tierA = Number(a.rank_tier ?? 0);
                 const tierB = Number(b.rank_tier ?? 0);
-                if (tierA !== tierB) return tierA - tierB; // 티어 낮은 순
+                if (tierA !== tierB) return tierA - tierB;
                 const rankA = Number(a.rank_detail ?? 0);
                 const rankB = Number(b.rank_detail ?? 0);
-                return rankA - rankB; // 티어 내 랭킹 낮은 순
+                return rankA - rankB;
             });
 
         const rankAll = sorted.map((user, idx) => ({
             id: user.id,
-            rank_all: idx + 1 // 티어가 99인 경우에도 순서대로 랭킹 부여
+            rank_all: idx + 1
         }));
 
         const { error } = await supabase
@@ -206,16 +209,13 @@ function RankedEditPage() {
         }
     };
 
-    // 랭킹 멤버 정보 새로고침
     const handleRefreshRankedProfiles = async () => {
         setLoading(true);
-        // 1. 현재 랭킹유저 id 목록
         const rankedIds = users.map(u => u.id);
         if (rankedIds.length === 0) {
             setLoading(false);
             return;
         }
-        // 2. profile 테이블에서 최신 정보 가져오기
         const { data: profileData, error } = await supabase
             .from('profile')
             .select('id, name, major, stnum, image_url')
@@ -225,7 +225,6 @@ function RankedEditPage() {
             setLoading(false);
             return;
         }
-        // 3. 기존 티어/랭킹 유지하며 병합
         const updatedUsers = users.map(user => {
             const profile = profileData.find((p: any) => p.id === user.id);
             return {
@@ -236,7 +235,6 @@ function RankedEditPage() {
                 image_url: profile?.image_url ?? user.image_url,
             };
         });
-        // 4. ranked_user 테이블에 업데이트
         const { error: upsertError } = await supabase
             .from('ranked_user')
             .upsert(updatedUsers, { onConflict: ['id'] });
@@ -250,113 +248,149 @@ function RankedEditPage() {
     };
 
     return (
-        <div className='Rankedit-ctn'>
-            <div className="Rankedit-title">
-                <h2>랭킹 수정</h2>
+        <div className='rank-edit-rankedit-container'>
+            <div className="rank-edit-rankedit-header">
+                <h1 className="rank-edit-rankedit-title">📊 랭킹 관리</h1>
+                <p className="rank-edit-rankedit-subtitle">총 {filteredUsers.length}명</p>
             </div>
-            <p>*데이터 없음이라고 뜰 경우 전체 유저보기를 눌렀다가 다시 랭킹유저 보기를 눌러주세요</p>
-            <div className="rankedit-btn-row">
-                <button onClick={handleShowRanked}>랭킹 유저</button>
-                <button onClick={handleShowAll}>전체 유저</button>
-                <button onClick={handleRefreshRankedProfiles}>새로고침</button>
+
+            <div className="rank-edit-rankedit-notice">
+                💡 데이터가 표시되지 않으면 '전체 유저'를 클릭 후 다시 '랭킹 유저'를 클릭해주세요.
             </div>
-            {/* 검색 및 액션 버튼은 랭킹/전체 유저 보기에서만 */}
-            {(listType === 'all' || listType === 'ranked') && (
-                <div className="rankedit-search-row">
+
+            <div className="rank-edit-rankedit-controls">
+                <div className="rank-edit-view-buttons">
+                    <button 
+                        onClick={handleShowRanked}
+                        className={`rank-edit-view-btn ${listType === 'ranked' ? 'active' : ''}`}
+                    >
+                        🏆 랭킹 유저
+                    </button>
+                    <button 
+                        onClick={handleShowAll}
+                        className={`rank-edit-view-btn ${listType === 'all' ? 'active' : ''}`}
+                    >
+                        👥 전체 유저
+                    </button>
+                    <button 
+                        onClick={handleRefreshRankedProfiles}
+                        className="rank-edit-refresh-btn"
+                    >
+                        🔄 새로고침
+                    </button>
+                </div>
+
+                <div className="rank-edit-action-row">
                     <input
                         type="text"
-                        placeholder="유저 이름 검색"
+                        placeholder="유저 이름 검색..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
+                        className="rank-edit-search-input"
                     />
                     {listType === 'all' && (
-                        <button onClick={handleAddUsers}>추가</button>
+                        <button onClick={handleAddUsers} className="rank-edit-action-btn rank-edit-add-btn">
+                            ➕ 추가 ({checkedIds.length})
+                        </button>
                     )}
                     {listType === 'ranked' && (
                         <>
-                            <button onClick={handleUpdateRanked}>저장</button>
-                            <button onClick={handleDeleteRanked}>삭제</button>
+                            <button onClick={handleUpdateRanked} className="rank-edit-action-btn rank-edit-save-btn">
+                                💾 저장
+                            </button>
+                            <button 
+                                onClick={handleDeleteRanked} 
+                                className="rank-edit-action-btn rank-edit-delete-btn"
+                                disabled={checkedIds.length === 0}
+                            >
+                                🗑️ 삭제 ({checkedIds.length})
+                            </button>
                         </>
                     )}
                 </div>
-            )}
+            </div>
+
             {loading ? (
-                <div className="loading-text">로딩중...</div>
+                <div className="rank-edit-loading-message">랭킹 정보를 불러오는 중...</div>
             ) : (
-                // 랭킹/전체 유저 보기일 때만 헤더와 리스트 렌더링
                 <>
                     {filteredUsers.length > 0 && (
-                        <div className={`member-edit-header ${listType}`}>
-                            <span className="profile-info">프로필 정보</span>
+                        <div className={`rank-edit-list-header ${listType}`}>
+                            <span className="rank-edit-header-profile">프로필 정보</span>
                             {listType === 'all' && (
-                                <span className="ranked-checkbox">랭킹 유저</span>
+                                <span className="rank-edit-header-check">추가</span>
                             )}
                             {listType === 'ranked' && (
                                 <>
-                                    <span className="tier-input">티어</span>
-                                    <span className="rank-input">랭킹</span>
-                                    <span className="select-checkbox">선택</span>
+                                    <span className="rank-edit-header-tier-rank"></span>
+                                    <span className="rank-edit-header-check">선택</span>
                                 </>
                             )}
                         </div>
                     )}
-                    <ul className="member-edit-list">
+                    <ul className="rank-edit-user-list">
                         {filteredUsers.length === 0 ? (
-                            <li className="no-data">데이터가 없습니다.</li>
+                            <li className="rank-edit-empty-state">데이터가 없습니다.</li>
                         ) : (
-                            filteredUsers.map(user => (
-                                <li key={user.id} className="member-edit-item">
-                                    <span className="profile-info">
-                                        <img
-                                            src={user.image_url
-                                                ? user.image_url
-                                                : "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"
-                                            }
-                                            alt="프로필"
-                                            className="profile-img"
-                                        />
-                                        <span>
-                                            <div className="user-name">{user.name}</div>
-                                            <div className="user-major">{user.major} ({user.stnum})</div>
-                                        </span>
-                                    </span>
-                                    {listType === 'all' && (
-                                        <span id={`ranked-checkbox-${user.id}`} className="ranked-checkbox">
-                                            <input
-                                                type="checkbox"
-                                                checked={checkedIds.includes(user.id)}
-                                                onChange={() => handleCheck(user.id)}
-                                                title="랭킹 유저에 추가"
-                                            />
-                                        </span>
+                            filteredUsers.map((user, index) => (
+                                <li key={user.id} className={`rank-edit-user-item ${checkedIds.includes(user.id) ? 'selected' : ''}`}>
+                                    {listType === 'ranked' && (
+                                        <div className="rank-edit-rank-number">{index + 1}</div>
                                     )}
+                                    <div className="rank-edit-user-profile">
+                                        <img
+                                            src={user.image_url || "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"}
+                                            alt="프로필"
+                                            className="rank-edit-profile-image"
+                                        />
+                                        <div className="rank-edit-user-profile-info">
+                                            <div className="rank-edit-user-name">{user.name}</div>
+                                            <div className="rank-edit-user-details">{user.major} ({user.stnum})</div>
+                                        </div>
+                                    </div>
                                     {listType === 'ranked' && (
                                         <>
-                                            <span id={`tier-input-${user.id}`} className="tier-input">
-                                                <input
-                                                    type="text"
-                                                    placeholder="티어"
-                                                    value={tierInputs[user.id] ?? user.rank_tier ?? ''}
-                                                    onChange={e => handleTierChange(user.id, e.target.value)}
-                                                />
-                                            </span>
-                                            <span id={`rank-input-${user.id}`} className="rank-input">
-                                                <input
-                                                    type="text"
-                                                    placeholder="랭킹"
-                                                    value={rankInputs[user.id] ?? user.rank_detail ?? ''}
-                                                    onChange={e => handleRankChange(user.id, e.target.value)}
-                                                />
-                                            </span>
-                                            <span id={`select-checkbox-${user.id}`} className="select-checkbox">
+                                            <div className="rank-edit-user-tier-rank">
+                                                <div className="rank-edit-user-tier">
+                                                    <label>티어:</label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="티어"
+                                                        value={tierInputs[user.id] ?? user.rank_tier ?? ''}
+                                                        onChange={e => handleTierChange(user.id, e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="rank-edit-user-rank">
+                                                    <label>티어 내 랭킹:</label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="랭킹"
+                                                        value={rankInputs[user.id] ?? user.rank_detail ?? ''}
+                                                        onChange={e => handleRankChange(user.id, e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="rank-edit-user-check-top">
                                                 <input
                                                     type="checkbox"
                                                     checked={checkedIds.includes(user.id)}
                                                     onChange={() => handleCheck(user.id)}
-                                                    title="랭킹 유저 선택"
+                                                    id={`check-${user.id}`}
                                                 />
-                                            </span>
+                                                <label htmlFor={`check-${user.id}`}></label>
+                                            </div>
                                         </>
+                                    )}
+                                    {listType === 'all' && (
+                                        <div className="rank-edit-user-check">
+                                            <input
+                                                type="checkbox"
+                                                checked={checkedIds.includes(user.id)}
+                                                onChange={() => handleCheck(user.id)}
+                                                id={`check-${user.id}`}
+                                            />
+                                            <label htmlFor={`check-${user.id}`}></label>
+                                        </div>
                                     )}
                                 </li>
                             ))

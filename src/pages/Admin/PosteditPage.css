@@ -79,3 +79,333 @@
 .postedit-checkbox {
 	margin-right: 10px;
 }
+
+.postedit-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.postedit-header {
+  text-align: center;
+  margin-bottom: 40px;
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #A52A2A;
+}
+
+.postedit-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+}
+
+.postedit-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+/* 컨트롤 영역 */
+.postedit-controls {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.search-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #A52A2A;
+  box-shadow: 0 0 0 3px rgba(165, 42, 42, 0.1);
+}
+
+.search-btn {
+  background: #A52A2A;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.search-btn:hover {
+  background: #8B2323;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(165, 42, 42, 0.3);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.select-all-btn,
+.delete-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-all-btn {
+  background: #f3f4f6;
+  color: #4a5568;
+  border: 2px solid #e5e7eb;
+}
+
+.select-all-btn:hover {
+  background: #e5e7eb;
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 2px solid #fecaca;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 게시글 리스트 */
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.post-card.selected {
+  background: #fef5f5;
+  border-color: #A52A2A;
+  box-shadow: 0 4px 12px rgba(165, 42, 42, 0.15);
+}
+
+/* 체크박스 커스텀 */
+.post-checkbox {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.post-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.post-checkbox label {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.post-checkbox label::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.post-checkbox input[type="checkbox"]:checked + label {
+  background: #A52A2A;
+  border-color: #A52A2A;
+}
+
+.post-checkbox input[type="checkbox"]:checked + label::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.post-checkbox label:hover {
+  border-color: #A52A2A;
+}
+
+/* 게시글 콘텐츠 */
+.post-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.post-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-type-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.post-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  font-size: 14px;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.empty-state {
+  background: white;
+  padding: 80px 20px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state p {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .postedit-container {
+    padding: 20px 10px;
+  }
+
+  .postedit-header {
+    padding: 20px;
+  }
+
+  .postedit-title {
+    font-size: 24px;
+  }
+
+  .postedit-subtitle {
+    font-size: 14px;
+  }
+
+  .postedit-controls {
+    padding: 16px;
+  }
+
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .select-all-btn,
+  .delete-btn {
+    width: 100%;
+  }
+
+  .post-card {
+    padding: 16px;
+  }
+
+  .post-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .post-title {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .post-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

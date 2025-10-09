@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient.tsx';
 import type { User } from '@supabase/supabase-js';
-// import { User } from './types.tsx';
 import { useNavigate } from 'react-router-dom';
 import "./Auth.css";
 
@@ -12,35 +11,109 @@ function Auth() {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
-  // 로그인
+  // 로그인 (Edge Function 사용)
   const signIn = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert(error.message);
-    else {
-      // 프로필에서 이름과 학과 가져오기
-      const { user } = data;
-      const { data: profileData, error: profileError } = await supabase
-        .from('profile') // 실제 테이블명에 맞게 수정
-        .select('name, major, stnum, image_url') // name과 major 필드 선택
-        .eq('id', user.id)
-        .single();
+    try {
+      // Edge Function 호출
+      const { data, error } = await supabase.functions.invoke('check-approved-login', {
+        body: {
+          email: email,
+          password: password
+        }
+      });
 
-      if (!profileError && profileData) {
-        // 로컬 스토리지에 사용자 정보 저장
-        localStorage.setItem('user_id', user.id);
-        localStorage.setItem('user_name', profileData.name || '');
-        localStorage.setItem('user_major', profileData.major || '');
-        localStorage.setItem('user_stnum', profileData.stnum || 0);
-        localStorage.setItem('user_image_url', profileData.image_url || '');
-
-        alert(`${profileData.name}님 환영합니다.`);
-      } else {
-        // 프로필 정보가 없는 경우에도 user_id는 저장
-        localStorage.setItem('user_id', user.id);
-        alert('로그인 성공');
+      // Edge Function에서 에러 응답 (401, 403, 404, 500 등)
+      if (error) {
+        // error.context가 Response 객체인 경우 body 파싱
+        if (error.context && error.context instanceof Response) {
+          try {
+            const errorBody = await error.context.json();
+            
+            // approved가 false인 경우
+            if (errorBody.approved === false) {
+              alert(errorBody.message || '관리자에게 승인을 요청하세요.');
+              return;
+            }
+            
+            // 기타 에러 메시지
+            alert(errorBody.message || '로그인에 실패했습니다.');
+            return;
+          } catch (parseError) {
+            // 파싱 실패 시 아무것도 하지 않음
+          }
+        }
+        
+        // Response 객체가 아니거나 파싱 실패한 경우
+        alert('로그인 중 오류가 발생했습니다.');
+        return;
       }
-      setUser(user);
-      window.location.replace('/');
+
+      // data가 없는 경우
+      if (!data) {
+        alert('서버 응답이 없습니다.');
+        return;
+      }
+
+      // 승인되지 않은 사용자 (approved: false)
+      if (data.approved === false) {
+        alert(data.message || '관리자에게 승인을 요청하세요.');
+        return;
+      }
+
+      // 로그인 실패 (이메일/비밀번호 오류 등)
+      if (data.success === false) {
+        alert(data.message || '로그인에 실패했습니다.');
+        return;
+      }
+
+      // 로그인 성공 - approved가 true인 경우
+      if (data.success === true && data.approved === true) {
+        const { user, session } = data;
+        
+        // 🔑 중요: 세션 설정
+        if (session) {
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token
+          });
+          
+          if (sessionError) {
+            alert('세션 설정에 실패했습니다.');
+            return;
+          }
+        }
+        
+        // 이제 세션이 설정되었으므로 profile 조회 가능
+        const { data: profileData, error: profileError } = await supabase
+          .from('profile')
+          .select('name, major, stnum, image_url')
+          .eq('id', user.id)
+          .single();
+
+        if (!profileError && profileData) {
+          // 로컬 스토리지에 사용자 정보 저장
+          localStorage.setItem('user_id', user.id);
+          localStorage.setItem('user_name', profileData.name || '');
+          localStorage.setItem('user_major', profileData.major || '');
+          localStorage.setItem('user_stnum', profileData.stnum || 0);
+          localStorage.setItem('user_image_url', profileData.image_url || '');
+
+          alert(`${profileData.name}님 환영합니다.`);
+        } else {
+          // 프로필 정보가 없는 경우에도 user_id는 저장
+          localStorage.setItem('user_id', user.id);
+          alert('로그인 성공');
+        }
+        
+        setUser(user);
+        window.location.replace('/');
+      } else {
+        // 예상치 못한 응답 구조
+        alert('예상치 못한 응답입니다.');
+      }
+
+    } catch (err) {
+      alert('예상치 못한 오류가 발생했습니다.');
     }
   };
 

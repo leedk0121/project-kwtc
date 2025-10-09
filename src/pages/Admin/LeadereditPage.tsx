@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from "../auth/supabaseClient.tsx";
-import './LeadereditPage.tsx';
+import './LeadereditPage.css';
 
 interface Profile {
   id: string;
@@ -165,18 +165,18 @@ const LeadereditPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container">
-        <div className="loading-message">데이터를 불러오는 중...</div>
+      <div className="leader-edit-container">
+        <div className="leader-edit-loading-message">데이터를 불러오는 중...</div>
       </div>
     );
   }
 
   return (
-    <div className="container">
-      <div className="header">
-        <h1 className="title">리더 편집 페이지</h1>
+    <div className="leader-edit-container">
+      <div className="leader-edit-header">
+        <h1 className="leader-edit-title">리더 편집 페이지</h1>
         <button 
-          className="add-role-button"
+          className="leader-edit-add-role-button"
           onClick={() => setShowAddRoleForm(true)}
           disabled={availableProfiles.length === 0}
         >
@@ -185,19 +185,19 @@ const LeadereditPage: React.FC = () => {
       </div>
 
       {availableProfiles.length === 0 && !showAddRoleForm && (
-        <div className="notice">
+        <div className="leader-edit-notice">
           모든 멤버에게 역할이 배정되었습니다.
         </div>
       )}
 
       {showAddRoleForm && (
-        <div className="add-role-form">
-          <h3 className="form-title">새 역할 추가</h3>
+        <div className="leader-edit-add-role-form">
+          <h3 className="leader-edit-form-title">새 역할 추가</h3>
           
-          <div className="form-group">
-            <label className="label">역할 이름</label>
+          <div className="leader-edit-form-group">
+            <label className="leader-edit-label">역할 이름</label>
             <input
-              className="input"
+              className="leader-edit-input"
               type="text"
               value={newRole.position}
               onChange={(e) => setNewRole({ ...newRole, position: e.target.value })}
@@ -205,10 +205,10 @@ const LeadereditPage: React.FC = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label className="label">역할 설명</label>
+          <div className="leader-edit-form-group">
+            <label className="leader-edit-label">역할 설명</label>
             <textarea
-              className="textarea"
+              className="leader-edit-textarea"
               value={newRole.position_description}
               onChange={(e) => setNewRole({ ...newRole, position_description: e.target.value })}
               placeholder="역할에 대한 설명을 입력하세요"
@@ -216,31 +216,30 @@ const LeadereditPage: React.FC = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label className="label">표시 순서</label>
+          <div className="leader-edit-form-group">
+            <label className="leader-edit-label">표시 순서</label>
             <input
-              className="input"
+              className="leader-edit-input"
               type="number"
               value={newRole.order_num}
               onChange={(e) => setNewRole({ ...newRole, order_num: parseInt(e.target.value) || 1 })}
               placeholder="표시 순서 (숫자가 낮을수록 위에 표시)"
               min="1"
             />
-            <small className="input-help">숫자가 낮을수록 임원진 목록에서 위쪽에 표시됩니다.</small>
+            <small className="leader-edit-input-help">숫자가 낮을수록 임원진 목록에서 위쪽에 표시됩니다.</small>
           </div>
 
-          <div className="form-group">
-            <label className="label">담당 멤버</label>
+          <div className="leader-edit-form-group">
+            <label className="leader-edit-label">담당 멤버</label>
             
-            {/* 선택된 멤버 표시 */}
             {selectedMember ? (
-              <div className="selected-member">
-                <div className="selected-member-info">
-                  <span className="selected-member-name">{selectedMember.name}</span>
-                  <span className="selected-member-details">({selectedMember.major} - {selectedMember.stnum})</span>
+              <div className="leader-edit-selected-member">
+                <div className="leader-edit-selected-member-info">
+                  <span className="leader-edit-selected-member-name">{selectedMember.name}</span>
+                  <span className="leader-edit-selected-member-details">({selectedMember.major} - {selectedMember.stnum})</span>
                 </div>
                 <button 
-                  className="remove-selected-button"
+                  className="leader-edit-remove-selected-button"
                   onClick={handleRemoveSelectedMember}
                   type="button"
                 >
@@ -249,9 +248,9 @@ const LeadereditPage: React.FC = () => {
               </div>
             ) : (
               <>
-                <div className="member-search-container">
+                <div className="leader-edit-member-search-container">
                   <input
-                    className="search-input"
+                    className="leader-edit-search-input"
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -259,7 +258,7 @@ const LeadereditPage: React.FC = () => {
                   />
                   {searchTerm && (
                     <button 
-                      className="clear-search-button"
+                      className="leader-edit-clear-search-button"
                       onClick={handleClearSearch}
                       type="button"
                     >
@@ -268,25 +267,24 @@ const LeadereditPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* 검색 결과 멤버 목록 */}
                 {searchTerm && (
-                  <div className="member-search-results">
+                  <div className="leader-edit-member-search-results">
                     {filteredAvailableProfiles.length === 0 ? (
-                      <div className="no-results">검색 결과가 없습니다.</div>
+                      <div className="leader-edit-no-results">검색 결과가 없습니다.</div>
                     ) : (
-                      <div className="member-options">
+                      <div className="leader-edit-member-options">
                         {filteredAvailableProfiles.slice(0, 5).map(profile => (
                           <div 
                             key={profile.id} 
-                            className="member-option"
+                            className="leader-edit-member-option"
                             onClick={() => handleSelectMemberForRole(profile)}
                           >
-                            <span className="member-option-name">{profile.name}</span>
-                            <span className="member-option-details">({profile.major} - {profile.stnum})</span>
+                            <span className="leader-edit-member-option-name">{profile.name}</span>
+                            <span className="leader-edit-member-option-details">({profile.major} - {profile.stnum})</span>
                           </div>
                         ))}
                         {filteredAvailableProfiles.length > 5 && (
-                          <div className="more-options">
+                          <div className="leader-edit-more-options">
                             {filteredAvailableProfiles.length - 5}명 더 있음
                           </div>
                         )}
@@ -298,39 +296,39 @@ const LeadereditPage: React.FC = () => {
             )}
           </div>
 
-          <div className="form-actions">
-            <button className="cancel-button" onClick={handleCancelAddRole}>취소</button>
-            <button className="save-button" onClick={handleAddRole}>저장</button>
+          <div className="leader-edit-form-actions">
+            <button className="leader-edit-cancel-button" onClick={handleCancelAddRole}>취소</button>
+            <button className="leader-edit-save-button" onClick={handleAddRole}>저장</button>
           </div>
         </div>
       )}
 
-      <div className="roles-list">
-        <h3 className="section-title">현재 역할</h3>
+      <div className="leader-edit-roles-list">
+        <h3 className="leader-edit-section-title">현재 역할</h3>
         {leaderProfiles.length === 0 ? (
-          <div className="empty-state">
+          <div className="leader-edit-empty-state">
             추가된 역할이 없습니다. 새 역할을 추가해보세요.
           </div>
         ) : (
           leaderProfiles.map(role => {
             const profile = getProfileByUserId(role.user_id);
             return (
-              <div key={role.user_id} className="role-card">
-                <div className="role-header">
-                  <div className="role-info">
-                    <h4 className="role-name">{role.position}</h4>
-                    <span className="role-order">순서: {role.order_num}</span>
+              <div key={role.user_id} className="leader-edit-role-card">
+                <div className="leader-edit-role-header">
+                  <div className="leader-edit-role-info">
+                    <h4 className="leader-edit-role-name">{role.position}</h4>
+                    <span className="leader-edit-role-order">순서: {role.order_num}</span>
                   </div>
                   <button 
-                    className="remove-button"
+                    className="leader-edit-remove-button"
                     onClick={() => handleRemoveRole(role.user_id)}
                   >
                     ✕
                   </button>
                 </div>
-                <p className="role-description">{role.position_description}</p>
+                <p className="leader-edit-role-description">{role.position_description}</p>
                 {profile && (
-                  <div className="assigned-member">
+                  <div className="leader-edit-assigned-member">
                     담당자: {profile.name} ({profile.major} - {profile.stnum})
                   </div>
                 )}

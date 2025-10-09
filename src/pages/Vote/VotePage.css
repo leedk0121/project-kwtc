@@ -272,11 +272,11 @@
 }
 
 .selected-date-title {
-  font-size: 28px;
+  font-size: 22px; /* 28px에서 22px로 축소 */
   font-weight: 700;
-  margin-bottom: 0; /* 기존 margin-bottom 제거 */
+  margin-bottom: 0;
   color: #1e293b;
-  flex: 1; /* 남은 공간 차지 */
+  flex: 1;
 }
 
 .selected-date-title-row {
@@ -590,7 +590,7 @@
   }
   
   .selected-date-title {
-    font-size: 22px; /* 모바일에서 제목 크기 조정 */
+    font-size: 18px; /* 22px에서 18px로 축소 */
     flex: 1;
   }
   

@@ -1,235 +1,525 @@
-.Rankedit-ctn{
-    font-family: 'Pretendard', sans-serif;
+.rank-edit-rankedit-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: #f8f9fa;
 }
 
-.Rankedit-ctn {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 24px 12px;
+.rank-edit-rankedit-header {
+  text-align: center;
+  margin-bottom: 24px;
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #A52A2A;
 }
 
-.Rankedit-title {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    height: 60px;
+.rank-edit-rankedit-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2d3748;
+  margin: 0 0 8px 0;
 }
 
-.rankedit-delete-container {
-    display: flex;
-    justify-content: flex-end; 
-    margin: 16px 10px;
-
+.rank-edit-rankedit-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
 }
 
-.rankedit-delete-container button{
-    padding: 5px 10px;
+.rank-edit-rankedit-notice {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  color: #92400e;
+  font-weight: 500;
 }
 
-.Rankedit-ctn p {
-    font-size: 12px;
-    color: #888;
-    text-align: center;
-    margin-bottom: 12px;
+.rank-edit-loading-message {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+  color: #4a5568;
+  font-weight: 600;
 }
 
-.Rankedit-ctn .rankedit-btn-row {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 24px;
+/* 컨트롤 영역 */
+.rank-edit-rankedit-controls {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.rankedit-search-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 16px;
-    gap: 8px;
+.rank-edit-view-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.rankedit-search-row input[type="text"] {
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 120px; /* 기존 220px → 120px로 변경 */
+.rank-edit-view-btn,
+.rank-edit-refresh-btn {
+  padding: 12px 24px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.rankedit-search-row button {
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background: #eee;
-    cursor: pointer;
+.rank-edit-view-btn:hover,
+.rank-edit-refresh-btn:hover {
+  border-color: #A52A2A;
+  background: #fef5f5;
 }
 
-.loading-text {
-    text-align: center;
-    padding: 16px 0;
-    color: #888;
+.rank-edit-view-btn.active {
+  background: #A52A2A;
+  color: white;
+  border-color: #A52A2A;
 }
 
-.member-edit-header {
-    display: flex;
-    align-items: center;
-    padding: 8px 0;
-    font-weight: bold;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 4px;
+.rank-edit-refresh-btn {
+  background: #f0f9ff;
+  color: #0284c7;
+  border-color: #bae6fd;
 }
 
-.member-edit-header .profile-info {
-    flex: 3;
-}
-.member-edit-header .ranked-checkbox,
-.member-edit-header .current-checkbox,
-.member-edit-header .tier-input,
-.member-edit-header .rank-input,
-.member-edit-header .select-checkbox {
-    width: 80px;
-    text-align: center;
+.rank-edit-refresh-btn:hover {
+  background: #e0f2fe;
+  border-color: #0ea5e9;
 }
 
-.member-edit-header.ranked .tier-input,
-.member-edit-header.ranked .rank-input {
-    width: 70px;
-}
-.member-edit-header.ranked .select-checkbox {
-    width: 60px;
+.rank-edit-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.member-edit-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    margin-top: 12px;
-    display: flex;
+.rank-edit-search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.rank-edit-search-input:focus {
+  outline: none;
+  border-color: #A52A2A;
+  box-shadow: 0 0 0 3px rgba(165, 42, 42, 0.1);
+}
+
+.rank-edit-action-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.rank-edit-add-btn {
+  background: #10b981;
+  color: white;
+}
+
+.rank-edit-add-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.rank-edit-save-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.rank-edit-save-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.rank-edit-delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 2px solid #fecaca;
+}
+
+.rank-edit-delete-btn:hover:not(:disabled) {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.rank-edit-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 리스트 헤더 */
+.rank-edit-list-header {
+  display: grid;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.rank-edit-list-header.all {
+  grid-template-columns: 1fr 80px;
+}
+
+.rank-edit-list-header.ranked {
+  grid-template-columns: 40px 1fr 350px;
+}
+
+.rank-edit-header-profile,
+.rank-edit-header-tier-rank,
+.rank-edit-header-check {
+  text-align: center;
+}
+
+.rank-edit-header-profile {
+  text-align: left;
+}
+
+/* 유저 리스트 */
+.rank-edit-user-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rank-edit-empty-state {
+  background: white;
+  padding: 60px 20px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #718096;
+  font-size: 16px;
+}
+
+.rank-edit-user-item {
+  display: grid;
+  align-items: center;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.rank-edit-user-item.selected {
+  border-color: #A52A2A;
+  box-shadow: 0 4px 12px rgba(165, 42, 42, 0.15);
+}
+
+.rank-edit-user-item:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.rank-edit-list-header.all ~ .rank-edit-user-list .rank-edit-user-item {
+  grid-template-columns: 1fr 80px;
+}
+
+.rank-edit-list-header.ranked ~ .rank-edit-user-list .rank-edit-user-item {
+  grid-template-columns: 40px 1fr 350px;
+}
+
+.rank-edit-rank-number {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #A52A2A;
+  text-align: center;
+}
+
+.rank-edit-user-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-left: 0;
+}
+
+.rank-edit-profile-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+}
+
+.rank-edit-user-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.rank-edit-user-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.rank-edit-user-details {
+  font-size: 13px;
+  color: #718096;
+}
+
+.rank-edit-user-tier-rank {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.rank-edit-user-tier,
+.rank-edit-user-rank {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rank-edit-user-tier label,
+.rank-edit-user-rank label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.rank-edit-user-tier input,
+.rank-edit-user-rank input {
+  width: 70px;
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.rank-edit-user-tier input:focus,
+.rank-edit-user-rank input:focus {
+  outline: none;
+  border-color: #A52A2A;
+  box-shadow: 0 0 0 3px rgba(165, 42, 42, 0.1);
+}
+
+/* 체크박스 커스텀 */
+.rank-edit-user-check {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rank-edit-user-check input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rank-edit-user-check label {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.rank-edit-user-check label::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.rank-edit-user-check input[type="checkbox"]:checked + label {
+  background: #A52A2A;
+  border-color: #A52A2A;
+}
+
+.rank-edit-user-check input[type="checkbox"]:checked + label::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.rank-edit-user-check label:hover {
+  border-color: #A52A2A;
+}
+
+.rank-edit-user-check-top {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.rank-edit-user-check-top input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rank-edit-user-check-top label {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  background: white;
+}
+
+.rank-edit-user-check-top label::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.rank-edit-user-check-top input[type="checkbox"]:checked + label {
+  background: #A52A2A;
+  border-color: #A52A2A;
+}
+
+.rank-edit-user-check-top input[type="checkbox"]:checked + label::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.rank-edit-user-check-top label:hover {
+  border-color: #A52A2A;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .rank-edit-rankedit-container {
+    padding: 20px 10px;
+  }
+
+  .rank-edit-rankedit-header {
+    padding: 20px;
+  }
+
+  .rank-edit-rankedit-title {
+    font-size: 24px;
+  }
+
+  .rank-edit-rankedit-controls {
+    padding: 16px;
+  }
+
+  .rank-edit-view-buttons {
     flex-direction: column;
-    gap: 12px;
-    align-items: center;
-    max-height: calc(100vh - 260px - 36px);
-    overflow-y: auto;
-}
+  }
 
-.member-edit-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f5f5f5;
+  .rank-edit-view-btn,
+  .rank-edit-refresh-btn {
     width: 100%;
-}
+  }
 
-.member-edit-item .profile-info {
-    flex: 3;
+  .rank-edit-action-row {
+    flex-direction: column;
+  }
+
+  .rank-edit-search-input {
+    width: 100%;
+  }
+
+  .rank-edit-action-btn {
+    width: 100%;
+  }
+
+  .rank-edit-list-header {
+    display: none;
+  }
+
+  .rank-edit-user-item {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .rank-edit-rank-number {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    font-size: 16px;
+  }
+
+  .rank-edit-user-profile {
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .rank-edit-user-check {
+    justify-self: start;
     display: flex;
     align-items: center;
-}
+    gap: 8px;
+  }
 
-.profile-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 8px;
-    vertical-align: middle;
-}
+  .rank-edit-user-tier-rank {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    justify-self: start;
+    align-items: center;
+  }
 
-.user-name {
-    font-weight: bold;
-}
-.user-major {
-    font-size: 13px;
-    color: #555;
-}
+  .rank-edit-user-tier,
+  .rank-edit-user-rank {
+    flex: 0 0 auto;
+  }
 
-.member-edit-item .ranked-checkbox,
-.member-edit-item .current-checkbox,
-.member-edit-item .tier-input,
-.member-edit-item .rank-input,
-.member-edit-item .select-checkbox {
+  .rank-edit-user-tier input,
+  .rank-edit-user-rank input {
     width: 80px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-}
-
-.member-edit-item .tier-input,
-.member-edit-item .rank-input {
-    margin-right: 2px;
-    width: 70px;
-}
-
-.member-edit-item .select-checkbox {
-    width: 60px;
-}
-
-.no-data {
-    text-align: center;
-    padding: 16px 0;
-    color: #888;
-}
-
-/* 랭킹 체크박스 */
-[id^="ranked-checkbox-"] {
-    width: 80px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-}
-
-/* 현재 유저 체크박스 */
-[id^="current-checkbox-"] {
-    width: 80px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-}
-
-/* 티어 입력 */
-[id^="tier-input-"] {
-    margin-right: 2px;
-    width: 70px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 랭킹 입력 */
-[id^="rank-input-"] {
-    margin-right: 2px;
-    width: 70px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 선택 체크박스 */
-[id^="select-checkbox-"] {
-    width: 60px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 티어 입력 input에 직접 적용 */
-[id^="tier-input-"] input {
-    width: 30px !important;
-}
-
-/* 랭킹 입력 input에 직접 적용 */
-[id^="rank-input-"] input {
-    width: 30px !important;
+  }
 }

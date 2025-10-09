@@ -4,19 +4,23 @@ import BoardPage from './pages/Board/BoardPage.tsx';
 import RankingPage from './pages/RankingPage.tsx';
 import IntroPage from './pages/Intro/IntroPage.tsx';
 import VotePage from './pages/Vote/VotePage.tsx';
-import HomePage from './pages/HomePage.tsx';
+import HomePage from './pages/HomePage.tsx'
+;
 import Auth from './pages/auth/Auth.tsx';
 import Signup from './pages/auth/SignupPage.tsx';
 import ProfilePage from './pages/auth/ProfilePage.tsx';
 import { NewPost } from './pages/Board/NewPost';
 import { PostDetail } from './pages/Board/PostDetail';
-import RankedEditPage from './pages/Admin/RankeditPage.tsx';
-import AdminPage from './pages/Admin/AdminPage.tsx';
-import PostEditPage from './pages/Admin/PostEditPage.tsx';
-import VoteAdd from './pages/Vote/VoteaddPage.tsx';
+
 import UnifiedreservationPage from './pages/reservation/UnifiedreservationPage.tsx';
+import VoteAdd from './pages/Vote/VoteaddPage.tsx';
 import ReservationProfile from './pages/reservation/ReservationProfile';
+
+import AdminPage from './pages/Admin/AdminPage.tsx';
+import RankedEditPage from './pages/Admin/RankeditPage.tsx';
+import PostEditPage from './pages/Admin/PostEditPage.tsx';
 import LeadereditPage from './pages/Admin/LeadereditPage.tsx';
+import LoginApprove from './pages/Admin/Loginapprovepage.tsx';
 import './App.css';
 
 function AppRoutes() {
@@ -49,6 +53,10 @@ function AppRoutes() {
     else if (isLeaderEdit) {
         // 리더 수정 페이지는 헤더, page_content 없이 단독 렌더링
         return <LeadereditPage />;
+    }
+    else if (location.pathname === "/admin/login-approve") {
+        // 로그인 승인 페이지는 헤더, page_content 없이 단독 렌더링
+        return <LoginApprove />;
     }
 
     return (
