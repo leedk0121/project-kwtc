@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../auth/supabaseClient.tsx";
 import './PostEditPage.css';
+import { withAdminAuth } from '../../services/adminHOC';
 
 function PostEditPage() {
     const [posts, setPosts] = useState<any[]>([]);
@@ -175,4 +176,4 @@ function PostEditPage() {
     );
 }
 
-export default PostEditPage;
+export default withAdminAuth(PostEditPage);

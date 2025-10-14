@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../auth/supabaseClient.tsx';
 import './RankeditPage.css';
+import { withAdminAuth } from '../../services/adminHOC';
 
 function RankedEditPage() {
     const [listType, setListType] = useState<'ranked' | 'all'>('ranked');
@@ -79,15 +80,27 @@ function RankedEditPage() {
         if (search) {
             return user.name?.toLowerCase().includes(search.toLowerCase());
         }
-        if (listType === 'ranked') {
-            return Number(user.rank_tier ?? 0) !== 0;
-        }
         return true;
     }).sort((a, b) => {
         if (listType === 'ranked') {
-            const tierA = Number(a.rank_tier ?? 0);
-            const tierB = Number(b.rank_tier ?? 0);
-            if (tierA !== tierB) return tierA - tierB;
+            const tierA = a.rank_tier;
+            const tierB = b.rank_tier;
+            
+            // null 값을 가진 유저를 맨 위로
+            if (tierA === null && tierB !== null) return -1;
+            if (tierA !== null && tierB === null) return 1;
+            if (tierA === null && tierB === null) return 0;
+            
+            const tierNumA = Number(tierA);
+            const tierNumB = Number(tierB);
+            
+            // 0 값을 가진 유저를 맨 아래로
+            if (tierNumA === 0 && tierNumB !== 0) return 1;
+            if (tierNumA !== 0 && tierNumB === 0) return -1;
+            
+            // 일반 정렬
+            if (tierNumA !== tierNumB) return tierNumA - tierNumB;
+            
             const rankA = Number(a.rank_detail ?? 0);
             const rankB = Number(b.rank_detail ?? 0);
             return rankA - rankB;
@@ -120,11 +133,21 @@ function RankedEditPage() {
             if (newIds.length > 0) {
                 const selectedRanked = filteredUsers
                     .filter(user => newIds.includes(user.id))
-                    .map(user => ({
-                        ...user,
-                        rank_tier: tierInputs[user.id] !== undefined && tierInputs[user.id] !== '' ? tierInputs[user.id] : '0',
-                        rank_detail: rankInputs[user.id] !== undefined && rankInputs[user.id] !== '' ? rankInputs[user.id] : '0'
-                    }));
+                    .map(user => {
+                        const userObj: any = { ...user };
+                        // rank_tier와 rank_detail은 입력된 값이 있을 때만 포함
+                        const tierValue = tierInputs[user.id];
+                        const detailValue = rankInputs[user.id];
+                        
+                        if (tierValue !== undefined && tierValue !== '') {
+                            userObj.rank_tier = tierValue;
+                        }
+                        if (detailValue !== undefined && detailValue !== '') {
+                            userObj.rank_detail = detailValue;
+                        }
+                        
+                        return userObj;
+                    });
                 const { error } = await supabase
                     .from('ranked_user')
                     .upsert(selectedRanked);
@@ -255,7 +278,8 @@ function RankedEditPage() {
             </div>
 
             <div className="rank-edit-rankedit-notice">
-                💡 데이터가 표시되지 않으면 '전체 유저'를 클릭 후 다시 '랭킹 유저'를 클릭해주세요.
+                💡 테린이 티어의 티어값은 0 입니다. <br />
+                💡 저장 버튼은 2번 눌러 주세요.
             </div>
 
             <div className="rank-edit-rankedit-controls">
@@ -402,4 +426,4 @@ function RankedEditPage() {
     );
 }
 
-export default RankedEditPage;
+export default withAdminAuth(RankedEditPage);

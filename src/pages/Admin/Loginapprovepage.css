@@ -85,75 +85,99 @@
 
 /* 검색 및 필터 */
 .login-approve-controls {
-  background: white;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
   padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
-
-.login-approve-search-box {
-  margin-bottom: 16px;
-}
-
-.login-approve-search-box input {
-  width: 100%;
-  max-width: 100%;
-  padding: 12px 18px;
-  border: 2px solid #e5e7eb;
+  background: white;
   border-radius: 12px;
-  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-approve-search {
+  flex: 1;
+  min-width: 250px;
+  max-width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
-.login-approve-search-box input:focus {
+.login-approve-search:focus {
   outline: none;
-  border-color: #A52A2A;
-  box-shadow: 0 0 0 3px rgba(165, 42, 42, 0.1);
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
+.login-approve-search::placeholder {
+  color: #999;
+}
+
+/* 필터 버튼 그룹 */
 .login-approve-filter-buttons {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f9fafb;
-  padding: 8px;
-  border-radius: 12px;
-}
-
-.login-approve-filter-buttons::before {
-  content: '🔍 필터';
-  font-size: 14px;
-  font-weight: 600;
-  color: #6b7280;
-  padding: 0 8px;
-  white-space: nowrap;
-}
-
-.login-approve-filter-btn {
-  flex: 1;
-  padding: 8px 16px;
-  border: 2px solid transparent;
-  background: white;
+  gap: 8px;
+  background: #f5f5f5;
+  padding: 4px;
   border-radius: 8px;
-  font-weight: 600;
+}
+
+.login-approve-filter-buttons button {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: #666;
   font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
-.login-approve-filter-btn:hover {
-  border-color: #A52A2A;
-  color: #A52A2A;
+.login-approve-filter-buttons button:hover {
+  background: #e0e0e0;
+  color: #333;
 }
 
-.login-approve-filter-btn.active {
-  background: #A52A2A;
+.login-approve-filter-buttons button.active {
+  background: #4a90e2;
   color: white;
-  border-color: #A52A2A;
-  box-shadow: 0 2px 8px rgba(165, 42, 42, 0.3);
+  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.3);
+}
+
+/* 새로고침 버튼 */
+.login-approve-refresh {
+  padding: 10px 20px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-approve-refresh:hover {
+  background: #357abd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.login-approve-refresh:active {
+  transform: translateY(0);
 }
 
 /* 프로필 리스트 */
@@ -169,7 +193,6 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 24px;
   transition: all 0.3s ease;
 }
 
@@ -327,33 +350,79 @@
     font-size: 16px;
   }
 
-  .login-approve-filter-buttons {
-    flex-wrap: wrap;
+  .login-approve-controls {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .login-approve-filter-buttons::before {
+  .login-approve-search {
     width: 100%;
-    text-align: center;
-    padding-bottom: 4px;
+    min-width: 100%;
+  }
+
+  .login-approve-filter-buttons {
+    justify-content: center;
+  }
+
+  .login-approve-refresh {
+    width: 100%;
+    justify-content: center;
   }
 
   .login-approve-profile-card {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .login-approve-profile-image {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+
+  .login-approve-profile-info {
+    flex: 1;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .login-approve-profile-name {
+    font-size: 16px;
+    margin-bottom: 6px;
   }
 
   .login-approve-profile-details {
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .login-approve-detail-item {
+    font-size: 12px;
+  }
+
+  .login-approve-profile-date {
+    font-size: 11px;
+    margin-top: 4px;
   }
 
   .login-approve-profile-actions {
-    width: 100%;
-    align-items: stretch;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: fit-content;
+  }
+
+  .login-approve-status-badge {
+    padding: 4px 10px;
+    font-size: 11px;
   }
 
   .login-approve-toggle-btn {
-    width: 100%;
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: 90px;
+    width: auto;
   }
 }

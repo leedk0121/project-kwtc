@@ -1,3 +1,5 @@
+// src/pages/Admin/AdminPage.tsx
+
 import { useNavigate } from 'react-router-dom';
 import { withAdminAuth } from '../../services/adminHOC';
 import './AdminPage.css';
@@ -25,10 +27,22 @@ function AdminPage() {
             color: '#f59e0b'
         },
         {
-            title: '🔐 로그인 승인',
-            description: '회원 가입 승인을 관리합니다',
+            title: '✅ 사용자 승인',
+            description: '신규 회원 가입을 승인하고 사용자를 삭제합니다',
             path: '/admin/login-approve',
             color: '#ef4444'
+        },
+        {
+            title: '👑 관리자 권한',
+            description: '사용자의 관리자 권한을 부여하거나 해제합니다',
+            path: '/admin/manage',
+            color: '#8b5cf6'
+        },
+        {
+            title: '🎓 전공 관리',
+            description: '전공 목록을 추가하고 관리합니다',
+            path: '/admin/major-manage',
+            color: '#ec4899'
         }
     ];
 

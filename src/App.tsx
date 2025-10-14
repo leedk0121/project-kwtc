@@ -19,7 +19,9 @@ import PostEditPage from './pages/Admin/PostEditPage.tsx';
 import LeadereditPage from './pages/Admin/LeadereditPage.tsx';
 import LoginApprove from './pages/Admin/Loginapprovepage.tsx';
 import AdminRoleManager from './pages/Admin/AdminRoleManager.tsx';
+import MajorManagePage from './pages/Admin/MajorManagePage';
 import './App.css';
+import ReservationSuccessPage from './pages/reservation/ReservationSuccessPage';
 
 // 헤더가 있는 레이아웃
 function LayoutWithHeader({ children }: { children: React.ReactNode }) {
@@ -54,6 +56,7 @@ function App() {
 
                 {/* 레이아웃 없는 독립 페이지들 */}
                 <Route path="/reservation" element={<UnifiedreservationPage />} />
+                <Route path="/reservation/success" element={<ReservationSuccessPage />} />
                 <Route path="/reservation/profile" element={<ReservationProfile />} />
 
                 {/* 관리자 페이지들 - 레이아웃 없음 */}
@@ -63,6 +66,7 @@ function App() {
                 <Route path="/admin/rank-edit" element={<RankedEditPage />} />
                 <Route path="/admin/post-edit" element={<PostEditPage />} />
                 <Route path="/admin/leader-edit" element={<LeadereditPage />} />
+                <Route path="/admin/major-manage" element={<MajorManagePage />} />
             </Routes>
         </Router>
     );

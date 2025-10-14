@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from "../auth/supabaseClient.tsx";
+import { withAdminAuth } from '../../services/adminHOC';
 import './LeadereditPage.css';
 
 interface Profile {
@@ -341,4 +342,4 @@ const LeadereditPage: React.FC = () => {
   );
 };
 
-export default LeadereditPage;
+export default withAdminAuth(LeadereditPage);

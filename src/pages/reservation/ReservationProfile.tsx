@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../auth/supabaseClient';
+import { supabase } from "../auth/supabaseClient";
 import './ReservationProfile.css';
 
 interface UserProfile {
@@ -16,21 +16,52 @@ interface UserProfile {
   reservation_alert?: boolean;
 }
 
-interface ReservationHistory {
-  id: number;
-  court: string;
-  court_num: string;
-  date: string;
-  time: string;
-  status: string;
-  created_at: string;
+interface ReservationDetail {
+  orderNumber: string;
+  useDayBegin: string;
+  useDayEnd: string;
+  useDayBeginDay: number;
+  useDayEndDay: number;
+  useTimeBegin: string;
+  useTimeEnd: string;
+  cName: string;
+  codeName: string;
+  productName: string;
+  price: number;
+  pricePay: number;
+  stat: string;
+  p_stat: string;
+  seq: number;
+  insertDate: string;
+  insertTime: string;
 }
 
-interface TennisAccountEditData {
-  nowon_id: string;
-  nowon_pass: string;
-  dobong_id: string;
-  dobong_pass: string;
+interface NowonReservation {
+  no: number;
+  apply_date: string;
+  reservation_date: string;
+  reservation_time: string;
+  facility: string;
+  location: string;
+  payment_amount: string;
+  payment_status: string;
+  payment_method: string;
+  cancel_status: string;
+  raw: {
+    totalPriceSale: number;
+    method: string;
+    pstat: string;
+    insertDate: string;
+    priceRefundTotalPricePay: number;
+    p: string;
+    okayYn: string;
+    totalcnt: number;
+    cName: string;
+    payMethod: string;
+    detailList: ReservationDetail[];
+    rstat: string;
+    seq: number;
+  };
 }
 
 // 테니스장 계정 수정 모달 컴포넌트
@@ -166,19 +197,28 @@ function TennisAccountEditModal({
   );
 }
 
-function ReservationProfile() {
+export default function ReservationProfile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [reservationHistory, setReservationHistory] = useState<ReservationHistory[]>([]);
+  const [reservationHistory, setReservationHistory] = useState<NowonReservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'history' | 'settings'>('profile');
   const [showNowonPass, setShowNowonPass] = useState(false);
   const [showDobongPass, setShowDobongPass] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+  const [filterStatus, setFilterStatus] = useState<'all' | 'payment-waiting' | 'payment-completed'>('all');
 
   useEffect(() => {
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      loadReservationHistory();
+    }
+  }, [activeTab]);
 
   const loadUserData = async () => {
     try {
@@ -220,6 +260,90 @@ function ReservationProfile() {
       console.error('사용자 데이터 로드 오류:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadReservationHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('로그인이 필요합니다');
+      }
+
+      console.log('📡 노원구 예약 내역 크롤링 시작...');
+
+      // supabase 클라이언트에서 URL 추출
+      const functionUrl = `${supabase.supabaseUrl}/functions/v1/crawl-nowon-reservation`;
+      console.log('📡 요청 URL:', functionUrl);
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('📥 응답 상태:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ 응답 오류:', errorData);
+        throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ 크롤링 결과:', result);
+      
+      // API 응답의 data를 직접 사용 (Storage 건너뛰기)
+      if (result.data && Array.isArray(result.data)) {
+        console.log('📦 API 응답 데이터 직접 사용:', result.data.length);
+        setReservationHistory(result.data);
+        return;
+      }
+      
+      // Storage에서 데이터 다운로드 (백업)
+      console.log('📦 Storage에서 데이터 다운로드 시작...');
+      
+      // Storage에서 데이터 읽기
+      if (result.userId) {
+        console.log('📦 Storage에서 데이터 다운로드 시작...');
+        
+        const { data: storageData, error: storageError } = await supabase.storage
+          .from('reservation-data')
+          .download(`nowon-reservations-${result.userId}.json`);
+
+        if (storageError) {
+          console.error('❌ Storage 다운로드 오류:', storageError);
+          throw new Error(`Storage 다운로드 실패: ${storageError.message}`);
+        }
+
+        const fileContent = await storageData.text();
+        const jsonData = JSON.parse(fileContent);
+        
+        console.log('📦 Storage 데이터:', jsonData);
+        
+        // 예약 데이터를 상태에 저장
+        const reservations = jsonData.reservations || [];
+        
+        console.log('📊 예약 개수:', reservations.length);
+        console.log('📊 첫 번째 예약:', reservations[0]);
+        console.log('📊 첫 번째 raw:', reservations[0]?.raw);
+        console.log('📊 첫 번째 detailList:', reservations[0]?.raw?.detailList);
+        
+        setReservationHistory(reservations);
+        
+        console.log('✅ State 업데이트 완료');
+      } else {
+        throw new Error('사용자 ID가 응답에 없습니다.');
+      }
+
+    } catch (error: any) {
+      console.error('❌ 예약 내역 로드 오류:', error);
+    } finally {
+      setLoadingHistory(false);
     }
   };
 
@@ -268,7 +392,7 @@ function ReservationProfile() {
         dobong_pass: accountInfo.dobong_pass
       } : null);
 
-      alert('테니스장 계정 정보가 성공적으로 수정되었습니다.');
+      console.log('✅ 테니스장 계정 정보가 성공적으로 수정되었습니다.');
     } catch (error) {
       console.error('계정 정보 저장 오류:', error);
       throw error;
@@ -313,10 +437,9 @@ function ReservationProfile() {
         reservation_alert: checked
       } : null);
 
-      console.log(`알림 설정이 ${checked ? '활성화' : '비활성화'}되었습니다.`);
+      console.log(`✅ 알림 설정이 ${checked ? '활성화' : '비활성화'}되었습니다.`);
     } catch (error) {
       console.error('알림 설정 저장 오류:', error);
-      alert('알림 설정 저장에 실패했습니다.');
     }
   };
 
@@ -337,10 +460,138 @@ function ReservationProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      alert('프로필 이미지 업로드 기능은 준비 중입니다.');
+      console.log('프로필 이미지 업로드 기능은 준비 중입니다.');
     } catch (error) {
       console.error('이미지 업로드 오류:', error);
     }
+  };
+
+  const toggleDetails = (seq: number) => {
+    const newExpanded = new Set(expandedItems);
+    if (newExpanded.has(seq)) {
+      newExpanded.delete(seq);
+    } else {
+      newExpanded.add(seq);
+    }
+    setExpandedItems(newExpanded);
+  };
+
+  const handleCancelReservation = async (seq: number, totalPrice: number) => {
+    const confirmCancel = window.confirm('정말로 예약을 취소하시겠습니까?');
+    if (!confirmCancel) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        alert('로그인이 필요합니다');
+        return;
+      }
+
+      console.log('🔄 예약 취소 요청 시작...');
+      console.log('seq:', seq, 'totalPrice:', totalPrice);
+
+      const functionUrl = `${supabase.supabaseUrl}/functions/v1/cancel-nowon-reservation`;
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inRseq: seq,
+          totalPrice: totalPrice
+        })
+      });
+
+      console.log('📥 응답 상태:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ 취소 오류:', errorData);
+        throw new Error(errorData.error || '예약 취소에 실패했습니다');
+      }
+
+      const result = await response.json();
+      console.log('✅ 취소 성공:', result);
+
+      alert('예약이 취소되었습니다.');
+      
+      // 예약 내역 새로고침
+      loadReservationHistory();
+
+    } catch (error: any) {
+      console.error('❌ 예약 취소 오류:', error);
+      alert(error.message || '예약 취소에 실패했습니다');
+    }
+  };
+
+  // 예약 상태에 따른 한글 표시
+  const getReservationStatus = (reservation: NowonReservation): string => {
+    const raw = reservation.raw;
+    
+    // 예약 취소
+    if (raw.rstat === 'C' || raw.rstat === '1') return '예약취소';
+    
+    // 결제 대기 (rstat === 'R' 추가)
+    if (raw.rstat === 'R' || raw.pstat === '결제대기') return '결제대기';
+    
+    // 결제 완료
+    if (raw.pstat === '결제완료') return '결제완료';
+    
+    // 승인 완료
+    if (raw.okayYn === 'Y') return '승인완료';
+    
+    return '대기중';
+  };
+
+  // 예약 상태에 따른 CSS 클래스
+  const getStatusClass = (reservation: NowonReservation): string => {
+    const raw = reservation.raw;
+    
+    // 예약 취소
+    if (raw.rstat === 'C' || raw.rstat === '1') return 'status-cancelled';
+    
+    // 결제 대기 (rstat === 'R' 추가)
+    if (raw.rstat === 'R' || raw.pstat === '결제대기') return 'status-payment-waiting';
+    
+    // 결제 완료
+    if (raw.pstat === '결제완료') return 'status-confirmed';
+    
+    // 승인 완료
+    if (raw.okayYn === 'Y') return 'status-approved';
+    
+    return 'status-pending';
+  };
+
+  // 요일 표시 (1=일, 2=월, 3=화, 4=수, 5=목, 6=금, 7=토)
+  const getDayOfWeek = (day: number): string => {
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    return days[day] || '';
+  };
+
+  // 필터링된 예약 내역
+  const getFilteredReservations = () => {
+    return reservationHistory.filter(reservation => {
+      const raw = reservation.raw;
+      
+      // 취소된 예약은 기본적으로 제외
+      if (raw.rstat === 'C' || raw.rstat === '1') {
+        return false;
+      }
+      
+      if (filterStatus === 'all') return true;
+      
+      if (filterStatus === 'payment-waiting') {
+        return raw.rstat === 'R' || raw.pstat === '결제대기';
+      }
+      
+      if (filterStatus === 'payment-completed') {
+        return raw.pstat === '결제완료';
+      }
+      
+      return true;
+    });
   };
 
   if (loading) {
@@ -397,7 +648,7 @@ function ReservationProfile() {
           className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
           onClick={() => setActiveTab('history')}
         >
-          예약 히스토리
+          내 예약
         </button>
         <button 
           className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
@@ -493,31 +744,157 @@ function ReservationProfile() {
         {activeTab === 'history' && (
           <div className="history-tab">
             <div className="history-card">
-              <h3>최근 예약 내역</h3>
-              {reservationHistory.length > 0 ? (
+              <div className="history-header">
+                <h3>노원구 테니스장 예약 내역</h3>
+                <button 
+                  className="refresh-history-btn"
+                  onClick={loadReservationHistory}
+                  disabled={loadingHistory}
+                >
+                  {loadingHistory ? '🔄 로딩 중...' : '🔄 새로고침'}
+                </button>
+              </div>
+              
+              {/* 필터 버튼 - 취소 제거 */}
+              {!loadingHistory && reservationHistory.filter(r => r.raw.rstat !== 'C' && r.raw.rstat !== '1').length > 0 && (
+                <div className="filter-buttons">
+                  <button 
+                    className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
+                    onClick={() => setFilterStatus('all')}
+                  >
+                    전체 ({reservationHistory.filter(r => r.raw.rstat !== 'C' && r.raw.rstat !== '1').length})
+                  </button>
+                  <button 
+                    className={`filter-btn ${filterStatus === 'payment-waiting' ? 'active' : ''}`}
+                    onClick={() => setFilterStatus('payment-waiting')}
+                  >
+                    결제대기 ({reservationHistory.filter(r => (r.raw.rstat === 'R' || r.raw.pstat === '결제대기') && r.raw.rstat !== 'C' && r.raw.rstat !== '1').length})
+                  </button>
+                  <button 
+                    className={`filter-btn ${filterStatus === 'payment-completed' ? 'active' : ''}`}
+                    onClick={() => setFilterStatus('payment-completed')}
+                  >
+                    결제완료 ({reservationHistory.filter(r => r.raw.pstat === '결제완료' && r.raw.rstat !== 'C' && r.raw.rstat !== '1').length})
+                  </button>
+                </div>
+              )}
+              
+              {loadingHistory ? (
+                <div className="loading-history">예약 내역을 불러오는 중...</div>
+              ) : getFilteredReservations().length > 0 ? (
                 <div className="history-list">
-                  {reservationHistory.map((reservation) => (
-                    <div key={reservation.id} className="history-item">
-                      <div className="history-info">
-                        <div className="court-info">
-                          {reservation.court} - {reservation.court_num}
+                  {getFilteredReservations()
+                    .filter(reservation => reservation?.raw)
+                    .map((reservation, index) => {
+                      const raw = reservation.raw;
+                      const isExpanded = expandedItems.has(raw.seq || index);
+                      const isPaymentWaiting = raw.rstat === 'R' || raw.pstat === '결제대기';
+                      
+                      return (
+                        <div key={raw.seq || index} className="history-item">
+                          <div className="history-main-info">
+                            <div className="court-name">{raw.cName || '코트 정보 없음'}</div>
+                            <div className={`status ${getStatusClass(reservation)}`}>
+                              {getReservationStatus(reservation)}
+                            </div>
+                          </div>
+
+                          {raw.detailList && raw.detailList.length > 0 ? (
+                            <div className="reservation-times">
+                              <div className="times-header">
+                                📅 예약 일정
+                              </div>
+                              <div className="time-summary">
+                                <div className="summary-date">
+                                  <span className="summary-icon">📆</span>
+                                  <strong>{raw.detailList[0].useDayBegin}</strong>
+                                  <span className="day-badge">
+                                    ({getDayOfWeek(raw.detailList[0].useDayBeginDay)})
+                                  </span>
+                                </div>
+                                <div className="summary-time">
+                                  <span className="summary-icon">⏰</span>
+                                  <strong>
+                                    {raw.detailList[0].useTimeBegin} ~ {raw.detailList[raw.detailList.length - 1].useTimeEnd}
+                                  </strong>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="no-detail-info">
+                              상세 예약 시간 정보가 없습니다.
+                            </div>
+                          )}
+
+                          <div className="history-item-actions">
+                            <button 
+                              className="toggle-details-btn"
+                              onClick={() => toggleDetails(raw.seq || index)}
+                            >
+                              {isExpanded ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
+                            </button>
+
+                            {isExpanded && (
+                              <div className="history-details">
+                                <div className="detail-row">
+                                  <span className="detail-label">신청일:</span>
+                                  <span className="detail-value">
+                                    {raw.insertDate ? `20${raw.insertDate}` : '날짜 정보 없음'}
+                                  </span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">총 금액:</span>
+                                  <span className="detail-value">
+                                    {(raw.priceRefundTotalPricePay || 0).toLocaleString()}원
+                                  </span>
+                                </div>
+                                {raw.payMethod && (
+                                  <div className="detail-row">
+                                    <span className="detail-label">결제방법:</span>
+                                    <span className="detail-value">{raw.payMethod}</span>
+                                  </div>
+                                )}
+                                <div className="detail-row">
+                                  <span className="detail-label">결제상태:</span>
+                                  <span className={`detail-value ${
+                                    (raw.rstat === 'R' || raw.pstat === '결제대기') ? 'payment-waiting-text' : ''
+                                  }`}>
+                                    {raw.pstat || '상태 정보 없음'}
+                                  </span>
+                                </div>
+                                
+                                {isPaymentWaiting && (
+                                  <div className="detail-actions">
+                                    <button 
+                                      className="cancel-reservation-btn-detail"
+                                      onClick={() => handleCancelReservation(
+                                        reservation.no,
+                                        raw.priceRefundTotalPricePay || 0
+                                      )}
+                                    >
+                                      <span className="cancel-icon">🗑️</span>
+                                      <span>예약 취소하기</span>
+                                    </button>
+                                    <p className="cancel-notice">
+                                      ⚠️ 취소 후에는 복구할 수 없습니다
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="date-time">
-                          {reservation.date} {reservation.time}
-                        </div>
-                      </div>
-                      <div className={`status ${reservation.status}`}>
-                        {reservation.status}
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
                 </div>
               ) : (
                 <div className="no-history">
-                  <p>예약 내역이 없습니다.</p>
-                  <button onClick={() => navigate('/reservation')}>
-                    예약하러 가기
-                  </button>
+                  <p>{filterStatus === 'all' ? '예약 내역이 없습니다.' : '해당하는 예약 내역이 없습니다.'}</p>
+                  {filterStatus === 'all' && (
+                    <button onClick={() => navigate('/reservation')}>
+                      예약하러 가기
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -562,5 +939,3 @@ function ReservationProfile() {
     </div>
   );
 }
-
-export default ReservationProfile;

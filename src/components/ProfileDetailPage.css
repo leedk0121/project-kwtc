@@ -1,15 +1,13 @@
 /* Reset and Base Styles */
 .profile-detail-container {
-  min-height: auto;
-  max-width: 480px;
+  width: 100%;
+  max-width: 600px;
   margin: 0 auto;
-  background: #FFFFFF;
-  padding: 16px;
-  border-radius: 16px;
-  /* box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); */
-  overflow: hidden;
-  position: relative;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow-x: hidden; /* 가로 넘침은 숨김 */
+  overflow-y: visible; /* 세로 넘침은 표시 */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* Loading & Error States */
@@ -62,20 +60,59 @@
 
 /* Header Section - 레이아웃 변경 */
 .profile-detail-header {
-  /* background: rgba(255, 255, 255, 0.95); 이 줄을 제거하거나 주석처리 */
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-  /* padding: 20px 16px; */
-  margin-bottom: 12px;
   position: relative;
-  overflow: hidden;
+  padding: 40px 24px 32px;
+  border-radius: 20px; /* 20px 20px 0 0 → 20px로 변경하여 전체 둥글게 */
+  overflow-x: hidden; /* 가로 넘침은 숨김 */
+  overflow-y: visible; /* 세로 넘침은 표시 */
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  /* 정사각형으로 만들기 위한 추가 스타일 */
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 448px; /* 480px - 32px(양쪽 패딩) */
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Decorations */
+.profile-detail-decorations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden; /* 가로 넘침은 숨김 */
+  overflow-y: visible; /* 세로 넘침은 표시 */
+  pointer-events: none;
+  border-radius: 20px; /* 20px 20px 0 0 → 20px로 변경 */
+}
+
+.profile-detail-decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.profile-detail-decoration-1 {
+  width: 150px;
+  height: 150px;
+  top: -30px;
+  right: -30px;
+}
+
+.profile-detail-decoration-2 {
+  width: 100px;
+  height: 100px;
+  bottom: -20px;
+  left: -20px;
+}
+
+.profile-detail-decoration-3 {
+  width: 80px;
+  height: 80px;
+  top: 50%;
+  right: 10%;
 }
 
 /* Rank positioned at top left */
@@ -151,6 +188,7 @@
   align-items: center;
   margin-bottom: 16px;
   padding-top: 20px; /* 랭킹과 겹치지 않도록 여백 추가 */
+  width: 100%;
 }
 
 .profile-detail-image-wrapper {
@@ -158,7 +196,6 @@
   height: 180px;
   border-radius: 50%;
   padding: 4px;
-
   position: relative;
   background: linear-gradient(135deg, #ffffff, #f0f0f0);
   display: flex;
@@ -221,6 +258,7 @@
 .profile-detail-basic-info {
   margin-bottom: 0;
   text-align: center;
+  width: 100%;
 }
 
 .profile-detail-name {
@@ -247,6 +285,8 @@
 /* Stats Section - 가로 정렬로 변경 */
 .profile-detail-stats {
   margin-bottom: 0;
+  width: 100%;
+  border-radius: 0 0 20px 20px; /* 하단 모서리만 둥글게 */
 }
 
 .profile-detail-stats-grid {

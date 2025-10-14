@@ -388,3 +388,36 @@ entrypoint = "./functions/admin-operations/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/admin-operations/*.html" ]
+
+[functions.nowon-reservation]
+enabled = true
+verify_jwt = true
+import_map = "./functions/nowon-reservation/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/nowon-reservation/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/nowon-reservation/*.html" ]
+
+[functions.crawl-nowon-reservation]
+enabled = true
+verify_jwt = true
+import_map = "./functions/crawl-nowon-reservation/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/crawl-nowon-reservation/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/crawl-nowon-reservation/*.html" ]
+
+[functions.cancel-nowon-reservation]
+enabled = true
+verify_jwt = true
+import_map = "./functions/cancel-nowon-reservation/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/cancel-nowon-reservation/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/cancel-nowon-reservation/*.html" ]

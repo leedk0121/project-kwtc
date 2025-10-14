@@ -14,10 +14,10 @@ function Signup() {
   const [name, setName] = useState('');
   const [major, setMajor] = useState('');
   const [stnum, setstnum] = useState('');
-  const [age, setAge] = useState('');
-  const [career, setCareer] = useState('');
+  const [birthday, setBirthday] = useState('');
   const [phone, setPhone] = useState('');
   const [playerIdx, setPlayerIdx] = useState(0);
+  const [departments, setDepartments] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
@@ -28,39 +28,39 @@ function Signup() {
     return () => clearInterval(interval);
   }, []);
 
-  const departments = [
-    "전자공학과",
-    "전자융합공학과",
-    "전자재료공학과",
-    "전자통신공학과",
-    "전기공학과",
-    "반도체시스템공학부",
-    "컴퓨터정보공학부",
-    "정보융합학부",
-    "지능형로봇학과",
-    "소프트웨어학부",
-    "로봇학부(AI로봇전공, 정보제어.지능시스템전공)",
-    "건축공학과",
-    "환경공학과",
-    "화학공학과",
-    "건축학과",
-    "수학과",
-    "화학과",
-    "전자바이오물리학과",
-    "스포츠융합과학과",
-    "국어국문학과",
-    "영어산업학과",
-    "미디어커뮤니케이션학부",
-    "산업심리학과",
-    "동북아문화산업학부",
-    "행정학과",
-    "법학부",
-    "국제학부",
-    "경영학부",
-    "국제통상학부"
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      const { data, error } = await supabase
+        .from('major_list')
+        .select('major_name')
+        .order('major_name', { ascending: true });
+      
+      if (error) {
+        console.error('학과 목록을 불러오는데 실패했습니다:', error);
+        return;
+      }
+      
+      if (data) {
+        setDepartments(data.map(item => item.major_name));
+      }
+    };
 
-    // 필요한 학과를 추가하세요
-];
+    fetchDepartments();
+  }, []);
+
+  // 생년월일로부터 나이 계산
+  const calculateAge = (birthday: string): number => {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
 
   const handleSignup = async () => {
     if (!email.includes('@')) {
@@ -71,6 +71,14 @@ function Signup() {
       alert('비밀번호는 6자 이상이어야 합니다.');
       return;
     }
+    if (!birthday) {
+      alert('생년월일을 입력하세요.');
+      return;
+    }
+    
+    // 생년월일로부터 나이 계산
+    const age = calculateAge(birthday);
+    
     // 회원가입 (이메일/비밀번호)
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
@@ -91,7 +99,6 @@ function Signup() {
         name, 
         major, 
         age, 
-        career, 
         phone, 
         stnum,
         image_url: "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"
@@ -101,6 +108,18 @@ function Signup() {
       alert(insertError.message);
       return;
     }
+    
+    // tennis_reservation_profile 테이블에도 user_id 저장
+    const { error: reservationError } = await supabase.from('tennis_reservation_profile').insert([
+      { 
+        user_id: userId
+      }
+    ]);
+    if (reservationError) {
+      console.error('예약 프로필 생성 실패:', reservationError);
+      // 예약 프로필 생성 실패해도 회원가입은 완료되도록 처리
+    }
+    
     alert('회원가입이 완료되었습니다! 관리자 승인 이후 로그인 가능합니다.');
     navigate('/login');
   };
@@ -143,13 +162,13 @@ function Signup() {
         </div>
         
         <div className="input-group">
-          <div className="input-label">나이</div>
-          <input type="number" placeholder="나이를 입력하세요" value={age} onChange={e => setAge(e.target.value)} />
+          <div className="input-label">생년월일</div>
+          <input type="date" value={birthday} onChange={e => setBirthday(e.target.value)} />
         </div>
         
         <div className="input-group">
           <div className="input-label">전화번호</div>
-          <input type="text" placeholder="전화번호를 입력하세요 (예: 010-1234-5678)" value={phone} onChange={e => setPhone(e.target.value)} />
+          <input type="text" placeholder="전화번호를 입력하세요 (예: 01012345678)" value={phone} onChange={e => setPhone(e.target.value)} />
         </div>
         
         <div className="button-center">

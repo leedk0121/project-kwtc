@@ -73,6 +73,25 @@ body, html {
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
+.mypage-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.mypage-btn:hover {
+  background: #4338ca;
+}
+
 .unified-reservation-container h1 {
   text-align: center;
   color: #2563eb;
@@ -579,6 +598,13 @@ body, html {
     font-size: 13px;
   }
 
+  .mypage-btn {
+    top: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
   .unified-reservation-container h1 {
     margin-top: 50px;
     font-size: 22px;
@@ -650,230 +676,134 @@ body, html {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .modal-content {
   background: white;
-  padding: 32px;
+  padding: 30px;
   border-radius: 16px;
-  max-width: 520px;
+  max-width: 500px;
   width: 90%;
-  max-height: 85vh;
+  max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  position: relative;
-  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.modal-content h3 {
-  margin: 0 0 12px 0;
+.modal-content h2 {
+  margin-top: 0;
   color: #1f2937;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
   text-align: center;
 }
 
-.modal-content p {
-  margin: 0 0 24px 0;
+.modal-description {
   color: #6b7280;
-  font-size: 15px;
-  line-height: 1.6;
-  text-align: center;
+  margin-bottom: 25px;
+  line-height: 1.5;
 }
 
-.form-fields {
-  margin-bottom: 28px;
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
-.form-field {
-  margin-bottom: 20px;
-}
-
-.form-field label {
-  display: block;
-  margin-bottom: 8px;
-  color: #374151;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.form-field input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 2px solid #e5e7eb;
+.account-section {
+  border: 1px solid #e5e7eb;
+  padding: 20px;
   border-radius: 8px;
-  font-size: 15px;
-  transition: all 0.2s ease;
+}
+
+.account-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #374151;
+  font-size: 1.2rem;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #4b5563;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
   box-sizing: border-box;
-  background-color: #f9fafb;
 }
 
-.form-field input:focus {
+.input-group input:focus {
   outline: none;
-  border-color: #2563eb;
-  background-color: white;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  border-color: #3b82f6;
 }
 
-.form-field input:hover {
-  border-color: #d1d5db;
-  background-color: white;
+.input-group input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
 }
 
 .modal-buttons {
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 32px;
+  gap: 10px;
+  margin-top: 25px;
 }
 
-.cancel-btn, .save-btn {
-  padding: 12px 24px;
+.modal-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  min-width: 100px;
+  transition: all 0.2s;
 }
 
-.cancel-btn {
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 2px solid #e5e7eb;
-}
-
-.cancel-btn:hover:not(:disabled) {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-.save-btn {
-  background-color: #2563eb;
+.modal-btn-primary {
+  background-color: #3b82f6;
   color: white;
-  border: 2px solid #2563eb;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-.save-btn:hover:not(:disabled) {
-  background-color: #1d4ed8;
-  border-color: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+.modal-btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
 }
 
-.save-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.cancel-btn:disabled, .save-btn:disabled {
-  opacity: 0.6;
+.modal-btn-primary:disabled {
+  background-color: #9ca3af;
   cursor: not-allowed;
-  transform: none !important;
 }
 
-/* 로딩 상태 시각화 */
-.save-btn:disabled::after {
-  content: '';
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ffffff;
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  margin-left: 8px;
+.modal-info {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f0f9ff;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 반응형 디자인 */
-@media (max-width: 600px) {
-  .modal-content {
-    padding: 24px;
-    margin: 20px;
-    width: calc(100% - 40px);
-  }
-  
-  .modal-content h3 {
-    font-size: 20px;
-  }
-  
-  .modal-buttons {
-    flex-direction: column;
-  }
-  
-  .cancel-btn, .save-btn {
-    width: 100%;
-  }
-}
-
-/* 스크롤바 스타일링 */
-.modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* 입력 필드 아이콘 효과 */
-.form-field {
-  position: relative;
-}
-
-.form-field input[type="password"]::after {
-  content: '🔒';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-}
-
-/* 모달 제목에 아이콘 추가 */
-.modal-content h3::before {
-  content: '🎾';
-  margin-right: 8px;
+.modal-info p {
+  margin: 5px 0;
+  color: #1e40af;
+  font-size: 0.9rem;
 }

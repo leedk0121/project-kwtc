@@ -1,0 +1,22 @@
+<table>
+								<caption>신청정보</caption>
+								<colgroup>
+									<col style="width:14.5% ;">
+									<col style="width:7.5% ;">
+									<col style="width:10% ;">
+									<col>
+									<col style="width:17.5% ;">
+									<col style="width:14.5% ;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">신청취소</th>
+										<th scope="col">No.</th>
+										<th scope="col">신청 일</th>
+										<th scope="col">예약 내역</th>
+										<th scope="col">결제 금액</th>
+										<th scope="col">결제상태/수단</th>
+									</tr>
+								</thead>
+								<tbody id="tbl"><tr><td>-</td><td>26</td><td>25.03.07</td><td><a href="apply_view?p=NzpjMJSKXT8ghG6WMgUJEeSz/qjN4DwRSiphZMHkihM=&amp;method=C" class="link">2025.03.09(일) 09:00~10:00<br>7코트 마들 테니스<br>2025.03.09(일) 10:00~11:00<br>7코트 마들 테니스<br></a></td><td> 10,400원</td><td><span class="c_gray">결제완료</span><span>신용카드</span></td></tr><tr><td>-</td><td>25</td><td>25.03.01</td><td><a href="apply_view?p=Pkch26Jr8eYh+DMrkZsfOzfuzWZW9hkvtsm5X57zmSE=&amp;method=C" class="link">2025.03.08(토) 15:00~16:00<br>2코트 초안산 테니스<br>2025.03.08(토) 16:00~17:00<br>2코트 초안산 테니스<br></a></td><td> 10,400원</td><td><span class="c_gray">결제완료</span><span>신용카드</span></td></tr><tr><td>-</td><td>24</td><td>25.02.10</td><td><a href="apply_view?p=ka00u/g1C9SQyvzDrRlpZpx/UA98X9pcFeEeHuVjQeg=&amp;method=C" class="link">2025.02.11(화) 17:00~18:00<br>2코트 초안산 테니스<br>2025.02.11(화) 18:00~19:00<br>2코트 초안산 테니스<br></a></td><td> 12,200원</td><td><span class="c_gray">결제완료</span><span>신용카드</span></td></tr><tr><td>-</td><td>23</td><td>25.02.07</td><td><a href="apply_view?p=SlcEbPDBe296TKnvnTWF+dsZ+1MVT0vwvVuyn9r1E44=&amp;method=C" class="link">2025.02.08(토) 16:00~17:00<br>7코트 마들 테니스<br></a></td><td> 5,200원</td><td><span class="c_gray">결제완료</span><span>신용카드</span></td></tr><tr><td>-</td><td>22</td><td>25.02.07</td><td><a href="apply_view?p=3I7kpjrgG4qHAIqazKQ7yCk41zk3nGB0MaItKviSozQ=&amp;method=C" class="link">2025.02.08(토) 17:00~18:00<br>7코트 마들 테니스<br></a></td><td> 5,200원</td><td><span class="c_gray">결제완료</span><span>신용카드</span></td></tr></tbody>
+							</table>

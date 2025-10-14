@@ -41,6 +41,13 @@ function UnifiedreservationPage() {
   const [crawlProgress, setCrawlProgress] = useState({ current: 0, total: 0 });
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
   const [usingCache, setUsingCache] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [accountForm, setAccountForm] = useState({
+    nowon_id: '',
+    nowon_pass: '',
+    dobong_id: '',
+    dobong_pass: ''
+  });
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -51,7 +58,6 @@ function UnifiedreservationPage() {
 
   // 페이지 로드 시 캐시 자동 로드
   useEffect(() => {
-    
     const autoLoadCache = async () => {
       // 사용자 정보가 로드될 때까지 대기
       if (!tennisAccount.dobong_id || !tennisAccount.nowon_id) return;
@@ -87,15 +93,80 @@ function UnifiedreservationPage() {
         .single();
 
       if (accountData) {
-        setTennisAccount({
-          nowon_id: accountData.nowon_id || '',
-          nowon_pass: accountData.nowon_pass || '',
-          dobong_id: accountData.dobong_id || '',
-          dobong_pass: accountData.dobong_pass || ''
-        });
+        const hasNowonAccount = accountData.nowon_id && accountData.nowon_pass;
+        const hasDobongAccount = accountData.dobong_id && accountData.dobong_pass;
+
+        // 계정 정보가 하나라도 없으면 모달 표시
+        if (!hasNowonAccount || !hasDobongAccount) {
+          setShowAccountModal(true);
+          setAccountForm({
+            nowon_id: accountData.nowon_id || '',
+            nowon_pass: accountData.nowon_pass || '',
+            dobong_id: accountData.dobong_id || '',
+            dobong_pass: accountData.dobong_pass || ''
+          });
+        } else {
+          setTennisAccount({
+            nowon_id: accountData.nowon_id,
+            nowon_pass: accountData.nowon_pass,
+            dobong_id: accountData.dobong_id,
+            dobong_pass: accountData.dobong_pass
+          });
+        }
+      } else {
+        // 계정 정보가 아예 없는 경우
+        setShowAccountModal(true);
       }
     } catch (error) {
       console.error('사용자 정보 로드 오류:', error);
+    }
+  };
+
+  const handleAccountSubmit = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      // 필수 입력 체크
+      if (!accountForm.nowon_id || !accountForm.nowon_pass) {
+        alert('노원구 계정 정보를 입력해주세요.');
+        return;
+      }
+
+      if (!accountForm.dobong_id || !accountForm.dobong_pass) {
+        alert('도봉구 계정 정보를 입력해주세요.');
+        return;
+      }
+
+      setLoading(true);
+
+      const { error } = await supabase
+        .from('tennis_reservation_profile')
+        .update({
+          nowon_id: accountForm.nowon_id,
+          nowon_pass: accountForm.nowon_pass,
+          dobong_id: accountForm.dobong_id,
+          dobong_pass: accountForm.dobong_pass
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('계정 정보 저장 실패:', error);
+        alert('계정 정보 저장에 실패했습니다.');
+        return;
+      }
+
+      setTennisAccount(accountForm);
+      setShowAccountModal(false);
+      alert('계정 정보가 저장되었습니다.');
+    } catch (error) {
+      console.error('계정 정보 저장 오류:', error);
+      alert('계정 정보 저장 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -169,94 +240,91 @@ function UnifiedreservationPage() {
     }
   };
 
-  // UnifiedReservationPage.tsx - 최종 수정 버전
-  // HTML 구조 분석 결과를 바탕으로 정확하게 파싱
-
-    const crawlDobong = async (dateStr: string): Promise<Reservation[]> => {
-  const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
-  
-  try {
-    const response = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'crawl_dobong',
-        username: tennisAccount.dobong_id,
-        password: tennisAccount.dobong_pass,
-        dateStr: dateStr.replace(/-/g, '')
-      })
-    });
-
-    const result = await response.json();
+  const crawlDobong = async (dateStr: string): Promise<Reservation[]> => {
+    const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
     
-    if (!result.success) {
-      console.error('도봉구 크롤링 실패:', result.error);
-      if (result.error && (
-        result.error.includes('로그인') || 
-        result.error.includes('인증') ||
-        result.error.includes('아이디') ||
-        result.error.includes('비밀번호')
-      )) {
-        throw new Error(`도봉구 로그인 실패: ${result.error}`);
-      }
-      return [];
-    }
+    try {
+      const response = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'crawl_dobong',
+          username: tennisAccount.dobong_id,
+          password: tennisAccount.dobong_pass,
+          dateStr: dateStr.replace(/-/g, '')
+        })
+      });
 
-    const playData = result.data.play_name;
-    const reservations: Reservation[] = [];
-
-    playData.forEach((court: any) => {
-      if (court.play_name === '다락원축구장') return;
-
-      const htmlx = court.htmlx || '';
+      const result = await response.json();
       
-      const blockRegex = /<div class='chk_d[^']*'>[\s\S]*?<\/div>/g;
-      const blocks = [...htmlx.matchAll(blockRegex)];
-
-      blocks.forEach((block) => {
-        const blockHtml = block[0];
-        
-        const timeMatch = blockHtml.match(/(\d{2}):(\d{2})\s*~\s*(\d{2}):(\d{2})/);
-        if (!timeMatch) return;
-        
-        const startTime = `${timeMatch[1]}:${timeMatch[2]}`;
-        const endTime = `${timeMatch[3]}:${timeMatch[4]}`;
-        
-        const hasNochk = blockHtml.includes("class='chk_d nochk'");
-        const hasCheckbox = blockHtml.includes("type='checkbox'");
-        const hasHiddenDisabled = blockHtml.includes("type='hidden'") && 
-                                  blockHtml.includes("disabled");
-        
-        let status: string;
-        if (hasNochk || hasHiddenDisabled) {
-          status = '예약불가';
-        } else if (hasCheckbox) {
-          status = '예약가능';
-        } else {
-          status = '예약불가';
+      if (!result.success) {
+        console.error('도봉구 크롤링 실패:', result.error);
+        if (result.error && (
+          result.error.includes('로그인') || 
+          result.error.includes('인증') ||
+          result.error.includes('아이디') ||
+          result.error.includes('비밀번호')
+        )) {
+          throw new Error(`도봉구 로그인 실패: ${result.error}`);
         }
+        return [];
+      }
 
-        reservations.push({
-          court: '도봉',
-          date: dateStr,
-          court_num: court.play_name,
-          start_time: startTime,
-          end_time: endTime,
-          status: status
+      const playData = result.data.play_name;
+      const reservations: Reservation[] = [];
+
+      playData.forEach((court: any) => {
+        if (court.play_name === '다락원축구장') return;
+
+        const htmlx = court.htmlx || '';
+        
+        const blockRegex = /<div class='chk_d[^']*'>[\s\S]*?<\/div>/g;
+        const blocks = [...htmlx.matchAll(blockRegex)];
+
+        blocks.forEach((block) => {
+          const blockHtml = block[0];
+          
+          const timeMatch = blockHtml.match(/(\d{2}):(\d{2})\s*~\s*(\d{2}):(\d{2})/);
+          if (!timeMatch) return;
+          
+          const startTime = `${timeMatch[1]}:${timeMatch[2]}`;
+          const endTime = `${timeMatch[3]}:${timeMatch[4]}`;
+          
+          const hasNochk = blockHtml.includes("class='chk_d nochk'");
+          const hasCheckbox = blockHtml.includes("type='checkbox'");
+          const hasHiddenDisabled = blockHtml.includes("type='hidden'") && 
+                                    blockHtml.includes("disabled");
+          
+          let status: string;
+          if (hasNochk || hasHiddenDisabled) {
+            status = '예약불가';
+          } else if (hasCheckbox) {
+            status = '예약가능';
+          } else {
+            status = '예약불가';
+          }
+
+          reservations.push({
+            court: '도봉',
+            date: dateStr,
+            court_num: court.play_name,
+            start_time: startTime,
+            end_time: endTime,
+            status: status
+          });
         });
       });
-    });
 
-    const totalAvailable = reservations.filter(r => r.status === '예약가능').length;
-    console.log(`✅ 도봉구 ${dateStr}: ${totalAvailable}개 예약 가능`);
-    
-    return reservations;
-    
-  } catch (error) {
-    console.error('도봉구 크롤링 오류:', error);
-    throw error;
-  }
-};
+      const totalAvailable = reservations.filter(r => r.status === '예약가능').length;
+      console.log(`✅ 도봉구 ${dateStr}: ${totalAvailable}개 예약 가능`);
+      
+      return reservations;
+      
+    } catch (error) {
+      console.error('도봉구 크롤링 오류:', error);
+      throw error;
+    }
+  };
 
   // ========== 노원구 Edge Function 크롤링 ==========
   const crawlNowon = async (dates: string[]): Promise<{ [date: string]: Reservation[] }> => {
@@ -304,7 +372,6 @@ function UnifiedreservationPage() {
         return result.data;
       } else {
         console.error('❌ 노원구 크롤링 실패:', result.error);
-        // 로그인 실패 체크
         if (result.error && (
           result.error.includes('로그인') || 
           result.error.includes('인증') ||
@@ -317,20 +384,21 @@ function UnifiedreservationPage() {
       }
     } catch (error: any) {
       console.error('❌ 노원구 Edge Function 호출 오류:', error);
-      throw error; // 에러를 상위로 전달
+      throw error;
     }
   };
 
   // ========== 한 달 데이터 크롤링 (메인 함수) ==========
- 
   const crawlMonthData = async (forceRefresh = false) => {
     if (!tennisAccount.dobong_id || !tennisAccount.dobong_pass) {
-      alert('도봉구 테니스장 계정 정보를 먼저 등록해주세요.\n(프로필 페이지에서 등록 가능)');
+      alert('도봉구 테니스장 계정 정보를 먼저 등록해주세요.');
+      setShowAccountModal(true);
       return;
     }
 
     if (!tennisAccount.nowon_id || !tennisAccount.nowon_pass) {
-      alert('노원구 테니스장 계정 정보를 먼저 등록해주세요.\n(프로필 페이지에서 등록 가능)');
+      alert('노원구 테니스장 계정 정보를 먼저 등록해주세요.');
+      setShowAccountModal(true);
       return;
     }
 
@@ -338,37 +406,31 @@ function UnifiedreservationPage() {
     setMonthData({});
     setCrawlProgress({ current: 0, total: 0 });
 
-    // ===== 오늘 날짜 계산 (시간 제외) =====
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+    today.setHours(0, 0, 0, 0);
     
     const lastDay = new Date(year, month + 1, 0);
     const totalDays = lastDay.getDate();
 
-    // ===== 크롤링 시작일 계산 =====
     let startDay = 1;
     
-    // 현재 선택한 월이 오늘이 속한 월이라면, 오늘 날짜부터 시작
     if (year === today.getFullYear() && month === today.getMonth()) {
       startDay = today.getDate();
       console.log(`📅 오늘(${startDay}일)부터 크롤링 시작`);
     }
-    // 선택한 월이 과거라면 크롤링하지 않음
     else if (year < today.getFullYear() || 
             (year === today.getFullYear() && month < today.getMonth())) {
       alert('과거 날짜는 크롤링할 수 없습니다.');
       setLoading(false);
       return;
     }
-    // 미래 월이라면 1일부터 크롤링
     else {
       console.log(`📅 ${year}년 ${month + 1}월 전체 크롤링 (미래 월)`);
     }
 
-    const daysToFetch = totalDays - startDay + 1; // 실제 크롤링할 날짜 수
+    const daysToFetch = totalDays - startDay + 1;
 
     try {
-      // forceRefresh가 false면 캐시 확인
       if (!forceRefresh) {
         console.log('📦 캐시 확인 중...');
         const cached = await getCachedMonthData(year, month);
@@ -392,7 +454,6 @@ function UnifiedreservationPage() {
       setCrawlProgress({ current: 0, total: daysToFetch });
       const newMonthData: MonthData = {};
 
-      // === 1. 노원구 전체 크롤링 (불암산, 마들, 초안산) ===
       console.log(`📍 노원구 크롤링 시작 (${startDay}일부터 ${totalDays}일까지)...`);
       const nowonDates: string[] = [];
       
@@ -409,7 +470,6 @@ function UnifiedreservationPage() {
       const nowonByDate = await crawlNowon(nowonDates);
       console.log(`✅ 노원구 크롤링 완료: ${Object.keys(nowonByDate).length}개 날짜`);
 
-      // === 2. 도봉구(다락원) 크롤링 (날짜별) ===
       console.log(`📍 도봉구(다락원) 크롤링 시작 (${startDay}일부터)...`);
       
       let processedDays = 0;
@@ -422,25 +482,19 @@ function UnifiedreservationPage() {
           String(currentDate.getDate()).padStart(2, "0"),
         ].join("-");
 
-        // 노원구 데이터 가져오기
         const dayReservations: Reservation[] = nowonByDate[formattedDate] || [];
-
-        // 도봉구(다락원) 데이터 크롤링
         const dobongData = await crawlDobong(formattedDate);
         dayReservations.push(...dobongData);
 
         newMonthData[formattedDate] = dayReservations;
 
-        // 진행상황 업데이트
         processedDays++;
         setCrawlProgress({ current: processedDays, total: daysToFetch });
 
-        // API 부하 방지 딜레이
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       console.log('✅ 도봉구(다락원) 크롤링 완료');
 
-      // === 3. Storage에 전체 데이터 저장 ===
       console.log('💾 Storage에 데이터 저장 중...');
       const saved = await saveMonthDataToStorage(year, month, newMonthData);
       
@@ -843,20 +897,274 @@ function UnifiedreservationPage() {
     return Date.now() - lastUpdated > oneHour;
   };
 
+  // ========== 노원구 예약 처리 함수 ==========
+  const handleNowonReservation = async (reservations: SelectedReservation[]) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        alert('로그인이 필요합니다.');
+        return { success: false, results: [] };
+      }
+
+      // cseq 매핑 (코트명 -> cseq 값)
+      const cseqMap: { [key: string]: string } = {
+        '불암산': '15',
+        '마들': '16', 
+        '초안산': '17'
+      };
+
+      // 불암산 코트 번호 매핑 (표시명 -> 실제 코트번호)
+      const bulamCourtNumMap: { [key: string]: string } = {
+        '1코트': '18',
+        '2코트': '19',
+        '3코트': '20'
+      };
+
+      // 초안산 코트 번호 매핑 (표시명 -> 실제 코트번호)
+      const choanCourtNumMap: { [key: string]: string } = {
+        '1코트': '30',
+        '2코트': '31',
+        '3코트': '32',
+        '4코트': '33'
+      };
+
+      // 마들 코트 번호 매핑 (표시명 -> 실제 코트번호)
+      const madeulCourtNumMap: { [key: string]: string } = {
+        '1코트': '21',
+        '2코트': '22',
+        '3코트': '23',
+        '4코트': '24',
+        '5코트': '25',
+        '6코트': '26',
+        '7코트': '27',
+        '8코트': '28',
+        '9코트': '29'
+      };
+
+      const reservationData = reservations.map(res => {
+        const [startTime, endTime] = res.time.split('~');
+        
+        // 표시명 가져오기
+        const displayCourtNum = getDisplayCourtNum(res.court_num);
+        
+        // 실제 코트 번호 변환
+        let actualCourtNum = res.court_num;
+        if (res.court === '불암산') {
+          actualCourtNum = bulamCourtNumMap[displayCourtNum] || res.court_num;
+        } else if (res.court === '초안산') {
+          actualCourtNum = choanCourtNumMap[displayCourtNum] || res.court_num;
+        } else if (res.court === '마들') {
+          actualCourtNum = madeulCourtNumMap[displayCourtNum] || res.court_num;
+        }
+
+        return {
+          cseq: cseqMap[res.court],
+          courtName: res.court,
+          startTime: startTime,
+          endTime: endTime,
+          displayCourtNum: displayCourtNum,
+          actualCourtNum: actualCourtNum,
+          date: res.date
+        };
+      });
+
+      console.log('📤 노원구 예약 요청 데이터:', reservationData);
+
+      const response = await fetch(
+        `https://aftlhyhiskoeyflfiljr.supabase.co/functions/v1/nowon-reservation`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            nowon_id: tennisAccount.nowon_id,
+            nowon_pass: tennisAccount.nowon_pass,
+            reservations: reservationData
+          })
+        }
+      );
+
+      console.log('📥 응답 상태:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Edge Function HTTP 오류:', errorText);
+        throw new Error(`예약 요청 실패: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('📦 Edge Function 응답 전체:', result);
+      
+      if (result.success) {
+        console.log('✅ 노원구 예약 성공:', result);
+        if (result.results) {
+          result.results.forEach((r: any) => {
+            console.log(`  - ${r.court} ${r.courtNum} ${r.time}: ${r.success ? '✅' : '❌'} ${r.message || ''}`);
+          });
+        }
+        return { success: true, results: result.results || [] };
+      } else {
+        console.error('❌ 노원구 예약 실패 - result.error:', result.error);
+        console.error('❌ 전체 응답:', JSON.stringify(result, null, 2));
+        throw new Error(result.error || result.message || '예약 실패 (상세 정보 없음)');
+      }
+    } catch (error: any) {
+      console.error('💥 노원구 예약 오류:', error);
+      console.error('오류 스택:', error.stack);
+      throw error;
+    }
+  };
+
+  // ========== 예약하기 버튼 핸들러 ==========
+  const handleReservationSubmit = async () => {
+    if (selectedReservations.length === 0) {
+      alert('예약할 코트를 선택해주세요.');
+      return;
+    }
+
+    // 노원구와 도봉구 예약 구분
+    const nowonReservations = selectedReservations.filter(
+      res => ['불암산', '마들', '초안산'].includes(res.court)
+    );
+    const dobongReservations = selectedReservations.filter(
+      res => res.court === '도봉'
+    );
+
+    try {
+      setLoading(true);
+      const allResults: any[] = [];
+
+      // 노원구 예약 처리
+      if (nowonReservations.length > 0) {
+        console.log(`📍 노원구 예약 시작: ${nowonReservations.length}개`);
+        const nowonResult = await handleNowonReservation(nowonReservations);
+        if (nowonResult.results && nowonResult.results.length > 0) {
+          allResults.push(...nowonResult.results);
+        }
+      }
+
+      // 도봉구 예약 처리 (추후 구현)
+      if (dobongReservations.length > 0) {
+        dobongReservations.forEach(res => {
+          allResults.push({
+            court: res.court,
+            courtNum: getDisplayCourtNum(res.court_num),
+            date: res.date,
+            time: res.time,
+            success: false,
+            message: '도봉구 예약 기능은 준비중입니다.'
+          });
+        });
+      }
+
+      console.log('🎯 최종 결과:', allResults);
+
+      // 예약 성공 페이지로 이동
+      navigate('/reservation/success', {
+        state: { reservations: allResults }
+      });
+
+      // 예약 선택 초기화
+      setSelectedReservations([]);
+      
+    } catch (error: any) {
+      console.error('예약 실패:', error);
+      alert(`❌ 예약 실패: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="unified-reservation-container">
+      {/* 계정 정보 입력 모달 */}
+      {showAccountModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>🎾 계정 정보 입력</h2>
+            <p className="modal-description">
+              예약 기능을 사용하려면 노원구와 도봉구 시설관리공단의 계정이 필요합니다.
+            </p>
+            
+            <div className="account-form">
+              <div className="account-section">
+                <h3>노원구 시설관리공단</h3>
+                <div className="input-group">
+                  <label>아이디</label>
+                  <input
+                    type="text"
+                    value={accountForm.nowon_id}
+                    onChange={(e) => setAccountForm({...accountForm, nowon_id: e.target.value})}
+                    placeholder="노원구 아이디"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>비밀번호</label>
+                  <input
+                    type="password"
+                    value={accountForm.nowon_pass}
+                    onChange={(e) => setAccountForm({...accountForm, nowon_pass: e.target.value})}
+                    placeholder="노원구 비밀번호"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              <div className="account-section">
+                <h3>도봉구 시설관리공단</h3>
+                <div className="input-group">
+                  <label>아이디</label>
+                  <input
+                    type="text"
+                    value={accountForm.dobong_id}
+                    onChange={(e) => setAccountForm({...accountForm, dobong_id: e.target.value})}
+                    placeholder="도봉구 아이디"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>비밀번호</label>
+                  <input
+                    type="password"
+                    value={accountForm.dobong_pass}
+                    onChange={(e) => setAccountForm({...accountForm, dobong_pass: e.target.value})}
+                    placeholder="도봉구 비밀번호"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-buttons">
+              <button 
+                className="modal-btn modal-btn-primary" 
+                onClick={handleAccountSubmit}
+                disabled={loading}
+              >
+                {loading ? '저장 중...' : '저장'}
+              </button>
+            </div>
+
+            <div className="modal-info">
+              <p>💡 나중에 마이페이지에서 수정할 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button className="home-btn" onClick={() => navigate("/participate")}>
         Back
       </button>
       
-      {currentUser && (
-        <div
-          className="user-info"
-          onClick={() => navigate("/reservation/profile")}
-        >
-          user: {currentUser}
-        </div>
-      )}
+      <button 
+        className="mypage-btn" 
+        onClick={() => navigate("/reservation/profile")}
+      >
+        마이페이지
+      </button>
 
       <h1>통합 예약 페이지</h1>
       <p>노원구(불암산/마들/초안산)와 도봉구(다락원) 테니스장 예약 정보를 한 번에 확인하세요.</p>
@@ -895,14 +1203,8 @@ function UnifiedreservationPage() {
 
           <button
             className="refresh-btn"
-            disabled={selectedReservations.length === 0}
-            onClick={() => {
-              if (selectedReservations.length === 0) {
-                alert('예약할 코트를 선택해주세요.');
-                return;
-              }
-              alert(`${selectedReservations.length}개의 예약을 진행합니다.`);
-            }}
+            disabled={selectedReservations.length === 0 || loading}
+            onClick={handleReservationSubmit}
           >
             <span>📝</span>
             예약하기 ({selectedReservations.length})

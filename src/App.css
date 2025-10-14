@@ -1,12 +1,12 @@
-@font-face {
-    font-family: 'Pretendard';
-    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-ExtraLight.woff') format('woff');
-    font-weight: 400;
-    font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
 
 .page_content {
     height: calc(100vh - 200px);
     overflow-y: auto;
-    font-family: 'Pretendard', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 전역 폰트 설정 (선택사항) */
+* {
+    font-family: 'Noto Sans KR', sans-serif;
 }
