@@ -326,8 +326,9 @@
   flex-shrink: 0;
 }
 
-.profile-detail-age-card .profile-detail-stat-icon {
-  background: linear-gradient(135deg, #FEF7E0 0%, #F5C842 100%); /* 더 연한 노란색 */
+/* birthday 카드 아이콘 색상 변경 */
+.profile-detail-birthday-card .profile-detail-stat-icon {
+  background: linear-gradient(135deg, #FFE6F0 0%, #FFB3D9 100%); /* 핑크톤으로 변경 */
 }
 
 .profile-detail-contact-card .profile-detail-stat-icon {

@@ -17,7 +17,7 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
             setLoading(true);
             const { data, error } = await supabase
                 .from('ranked_user')
-                .select('name, major, stnum, rank_all, image_url, age, phone, rank_tier')
+                .select('name, major, stnum, rank_all, image_url, birthday, phone, rank_tier')
                 .eq('id', id)
                 .single();
             
@@ -136,8 +136,8 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
                             <span>🎂</span>
                         </div>
                         <div className="profile-detail-stat-content">
-                            <h3 className="profile-detail-stat-label">나이</h3>
-                            <p className="profile-detail-stat-value">{profile.age}세</p>
+                            <h3 className="profile-detail-stat-label">생년월일</h3>
+                            <p className="profile-detail-stat-value">{profile.birthday}</p>
                         </div>
                     </div>
                     

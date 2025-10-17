@@ -12,7 +12,7 @@ function ProfilePage() {
     email: string;
     phone: string;
     stnum: string;
-    age: string;
+    birthday: string;
     image_url?: string;
   } | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -25,7 +25,7 @@ function ProfilePage() {
       if (!user) return;
       const { data, error } = await supabase
         .from('profile')
-        .select('id, name, major, email, phone, stnum, age, image_url')
+        .select('id, name, major, email, phone, stnum, birthday, image_url')
         .eq('id', user.id)
         .single();
       if (!error && data) setProfile(data);
@@ -117,7 +117,7 @@ function ProfilePage() {
         email: profile.email,
         phone: profile.phone,
         stnum: profile.stnum,
-        age: profile.age,
+        birthday: profile.birthday,
         image_url: profile.image_url,
       })
       .eq('id', profile.id);
@@ -147,7 +147,7 @@ function ProfilePage() {
       if (!user) return;
       const { data, error } = await supabase
         .from('profile')
-        .select('id, name, major, email, phone, stnum, age, image_url')
+        .select('id, name, major, email, phone, stnum, birthday, image_url')
         .eq('id', user.id)
         .single();
       if (!error && data) setProfile(data);
@@ -273,17 +273,17 @@ function ProfilePage() {
                 </div>
 
                 <div className="form-group">
-                  <label>나이</label>
+                  <label>생년월일</label>
                   {isEditing ? (
                     <input 
-                      name="age" 
-                      value={profile.age} 
+                      name="birthday" 
+                      value={profile.birthday} 
                       onChange={handleChange}
                       className="form-input"
-                      type="number"
+                      type="date"
                     />
                   ) : (
-                    <div className="form-value">{profile.age}세</div>
+                    <div className="form-value">{profile.birthday}</div>
                   )}
                 </div>
               </div>

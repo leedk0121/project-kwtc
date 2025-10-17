@@ -38,7 +38,7 @@ function RankedEditPage() {
         try {
             const { data: allData, error: allError } = await supabase
                 .from('profile')
-                .select('id, name, age, phone, major, stnum, image_url');
+                .select('id, name, birthday, phone, major, stnum, image_url');
             if (allError) {
                 console.error('전체 유저 데이터 로딩 오류:', allError.message, allError.details);
             }
@@ -134,7 +134,15 @@ function RankedEditPage() {
                 const selectedRanked = filteredUsers
                     .filter(user => newIds.includes(user.id))
                     .map(user => {
-                        const userObj: any = { ...user };
+                        const userObj: any = { 
+                            id: user.id,
+                            name: user.name,
+                            major: user.major,
+                            stnum: user.stnum,
+                            image_url: user.image_url,
+                            birthday: user.birthday,
+                            phone: user.phone
+                        };
                         // rank_tier와 rank_detail은 입력된 값이 있을 때만 포함
                         const tierValue = tierInputs[user.id];
                         const detailValue = rankInputs[user.id];
@@ -241,7 +249,7 @@ function RankedEditPage() {
         }
         const { data: profileData, error } = await supabase
             .from('profile')
-            .select('id, name, major, stnum, image_url')
+            .select('id, name, major, stnum, image_url, birthday, phone')
             .in('id', rankedIds);
         if (error || !profileData) {
             alert('프로필 데이터 불러오기 실패: ' + error?.message);
@@ -256,6 +264,8 @@ function RankedEditPage() {
                 major: profile?.major ?? user.major,
                 stnum: profile?.stnum ?? user.stnum,
                 image_url: profile?.image_url ?? user.image_url,
+                birthday: profile?.birthday ?? user.birthday,
+                phone: profile?.phone ?? user.phone,
             };
         });
         const { error: upsertError } = await supabase

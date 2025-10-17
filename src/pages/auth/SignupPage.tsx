@@ -48,20 +48,6 @@ function Signup() {
     fetchDepartments();
   }, []);
 
-  // 생년월일로부터 나이 계산
-  const calculateAge = (birthday: string): number => {
-    const birthDate = new Date(birthday);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
-  };
-
   const handleSignup = async () => {
     if (!email.includes('@')) {
       alert('올바른 이메일을 입력하세요.');
@@ -75,9 +61,6 @@ function Signup() {
       alert('생년월일을 입력하세요.');
       return;
     }
-    
-    // 생년월일로부터 나이 계산
-    const age = calculateAge(birthday);
     
     // 회원가입 (이메일/비밀번호)
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -98,7 +81,7 @@ function Signup() {
         email, 
         name, 
         major, 
-        age, 
+        birthday,
         phone, 
         stnum,
         image_url: "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"

@@ -6,12 +6,13 @@ import "./Rankingpage.css";
 function RankingPage() {
     const [users, setUsers] = useState<any[]>([]);
     const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+    const [masterTierIcon, setMasterTierIcon] = useState<string>(''); // URL로 변경
     const tiers = [1, 2, 3, 4, 5];
     const tierRefs = useRef<(HTMLDivElement | null)[]>(Array(tiers.length).fill(null));
 
     // 티어별 정보 객체
     const tierInfo = {
-        1: { name: 'Master', color: '#FFD700', icon: '👑', gradient: 'linear-gradient(135deg, #FFD700, #FFA500)' },
+        1: { name: 'Master', color: '#B9F2FF', icon: masterTierIcon, gradient: 'linear-gradient(135deg, #B9F2FF, #87CEEB)' },
         2: { name: 'Diamond', color: '#B9F2FF', icon: '💎', gradient: 'linear-gradient(135deg, #B9F2FF, #87CEEB)' },
         3: { name: 'Platinum', color: '#E6E6FA', icon: '⭐', gradient: 'linear-gradient(135deg, #E6E6FA, #DDA0DD)' },
         4: { name: 'Gold', color: '#FFE135', icon: '🥇', gradient: 'linear-gradient(135deg, #FFE135, #DAA520)' },
@@ -20,7 +21,18 @@ function RankingPage() {
     };
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
+            // Master 티어 아이콘 가져오기 (스토리지에서)
+            const { data: iconUrlData } = supabase
+                .storage
+                .from('tier_icon')
+                .getPublicUrl('tier_chall.png');
+            
+            if (iconUrlData?.publicUrl) {
+                setMasterTierIcon(iconUrlData.publicUrl);
+            }
+
+            // 유저 데이터 가져오기
             const { data, error } = await supabase
                 .from('ranked_user')
                 .select('id, major, name, stnum, rank_tier, rank_detail, rank_all, image_url')
@@ -28,7 +40,7 @@ function RankingPage() {
                 .order('rank_detail', { ascending: true });
             if (!error && data) setUsers(data);
         };
-        fetchUsers();
+        fetchData();
     }, []);
 
     const handleTierScroll = (tierIdx: number) => {
@@ -84,7 +96,13 @@ function RankingPage() {
                             className={`tier-nav-btn tier-${tier}`}
                             onClick={() => handleTierScroll(idx)}
                         >
-                            <span className="tier-icon">{tierInfo[tier as keyof typeof tierInfo].icon}</span>
+                            <span className="tier-icon">
+                                {tier === 1 && masterTierIcon ? (
+                                    <img src={masterTierIcon} alt="Master" style={{ width: '48px', height: '48px' }} />
+                                ) : (
+                                    tierInfo[tier as keyof typeof tierInfo].icon
+                                )}
+                            </span>
                             <span className="tier-name">{tierInfo[tier as keyof typeof tierInfo].name}</span>
                         </button>
                     ))}
@@ -106,7 +124,13 @@ function RankingPage() {
                             style={{ background: tierInfo[tier as keyof typeof tierInfo].gradient }}
                         >
                             <div className="tier-info">
-                                <span className="tier-icon-large">{tierInfo[tier as keyof typeof tierInfo].icon}</span>
+                                <span className="tier-icon-large">
+                                    {tier === 1 && masterTierIcon ? (
+                                        <img src={masterTierIcon} alt="Master" style={{ width: '80px', height: '80px' }} />
+                                    ) : (
+                                        tierInfo[tier as keyof typeof tierInfo].icon
+                                    )}
+                                </span>
                                 <div className="tier-text">
                                     <h2 className="tier-title">{tierInfo[tier as keyof typeof tierInfo].name}</h2>
                                     <span className="tier-subtitle">Tier {tier}</span>
