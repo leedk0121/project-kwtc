@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ReservationSuccessPage.css';
 
+// 🆕 타입 수정: price, pprice, eprice 추가
 type SuccessReservation = {
   court: string;
   courtNum: string;
@@ -9,6 +10,10 @@ type SuccessReservation = {
   time: string;
   success: boolean;
   message?: string;
+  rent_no?: string;  // 예약번호
+  price?: string;    // 총 가격
+  pprice?: string;   // 시설 가격
+  eprice?: string;   // 장비 가격
 };
 
 function ReservationSuccessPage() {
@@ -44,7 +49,24 @@ function ReservationSuccessPage() {
                     <span className="date">📅 {res.date}</span>
                     <span className="time">🕐 {res.time}</span>
                   </div>
-                  {res.message && (
+                  {/* 🆕 예약번호 표시 */}
+                  {res.rent_no && (
+                    <div className="reservation-message success-message">
+                      📋 예약번호: {res.rent_no}
+                    </div>
+                  )}
+                  {/* 🆕 가격 표시 */}
+                  {res.price && (
+                    <div className="reservation-message success-message">
+                      💰 총 금액: {res.price}
+                      {res.pprice && res.eprice && (
+                        <span style={{ fontSize: '0.9em', color: '#666', marginLeft: '8px' }}>
+                          (시설: {res.pprice}{res.eprice !== '0원' && `, 장비: ${res.eprice}`})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {res.message && !res.rent_no && (
                     <div className="reservation-message success-message">
                       {res.message}
                     </div>

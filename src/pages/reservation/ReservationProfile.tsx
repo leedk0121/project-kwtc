@@ -203,7 +203,7 @@ export default function ReservationProfile() {
   const [reservationHistory, setReservationHistory] = useState<NowonReservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'history' | 'settings'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'nowon-history' | 'darakwon-history'>('profile');
   const [showNowonPass, setShowNowonPass] = useState(false);
   const [showDobongPass, setShowDobongPass] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -215,7 +215,7 @@ export default function ReservationProfile() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'history') {
+    if (activeTab === 'nowon-history') {
       loadReservationHistory();
     }
   }, [activeTab]);
@@ -645,16 +645,16 @@ export default function ReservationProfile() {
           프로필
         </button>
         <button 
-          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
+          className={`tab-btn ${activeTab === 'nowon-history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('nowon-history')}
         >
-          내 예약
+          노원구 예약
         </button>
         <button 
-          className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
+          className={`tab-btn ${activeTab === 'darakwon-history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('darakwon-history')}
         >
-          설정
+          다락원 예약
         </button>
       </div>
 
@@ -738,10 +738,28 @@ export default function ReservationProfile() {
                 수정
               </button>
             </div>
+
+            <div className="info-card">
+              <h3>계정 설정</h3>
+              <div className="setting-item">
+                <span className="setting-label">알림 설정</span>
+                <label className="toggle">
+                  <input 
+                    type="checkbox" 
+                    checked={profile?.reservation_alert ?? true}
+                    onChange={(e) => handleReservationAlertToggle(e.target.checked)}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <button className="logout-btn" onClick={handleLogout}>
+                로그아웃
+              </button>
+            </div>
           </div>
         )}
 
-        {activeTab === 'history' && (
+        {activeTab === 'nowon-history' && (
           <div className="history-tab">
             <div className="history-card">
               <div className="history-header">
@@ -901,24 +919,22 @@ export default function ReservationProfile() {
           </div>
         )}
 
-        {activeTab === 'settings' && (
-          <div className="settings-tab">
-            <div className="settings-card">
-              <h3>계정 설정</h3>
-              <div className="setting-item">
-                <span className="setting-label">알림 설정</span>
-                <label className="toggle">
-                  <input 
-                    type="checkbox" 
-                    checked={profile?.reservation_alert ?? true}
-                    onChange={(e) => handleReservationAlertToggle(e.target.checked)}
-                  />
-                  <span className="slider"></span>
-                </label>
+        {activeTab === 'darakwon-history' && (
+          <div className="history-tab">
+            <div className="history-card">
+              <div className="history-header">
+                <h3>다락원 예약 내역</h3>
+                <button 
+                  className="refresh-history-btn"
+                  disabled
+                >
+                  🔄 새로고침
+                </button>
               </div>
-              <button className="logout-btn" onClick={handleLogout}>
-                로그아웃
-              </button>
+              
+              <div className="no-history">
+                <p>다락원 예약 내역 기능은 준비 중입니다.</p>
+              </div>
             </div>
           </div>
         )}

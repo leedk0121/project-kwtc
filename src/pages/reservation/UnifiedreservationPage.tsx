@@ -1022,22 +1022,25 @@ function UnifiedreservationPage() {
     try {
       const PROXY_URL = 'http://kwtc.dothome.co.kr/get_rent_no.php';
       
-      console.log(`📍 도봉구 예약 시작: ${reservations.length}개`);
+      console.log(`📍 도봉구(다락원) 예약 시작: ${reservations.length}개`);
       
-      // Supabase에서 생년월일 가져오기
+      // Supabase에서 생년월일과 전화번호 가져오기
       const { data: { user } } = await supabase.auth.getUser();
       let birthday = '';
+      let phoneNumber = '';
       
       if (user) {
         const { data: profileData } = await supabase
           .from('profile')
-          .select('birthday')
+          .select('birthday, phone')
           .eq('id', user.id)
           .single();
         
-        if (profileData && profileData.birthday) {
-          birthday = profileData.birthday;
+        if (profileData) {
+          birthday = profileData.birthday || '';
+          phoneNumber = profileData.phone || '';
           console.log('📅 생년월일:', birthday);
+          console.log('📱 전화번호:', phoneNumber);
         }
       }
       
@@ -1049,7 +1052,8 @@ function UnifiedreservationPage() {
           action: 'get_rent_no',
           username: tennisAccount.dobong_id,
           password: tennisAccount.dobong_pass,
-          birthday: birthday,  // 생년월일 추가
+          birthday: birthday,
+          phone_number: phoneNumber,
           reservations: reservations.map(res => ({
             court: res.court,
             court_num: res.court_num,
@@ -1059,9 +1063,9 @@ function UnifiedreservationPage() {
         })
       });
 
-      // 응답을 텍스트로 먼저 확인
+      // 응답 확인
       const responseText = await response.text();
-      console.log('📄 원본 응답 텍스트:', responseText.substring(0, 1000));
+      console.log('📄 원본 응답:', responseText.substring(0, 500));
 
       let result;
       try {
@@ -1069,67 +1073,32 @@ function UnifiedreservationPage() {
       } catch (parseError) {
         console.error('❌ JSON 파싱 실패');
         console.error('전체 응답:', responseText);
-        throw new Error('서버 응답이 올바른 JSON 형식이 아닙니다. PHP 에러를 확인하세요.');
+        throw new Error('서버 응답 파싱 실패');
       }
       
-      console.log('🔍 API 전체 응답:', JSON.stringify(result, null, 2));
+      console.log('🔍 API 응답:', JSON.stringify(result, null, 2));
       
       if (!result.success) {
         console.error('❌ 도봉구 예약 실패:', result.error);
         throw new Error(result.error || '도봉구 예약 실패');
       }
 
-      // 결과 처리
-      console.log('✅ 도봉구 예약 완료:', result.results);
+      // 결과 처리 및 표시
+      console.log('✅ 도봉구 예약 처리 완료');
       
       if (result.results && result.results.length > 0) {
         result.results.forEach((r: any) => {
           const icon = r.success ? '✅' : '❌';
           const msg = r.success 
-            ? `rent_no: ${r.rent_no}` 
-            : r.error || '알 수 없는 오류';
+            ? `예약 성공 (rent_no: ${r.rent_no})` 
+            : (r.error || r.message || '알 수 없는 오류');
           console.log(`${icon} ${r.court} ${r.court_num} ${r.time}: ${msg}`);
           
-          // 실패 시 전체 응답 객체 출력
-          if (!r.success) {
-            console.log('🔍 전체 응답 객체:', JSON.stringify(r, null, 2));
-            
-            // raw_response가 있으면 출력
-            if (r.raw_response) {
-              console.group('📄 원본 응답');
-              console.log(r.raw_response);
-              console.groupEnd();
-            }
-            
-            // json_error가 있으면 출력
-            if (r.json_error) {
-              console.error('🔴 JSON 파싱 오류:', r.json_error);
-            }
-            
-            if (r.debug_log && r.debug_log.length > 0) {
-              console.group('🔍 디버그 로그');
-              r.debug_log.forEach((log: string) => console.log(log));
-              console.groupEnd();
-            } else {
-              console.warn('⚠️ debug_log가 없습니다');
-            }
-            
-            if (r.error_details) {
-              console.group('🔍 상세 오류 분석');
-              console.log('찾으려는 정보:', r.error_details.looking_for);
-              console.log('발견된 play:', r.error_details.found_plays);
-              console.log('발견된 코트:', r.error_details.found_courts);
-              console.log('발견된 시간대 (처음 10개):', r.error_details.found_times.slice(0, 10));
-              
-              // 데이터 구조 정보 출력
-              if (r.error_details.data_structure) {
-                console.log('📊 rent_list 데이터 구조:', r.error_details.data_structure);
-              }
-              
-              console.groupEnd();
-            } else {
-              console.warn('⚠️ error_details가 없습니다');
-            }
+          // 디버그 로그 출력
+          if (r.debug_log && r.debug_log.length > 0) {
+            console.group(`🔍 ${r.court_num} ${r.time} 디버그 로그`);
+            r.debug_log.forEach((log: string) => console.log(log));
+            console.groupEnd();
           }
         });
       }
@@ -1181,8 +1150,9 @@ function UnifiedreservationPage() {
             date: r.date,
             time: r.time,
             success: r.success,
-            message: r.success ? `rent_no: ${r.rent_no}` : r.error,
-            rent_no: r.rent_no
+            message: r.success ? `예약 완료 (rent_no: ${r.rent_no})` : r.error,
+            rent_no: r.rent_no,
+            price: r.price
           })));
         }
       }
@@ -1348,7 +1318,7 @@ function UnifiedreservationPage() {
 
         {!loading && (
           <div className="tip-message">
-            💡 Tip: 새로고침을 누르면 최신 예약 정보를 불러옵니다
+            💡 Tip: 마이페이지에서 내 예약 내역을 확인할 수 있습니다.
           </div>
         )}
       </div>
