@@ -420,10 +420,10 @@
 }
 
 .post-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
 .post-badge {
@@ -432,6 +432,27 @@
   padding: 4px 8px;
   border-radius: 6px;
   text-transform: uppercase;
+  display: inline-block;
+}
+
+.pin-icon {
+  display: inline-block !important;
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+  position: relative;
+  top: -3px; /* 핀 아이콘을 3px 위로 이동 */
+}
+
+/* 모바일에서도 동일하게 오른쪽에 위치 */
+@media (max-width: 480px) {
+  .post-header {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .pin-icon {
+    margin-left: 8px;
+    margin-right: 0;
+  }
 }
 
 .post-badge.announcement {
@@ -447,16 +468,6 @@
 .post-badge.normal {
   background: #dbeafe;
   color: #2563eb;
-}
-
-.pin-icon {
-  font-size: 14px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 .post-title {

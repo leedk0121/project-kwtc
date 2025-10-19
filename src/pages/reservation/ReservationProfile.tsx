@@ -64,6 +64,28 @@ interface NowonReservation {
   };
 }
 
+interface DobongReservation {
+  type: 'pending' | 'completed';
+  column_1?: string;  // 번호
+  column_2?: string;  // 상태 (예: "예약대기", "예약완료")
+  column_3?: string;  // (미사용 또는 기타)
+  column_4?: string;  // (미사용 또는 기타)
+  column_5?: string;  // 시설명
+  column_6?: string;  // 날짜
+  column_7?: string;  // 시간
+  links?: Array<{
+    text: string;
+    href: string;
+  }>;
+}
+
+interface TennisAccountEditData {
+  nowon_id: string;
+  nowon_pass: string;
+  dobong_id: string;
+  dobong_pass: string;
+}
+
 // 테니스장 계정 수정 모달 컴포넌트
 function TennisAccountEditModal({ 
   isOpen, 
@@ -201,14 +223,20 @@ export default function ReservationProfile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [reservationHistory, setReservationHistory] = useState<NowonReservation[]>([]);
+  const [dobongReservationHistory, setDobongReservationHistory] = useState<DobongReservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [loadingDobongHistory, setLoadingDobongHistory] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'nowon-history' | 'darakwon-history'>('profile');
   const [showNowonPass, setShowNowonPass] = useState(false);
   const [showDobongPass, setShowDobongPass] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [filterStatus, setFilterStatus] = useState<'all' | 'payment-waiting' | 'payment-completed'>('all');
+  const [dobongFilterType, setDobongFilterType] = useState<'pending' | 'completed' | 'cancelled'>('pending'); // 기본값: 예약대기
+  const [expandedDobongItems, setExpandedDobongItems] = useState<Set<number>>(new Set());
+  // 도봉구 headers 상태 추가
+  const [dobongHeaders, setDobongHeaders] = useState<{ pending?: string[]; completed?: string[] }>({});
 
   useEffect(() => {
     loadUserData();
@@ -217,22 +245,21 @@ export default function ReservationProfile() {
   useEffect(() => {
     if (activeTab === 'nowon-history') {
       loadReservationHistory();
+    } else if (activeTab === 'darakwon-history') {
+      loadDobongReservationHistory();
     }
   }, [activeTab]);
 
   const loadUserData = async () => {
     try {
-      // 로컬 스토리지에서 기본 정보 가져오기
       const userName = localStorage.getItem('user_name') || '';
       const userMajor = localStorage.getItem('user_major') || '';
       const userStnum = localStorage.getItem('user_stnum') || '';
       const userImageUrl = localStorage.getItem('user_image_url') || '';
       
-      // 현재 사용자 정보 가져오기
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // tennis_reservation_profile에서 테니스장 계정 정보 가져오기
         const { data: reservationData, error } = await supabase
           .from('tennis_reservation_profile')
           .select('nowon_id, nowon_pass, dobong_id, dobong_pass, reservation_alert')
@@ -274,7 +301,6 @@ export default function ReservationProfile() {
 
       console.log('📡 노원구 예약 내역 크롤링 시작...');
 
-      // supabase 클라이언트에서 URL 추출
       const functionUrl = `${supabase.supabaseUrl}/functions/v1/crawl-nowon-reservation`;
       console.log('📡 요청 URL:', functionUrl);
 
@@ -297,17 +323,12 @@ export default function ReservationProfile() {
       const result = await response.json();
       console.log('✅ 크롤링 결과:', result);
       
-      // API 응답의 data를 직접 사용 (Storage 건너뛰기)
       if (result.data && Array.isArray(result.data)) {
         console.log('📦 API 응답 데이터 직접 사용:', result.data.length);
         setReservationHistory(result.data);
         return;
       }
       
-      // Storage에서 데이터 다운로드 (백업)
-      console.log('📦 Storage에서 데이터 다운로드 시작...');
-      
-      // Storage에서 데이터 읽기
       if (result.userId) {
         console.log('📦 Storage에서 데이터 다운로드 시작...');
         
@@ -323,16 +344,7 @@ export default function ReservationProfile() {
         const fileContent = await storageData.text();
         const jsonData = JSON.parse(fileContent);
         
-        console.log('📦 Storage 데이터:', jsonData);
-        
-        // 예약 데이터를 상태에 저장
         const reservations = jsonData.reservations || [];
-        
-        console.log('📊 예약 개수:', reservations.length);
-        console.log('📊 첫 번째 예약:', reservations[0]);
-        console.log('📊 첫 번째 raw:', reservations[0]?.raw);
-        console.log('📊 첫 번째 detailList:', reservations[0]?.raw?.detailList);
-        
         setReservationHistory(reservations);
         
         console.log('✅ State 업데이트 완료');
@@ -347,6 +359,118 @@ export default function ReservationProfile() {
     }
   };
 
+  const loadDobongReservationHistory = async () => {
+    try {
+      setLoadingDobongHistory(true);
+      
+      if (!profile?.dobong_id || !profile?.dobong_pass) {
+        alert('도봉구 계정 정보가 없습니다. 프로필에서 등록해주세요.');
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('로그인이 필요합니다');
+      }
+
+      console.log('📡 도봉구 예약 내역 크롤링 시작...');
+
+      const PROXY_URL = 'http://kwtc.dothome.co.kr/get_reservation_list.php';
+      
+      const response = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'get_reservation_list',
+          username: profile.dobong_id,
+          password: profile.dobong_pass,
+          userId: user.id
+        })
+      });
+
+      console.log('📥 응답 상태:', response.status, response.statusText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ 크롤링 결과:', result);
+      
+      if (result.success && result.data) {
+        // 예약 대기 + 예약 완료 데이터 통합
+        const pendingReservations = result.data.pending?.reservations || [];
+        const completedReservations = result.data.completed?.reservations || [];
+        const allReservations = [...pendingReservations, ...completedReservations];
+
+        // headers 추출
+        setDobongHeaders({
+          pending: result.data.pending?.headers,
+          completed: result.data.completed?.headers,
+        });
+        
+        console.log('📦 예약 대기:', pendingReservations.length);
+        console.log('📦 예약 완료:', completedReservations.length);
+        console.log('📦 전체:', allReservations.length);
+        
+        setDobongReservationHistory(allReservations);
+        
+        // Storage에 저장
+        try {
+          const jsonData = {
+            pending: result.data.pending,
+            completed: result.data.completed,
+            total_count: allReservations.length,
+            crawled_at: new Date().toISOString()
+          };
+          
+          const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+            type: 'application/json'
+          });
+          
+          const fileName = `dobong-reservations-${user.id}.json`;
+          
+          const { data: existingFiles } = await supabase.storage
+            .from('reservation-data')
+            .list('', {
+              search: fileName
+            });
+          
+          if (existingFiles && existingFiles.length > 0) {
+            await supabase.storage
+              .from('reservation-data')
+              .remove([fileName]);
+          }
+          
+          const { error: uploadError } = await supabase.storage
+            .from('reservation-data')
+            .upload(fileName, blob, {
+              contentType: 'application/json',
+              upsert: true
+            });
+          
+          if (uploadError) {
+            console.error('Storage 업로드 실패:', uploadError);
+          } else {
+            console.log('✅ Storage 저장 완료:', fileName);
+          }
+        } catch (storageError) {
+          console.error('Storage 처리 오류:', storageError);
+        }
+      } else {
+        throw new Error(result.error || '데이터를 불러올 수 없습니다');
+      }
+      
+    } catch (error: any) {
+      console.error('❌ 도봉구 예약 내역 조회 오류:', error);
+      alert(error.message || '예약 내역을 불러올 수 없습니다');
+    } finally {
+      setLoadingDobongHistory(false);
+    }
+  };
+
   const handleEditTennisAccount = () => {
     setShowEditModal(true);
   };
@@ -356,7 +480,6 @@ export default function ReservationProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('사용자 정보를 찾을 수 없습니다.');
 
-      // 기존 레코드가 있는지 확인
       const { data: existingData } = await supabase
         .from('tennis_reservation_profile')
         .select('*')
@@ -364,7 +487,6 @@ export default function ReservationProfile() {
         .single();
 
       if (existingData) {
-        // 기존 레코드 업데이트
         const { error } = await supabase
           .from('tennis_reservation_profile')
           .update(accountInfo)
@@ -372,7 +494,6 @@ export default function ReservationProfile() {
 
         if (error) throw error;
       } else {
-        // 새 레코드 생성
         const { error } = await supabase
           .from('tennis_reservation_profile')
           .insert({
@@ -383,7 +504,6 @@ export default function ReservationProfile() {
         if (error) throw error;
       }
 
-      // 프로필 상태 업데이트
       setProfile(prev => prev ? {
         ...prev,
         nowon_id: accountInfo.nowon_id,
@@ -404,7 +524,6 @@ export default function ReservationProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('사용자 정보를 찾을 수 없습니다.');
 
-      // 기존 레코드가 있는지 확인
       const { data: existingData } = await supabase
         .from('tennis_reservation_profile')
         .select('*')
@@ -412,7 +531,6 @@ export default function ReservationProfile() {
         .single();
 
       if (existingData) {
-        // 기존 레코드 업데이트
         const { error } = await supabase
           .from('tennis_reservation_profile')
           .update({ reservation_alert: checked })
@@ -420,7 +538,6 @@ export default function ReservationProfile() {
 
         if (error) throw error;
       } else {
-        // 새 레코드 생성
         const { error } = await supabase
           .from('tennis_reservation_profile')
           .insert({
@@ -431,7 +548,6 @@ export default function ReservationProfile() {
         if (error) throw error;
       }
 
-      // 프로필 상태 업데이트
       setProfile(prev => prev ? {
         ...prev,
         reservation_alert: checked
@@ -476,6 +592,16 @@ export default function ReservationProfile() {
     setExpandedItems(newExpanded);
   };
 
+  const toggleDobongDetails = (index: number) => {
+    const newExpanded = new Set(expandedDobongItems);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
+    } else {
+      newExpanded.add(index);
+    }
+    setExpandedDobongItems(newExpanded);
+  };
+
   const handleCancelReservation = async (seq: number, totalPrice: number) => {
     const confirmCancel = window.confirm('정말로 예약을 취소하시겠습니까?');
     if (!confirmCancel) return;
@@ -517,7 +643,6 @@ export default function ReservationProfile() {
 
       alert('예약이 취소되었습니다.');
       
-      // 예약 내역 새로고침
       loadReservationHistory();
 
     } catch (error: any) {
@@ -526,56 +651,140 @@ export default function ReservationProfile() {
     }
   };
 
-  // 예약 상태에 따른 한글 표시
+  // 도봉구 예약 취소 함수 - 예약 객체 전체를 인자로 받아 필요한 정보 추출
+  const handleDobongCancelReservation = async (reservation: DobongReservation) => {
+    const rentNo = reservation.column_1 || '';
+    const facilityName = reservation.column_5 || '시설명 없음';
+
+    // place_code: 실내코트면 019, 실외코트면 022
+    let place_code = '';
+    if (facilityName.includes('실내')) {
+      place_code = '019';
+    } else if (facilityName.includes('실외')) {
+      place_code = '022';
+    }
+    // event_code는 항상 039
+    const event_code = '039';
+
+    // member_name은 로컬스토리지에서 user_name을 가져옴
+    const member_name = localStorage.getItem('user_name') || '';
+
+    // goodsName: facilityName에서 앞에 8글자 뺀 뒤 5글자
+    let goodsName = '';
+    if (facilityName.length >= 12) {
+      goodsName = facilityName.substring(7, 12);
+    }
+
+    // member_id는 tennis_reservation_profile 테이블의 dobong_id (이미 profile.dobong_id로 관리 중)
+    const member_id = profile?.dobong_id || '';
+
+    // 확인 알림
+    if (!confirm(`정말로 "${facilityName}" 예약을 취소하시겠습니까?\n\n취소 후에는 복구할 수 없습니다.`)) {
+      return;
+    }
+
+    try {
+      if (!profile?.dobong_id || !profile?.dobong_pass) {
+        alert('도봉구 계정 정보가 없습니다.');
+        return;
+      }
+
+      const CANCEL_URL = 'http://kwtc.dothome.co.kr/cancel_dobong_reservation.php';
+
+      const payload: any = {
+        action: 'cancel_reservation',
+        username: profile.dobong_id,
+        password: profile.dobong_pass,
+        rent_no: rentNo,
+        place_code,
+        event_code,
+        member_name,
+        goodsName,
+        member_id
+      };
+
+      const response = await fetch(CANCEL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ 취소 결과:', result);
+
+      if (result.debug_log && result.debug_log.length > 0) {
+        console.group('🔍 취소 디버그 로그');
+        result.debug_log.forEach((log: string) => console.log(log));
+        console.groupEnd();
+      }
+
+      if (result.success) {
+        alert('✅ ' + (result.message || '예약이 취소되었습니다.'));
+        loadDobongReservationHistory();
+      } else {
+        throw new Error(result.error || result.message || '취소 실패');
+      }
+
+    } catch (error: any) {
+      console.error('❌ 도봉구 예약 취소 오류:', error);
+      alert('❌ 예약 취소 실패: ' + error.message);
+    }
+  };
+
   const getReservationStatus = (reservation: NowonReservation): string => {
     const raw = reservation.raw;
     
-    // 예약 취소
     if (raw.rstat === 'C' || raw.rstat === '1') return '예약취소';
-    
-    // 결제 대기 (rstat === 'R' 추가)
     if (raw.rstat === 'R' || raw.pstat === '결제대기') return '결제대기';
-    
-    // 결제 완료
     if (raw.pstat === '결제완료') return '결제완료';
-    
-    // 승인 완료
     if (raw.okayYn === 'Y') return '승인완료';
     
     return '대기중';
   };
 
-  // 예약 상태에 따른 CSS 클래스
   const getStatusClass = (reservation: NowonReservation): string => {
     const raw = reservation.raw;
     
-    // 예약 취소
     if (raw.rstat === 'C' || raw.rstat === '1') return 'status-cancelled';
-    
-    // 결제 대기 (rstat === 'R' 추가)
     if (raw.rstat === 'R' || raw.pstat === '결제대기') return 'status-payment-waiting';
-    
-    // 결제 완료
     if (raw.pstat === '결제완료') return 'status-confirmed';
-    
-    // 승인 완료
     if (raw.okayYn === 'Y') return 'status-approved';
     
     return 'status-pending';
   };
 
-  // 요일 표시 (1=일, 2=월, 3=화, 4=수, 5=목, 6=금, 7=토)
+  const getDobongStatusClass = (reservation: DobongReservation): string => {
+    const status = reservation.column_2 || '';
+    
+    // 시간경과취소는 빨간색
+    if (status.includes('시간경과취소') || status.includes('취소')) {
+      return 'status-time-cancelled';
+    }
+    
+    // 예약완료는 초록색
+    if (reservation.type === 'completed') {
+      return 'status-completed';
+    }
+    
+    // 예약대기는 노란색
+    return 'status-pending';
+  };
+
   const getDayOfWeek = (day: number): string => {
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     return days[day] || '';
   };
 
-  // 필터링된 예약 내역
   const getFilteredReservations = () => {
     return reservationHistory.filter(reservation => {
       const raw = reservation.raw;
       
-      // 취소된 예약은 기본적으로 제외
       if (raw.rstat === 'C' || raw.rstat === '1') {
         return false;
       }
@@ -592,6 +801,66 @@ export default function ReservationProfile() {
       
       return true;
     });
+  };
+
+  const getFilteredDobongReservations = () => {
+    if (dobongFilterType === 'pending') {
+      return dobongReservationHistory.filter(
+        r => r.type === 'pending' && !(r.column_2?.includes('취소'))
+      );
+    }
+    if (dobongFilterType === 'cancelled') {
+      return dobongReservationHistory.filter(
+        r => r.column_2?.includes('취소')
+      );
+    }
+    return dobongReservationHistory.filter(
+      r => r.type === 'completed' && !(r.column_2?.includes('취소'))
+    );
+  };
+
+  // 다락원 예약 내역 필터별 카운트 계산 (헤더 데이터 포함)
+  const getDobongCounts = () => {
+    // 헤더 상태 추출
+    const headerPendingStatus = dobongHeaders.pending && dobongHeaders.pending.length > 14 ? dobongHeaders.pending[9] : '';
+    const headerCompletedStatus = dobongHeaders.completed && dobongHeaders.completed.length > 14 ? dobongHeaders.completed[9] : '';
+
+    // 실제 데이터 카운트
+    const pendingCount = dobongReservationHistory.filter(
+      r => r.type === 'pending' && !(r.column_2?.includes('취소')) && !(r.column_2?.includes('완료'))
+    ).length;
+    const cancelledCount = dobongReservationHistory.filter(
+      r => r.column_2?.includes('취소')
+    ).length;
+    const completedCount = dobongReservationHistory.filter(
+      r => r.type === 'completed' && !(r.column_2?.includes('취소'))
+    ).length;
+
+    // 헤더가 실제로 해당 리스트에 표시될 때만 +1
+    return {
+      pending: pendingCount + (
+        dobongHeaders.pending && dobongHeaders.pending.length > 14 &&
+        !headerPendingStatus.includes('취소') &&
+        !headerPendingStatus.includes('완료')
+          ? 1 : 0
+      ),
+      cancelled: cancelledCount + (
+        dobongHeaders.pending && dobongHeaders.pending.length > 14 &&
+        headerPendingStatus.includes('취소')
+          ? 1 : 0
+      ),
+      completed: completedCount +
+        (
+          dobongHeaders.pending && dobongHeaders.pending.length > 14 &&
+          headerPendingStatus.includes('완료')
+            ? 1 : 0
+        ) +
+        (
+          dobongHeaders.completed && dobongHeaders.completed.length > 14 &&
+          headerCompletedStatus.includes('완료')
+            ? 1 : 0
+        )
+    };
   };
 
   if (loading) {
@@ -648,13 +917,13 @@ export default function ReservationProfile() {
           className={`tab-btn ${activeTab === 'nowon-history' ? 'active' : ''}`}
           onClick={() => setActiveTab('nowon-history')}
         >
-          노원구 예약
+          노원구 예약 내역
         </button>
         <button 
           className={`tab-btn ${activeTab === 'darakwon-history' ? 'active' : ''}`}
           onClick={() => setActiveTab('darakwon-history')}
         >
-          다락원 예약
+          다락원 예약 내역
         </button>
       </div>
 
@@ -739,23 +1008,9 @@ export default function ReservationProfile() {
               </button>
             </div>
 
-            <div className="info-card">
-              <h3>계정 설정</h3>
-              <div className="setting-item">
-                <span className="setting-label">알림 설정</span>
-                <label className="toggle">
-                  <input 
-                    type="checkbox" 
-                    checked={profile?.reservation_alert ?? true}
-                    onChange={(e) => handleReservationAlertToggle(e.target.checked)}
-                  />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              <button className="logout-btn" onClick={handleLogout}>
-                로그아웃
-              </button>
-            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              로그아웃
+            </button>
           </div>
         )}
 
@@ -771,6 +1026,21 @@ export default function ReservationProfile() {
                 >
                   {loadingHistory ? '🔄 로딩 중...' : '🔄 새로고침'}
                 </button>
+              </div>
+              
+              {/* 안내 문구 추가 */}
+              <div className="history-tip">
+                <div className="tip-text">
+                  💡 결제는 노원구 시설관리공단에서 직접 해야됩니다.
+                </div>
+                <a 
+                  href="https://reservation.nowonsc.kr/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tip-link-btn"
+                >
+                  결제하러 가기 →
+                </a>
               </div>
               
               {/* 필터 버튼 - 취소 제거 */}
@@ -807,11 +1077,11 @@ export default function ReservationProfile() {
                       const raw = reservation.raw;
                       const isExpanded = expandedItems.has(raw.seq || index);
                       const isPaymentWaiting = raw.rstat === 'R' || raw.pstat === '결제대기';
-                      
+
                       return (
                         <div key={raw.seq || index} className="history-item">
                           <div className="history-main-info">
-                            <div className="court-name">{raw.cName || '코트 정보 없음'}</div>
+                            <div className="court-name">{raw.cName || '코트 정보 없음'}장</div>
                             <div className={`status ${getStatusClass(reservation)}`}>
                               {getReservationStatus(reservation)}
                             </div>
@@ -844,6 +1114,7 @@ export default function ReservationProfile() {
                             </div>
                           )}
 
+                          {/* 상세정보 접기/펼치기 버튼을 상세정보 바로 위로 이동 */}
                           <div className="history-item-actions">
                             <button 
                               className="toggle-details-btn"
@@ -851,56 +1122,56 @@ export default function ReservationProfile() {
                             >
                               {isExpanded ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
                             </button>
-
-                            {isExpanded && (
-                              <div className="history-details">
-                                <div className="detail-row">
-                                  <span className="detail-label">신청일:</span>
-                                  <span className="detail-value">
-                                    {raw.insertDate ? `20${raw.insertDate}` : '날짜 정보 없음'}
-                                  </span>
-                                </div>
-                                <div className="detail-row">
-                                  <span className="detail-label">총 금액:</span>
-                                  <span className="detail-value">
-                                    {(raw.priceRefundTotalPricePay || 0).toLocaleString()}원
-                                  </span>
-                                </div>
-                                {raw.payMethod && (
-                                  <div className="detail-row">
-                                    <span className="detail-label">결제방법:</span>
-                                    <span className="detail-value">{raw.payMethod}</span>
-                                  </div>
-                                )}
-                                <div className="detail-row">
-                                  <span className="detail-label">결제상태:</span>
-                                  <span className={`detail-value ${
-                                    (raw.rstat === 'R' || raw.pstat === '결제대기') ? 'payment-waiting-text' : ''
-                                  }`}>
-                                    {raw.pstat || '상태 정보 없음'}
-                                  </span>
-                                </div>
-                                
-                                {isPaymentWaiting && (
-                                  <div className="detail-actions">
-                                    <button 
-                                      className="cancel-reservation-btn-detail"
-                                      onClick={() => handleCancelReservation(
-                                        reservation.no,
-                                        raw.priceRefundTotalPricePay || 0
-                                      )}
-                                    >
-                                      <span className="cancel-icon">🗑️</span>
-                                      <span>예약 취소하기</span>
-                                    </button>
-                                    <p className="cancel-notice">
-                                      ⚠️ 취소 후에는 복구할 수 없습니다
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            )}
                           </div>
+
+                          {isExpanded && (
+                            <div className="history-details">
+                              <div className="detail-row">
+                                <span className="detail-label">신청일:</span>
+                                <span className="detail-value">
+                                  {raw.insertDate ? `20${raw.insertDate}` : '날짜 정보 없음'}
+                                </span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="detail-label">총 금액:</span>
+                                <span className="detail-value">
+                                  {(raw.priceRefundTotalPricePay || 0).toLocaleString()}원
+                                </span>
+                              </div>
+                              {raw.payMethod && (
+                                <div className="detail-row">
+                                  <span className="detail-label">결제방법:</span>
+                                  <span className="detail-value">{raw.payMethod}</span>
+                                </div>
+                              )}
+                              <div className="detail-row">
+                                <span className="detail-label">결제상태:</span>
+                                <span className={`detail-value ${
+                                  (raw.rstat === 'R' || raw.pstat === '결제대기') ? 'payment-waiting-text' : ''
+                                }`}>
+                                  {raw.pstat || '상태 정보 없음'}
+                                </span>
+                              </div>
+                              
+                              {isPaymentWaiting && (
+                                <div className="detail-actions">
+                                  <button 
+                                    className="cancel-reservation-btn-detail"
+                                    onClick={() => handleCancelReservation(
+                                      reservation.no,
+                                      raw.priceRefundTotalPricePay || 0
+                                    )}
+                                  >
+                                    <span className="cancel-icon">🗑️</span>
+                                    <span>예약 취소하기</span>
+                                  </button>
+                                  <p className="cancel-notice">
+                                    ⚠️ 취소 후에는 복구할 수 없습니다
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -923,17 +1194,329 @@ export default function ReservationProfile() {
           <div className="history-tab">
             <div className="history-card">
               <div className="history-header">
-                <h3>다락원 예약 내역</h3>
+                <h3>다락원 테니스장 예약 내역</h3>
                 <button 
                   className="refresh-history-btn"
-                  disabled
+                  onClick={loadDobongReservationHistory}
+                  disabled={loadingDobongHistory}
                 >
-                  🔄 새로고침
+                  {loadingDobongHistory ? '🔄 로딩 중...' : '🔄 새로고침'}
                 </button>
               </div>
               
-              <div className="no-history">
-                <p>다락원 예약 내역 기능은 준비 중입니다.</p>
+              {/* 안내 문구 추가 */}
+              <div className="history-tip">
+                <div className="tip-text">
+                  💡 다락원 예약 내역은 최신 10개만 보여집니다
+                  <br />
+                  💡 결제는 도봉구 시설관리공단에서 직접 해야됩니다
+                </div>
+                <a 
+                  href="https://yeyak.dobongsiseol.or.kr/rent/index.php?c_id=05&page_info=index&n_type=rent&c_ox=0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tip-link-btn"
+                >
+                  결제하러 가기 →
+                </a>
+              </div>
+
+              {/* 필터 버튼 */}
+              {!loadingDobongHistory && dobongReservationHistory.length > 0 && (
+                <div className="dobong-filter-buttons">
+                  {(() => {
+                    const counts = getDobongCounts();
+                    return (
+                      <>
+                        <button 
+                          className={`dobong-filter-btn ${dobongFilterType === 'pending' ? 'active' : ''}`}
+                          onClick={() => setDobongFilterType('pending')}
+                        >
+                          ⏳ 결제대기 ({counts.pending})
+                        </button>
+                        <button 
+                          className={`dobong-filter-btn ${dobongFilterType === 'cancelled' ? 'active' : ''}`}
+                          onClick={() => setDobongFilterType('cancelled')}
+                        >
+                          🗑️ 취소 ({counts.cancelled})
+                        </button>
+                        <button 
+                          className={`dobong-filter-btn ${dobongFilterType === 'completed' ? 'active' : ''}`}
+                          onClick={() => setDobongFilterType('completed')}
+                        >
+                          ✅ 예약 완료 ({counts.completed})
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* 예약 내역 리스트 */}
+              <div className="history-list">
+                {/* 헤더 예약 데이터도 리스트에 포함 */}
+                {!loadingDobongHistory && dobongFilterType === 'pending' && dobongHeaders.pending && dobongHeaders.pending.length > 14 && !dobongHeaders.pending[9]?.includes('취소') && !dobongHeaders.pending[9]?.includes('완료') && (
+                  <div className="history-item dobong-item status-pending">
+                    <div className="history-main-info">
+                      <div className="facility-name">
+                        {dobongHeaders.pending[12]
+                          ? dobongHeaders.pending[12].substring(7, 12)
+                          : '시설명 없음'}
+                      </div>
+                      <div className="reservation-status">
+                        {dobongHeaders.pending[9] || '상태 없음'}
+                      </div>
+                    </div>
+                    <div className="reservation-times">
+                      <div className="times-header">📅 예약 일정</div>
+                      <div className="time-summary">
+                        <div className="summary-date">
+                          <span className="summary-icon">📆</span>
+                          <strong>{dobongHeaders.pending[13]}</strong>
+                        </div>
+                        <div className="summary-time">
+                          <span className="summary-icon">⏰</span>
+                          <strong>{dobongHeaders.pending[14]}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="dobong-details">
+                      <div className="detail-row">
+                        <span className="detail-label">예약번호:</span>
+                        <span className="detail-value">{dobongHeaders.pending[8]}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">신청일자:</span>
+                        <span className="detail-value">{dobongHeaders.pending[10]}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!loadingDobongHistory && dobongFilterType === 'cancelled' && dobongHeaders.pending && dobongHeaders.pending.length > 14 && dobongHeaders.pending[9]?.includes('취소') && (
+                  <div className="history-item dobong-item status-time-cancelled">
+                    <div className="history-main-info">
+                      <div className="facility-name">
+                        {dobongHeaders.pending[12]
+                          ? dobongHeaders.pending[12].substring(7, 12)
+                          : '시설명 없음'}
+                      </div>
+                      <div className="reservation-status">
+                        {dobongHeaders.pending[9] || '상태 없음'}
+                      </div>
+                    </div>
+                    <div className="reservation-times">
+                      <div className="times-header">📅 예약 일정</div>
+                      <div className="time-summary">
+                        <div className="summary-date">
+                          <span className="summary-icon">📆</span>
+                          <strong>{dobongHeaders.pending[13]}</strong>
+                        </div>
+                        <div className="summary-time">
+                          <span className="summary-icon">⏰</span>
+                          <strong>{dobongHeaders.pending[14]}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="dobong-details">
+                      <div className="detail-row">
+                        <span className="detail-label">예약번호:</span>
+                        <span className="detail-value">{dobongHeaders.pending[8]}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">신청일자:</span>
+                        <span className="detail-value">{dobongHeaders.pending[10]}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!loadingDobongHistory && dobongFilterType === 'completed' && dobongHeaders.pending && dobongHeaders.pending.length > 14 && dobongHeaders.pending[9]?.includes('완료') && (
+                  <div className="history-item dobong-item status-completed">
+                    <div className="history-main-info">
+                      <div className="facility-name">
+                        {dobongHeaders.pending[12]
+                          ? dobongHeaders.pending[12].substring(7, 12)
+                          : '시설명 없음'}
+                      </div>
+                      <div className="reservation-status">
+                        {dobongHeaders.pending[9] || '상태 없음'}
+                      </div>
+                    </div>
+                    <div className="reservation-times">
+                      <div className="times-header">📅 예약 일정</div>
+                      <div className="time-summary">
+                        <div className="summary-date">
+                          <span className="summary-icon">📆</span>
+                          <strong>{dobongHeaders.pending[13]}</strong>
+                        </div>
+                        <div className="summary-time">
+                          <span className="summary-icon">⏰</span>
+                          <strong>{dobongHeaders.pending[14]}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="dobong-details">
+                      <div className="detail-row">
+                        <span className="detail-label">예약번호:</span>
+                        <span className="detail-value">{dobongHeaders.pending[8]}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">신청일자:</span>
+                        <span className="detail-value">{dobongHeaders.pending[10]}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!loadingDobongHistory && dobongFilterType === 'completed' && dobongHeaders.completed && dobongHeaders.completed.length > 14 && dobongHeaders.completed[9]?.includes('완료') && (
+                  <div className="history-item dobong-item status-completed">
+                    <div className="history-main-info">
+                      <div className="facility-name">
+                        {dobongHeaders.completed[12]
+                          ? dobongHeaders.completed[12].substring(7, 12)
+                          : '시설명 없음'}
+                      </div>
+                      <div className="reservation-status">
+                        {dobongHeaders.completed[9] || '상태 없음'}
+                      </div>
+                    </div>
+                    <div className="reservation-times">
+                      <div className="times-header">📅 예약 일정</div>
+                      <div className="time-summary">
+                        <div className="summary-date">
+                          <span className="summary-icon">📆</span>
+                          <strong>{dobongHeaders.completed[13]}</strong>
+                        </div>
+                        <div className="summary-time">
+                          <span className="summary-icon">⏰</span>
+                          <strong>{dobongHeaders.completed[14]}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="dobong-details">
+                      <div className="detail-row">
+                        <span className="detail-label">예약번호:</span>
+                        <span className="detail-value">{dobongHeaders.completed[8]}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">신청일자:</span>
+                        <span className="detail-value">{dobongHeaders.completed[10]}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 실제 예약 데이터 리스트 */}
+                {loadingDobongHistory ? (
+                  <div className="loading-history">예약 내역을 불러오는 중...</div>
+                ) : getFilteredDobongReservations().length > 0 ? (
+                  getFilteredDobongReservations().map((reservation, index) => {
+                    const isExpanded = expandedDobongItems.has(index);
+                    const statusClass = getDobongStatusClass(reservation);
+                    // 결제대기 상태 여부
+                    const isPaymentWaiting = reservation.column_2 === '예약대기' || reservation.type === 'pending';
+                    // 취소 상태 여부
+                    const isCancelled = reservation.column_2?.includes('취소');
+
+                    return (
+                      <div 
+                        key={index} 
+                        className={`history-item dobong-item ${statusClass}`}
+                      >
+                        {/* 메인 정보 */}
+                        <div className="history-main-info">
+                          <div className="facility-name">
+                            {/* facilityName 앞 7자 제외, 뒤 5자만 출력 (무조건 앞 7자 제외) */}
+                            {reservation.column_5
+                              ? reservation.column_5.substring(7, 12)
+                              : '시설명 없음'}
+                          </div>
+                          <div className={`reservation-status ${statusClass}`}>
+                            {reservation.column_2 || (reservation.type === 'pending' ? '⏳ 예약대기' : '✅ 예약완료')}
+                          </div>
+                        </div>
+
+                        {/* 예약 시간 정보 */}
+                        {(reservation.column_6 || reservation.column_7) && (
+                          <div className="reservation-times">
+                            <div className="times-header">
+                              📅 예약 일정
+                            </div>
+                            <div className="time-summary">
+                              {reservation.column_6 && (
+                                <div className="summary-date">
+                                  <span className="summary-icon">📆</span>
+                                  <strong>{reservation.column_6}</strong>
+                                </div>
+                              )}
+                              {reservation.column_7 && (
+                                <div className="summary-time">
+                                  <span className="summary-icon">⏰</span>
+                                  <strong>{reservation.column_7}</strong>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 상세정보 접기/펼치기 버튼을 상세정보 바로 위로 이동 */}
+                        <div className="history-item-actions">
+                          <button 
+                            className="toggle-details-btn"
+                            onClick={() => toggleDobongDetails(index)}
+                          >
+                            {isExpanded ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
+                          </button>
+                        </div>
+
+                        {/* 상세 정보 */}
+                        {isExpanded && (
+                          <div className="dobong-details">
+                            {reservation.column_1 && (
+                              <div className="detail-row">
+                                <span className="detail-label">예약번호:</span>
+                                <span className="detail-value">{reservation.column_1}</span>
+                              </div>
+                            )}
+                            {reservation.column_3 && (
+                              <div className="detail-row">
+                                <span className="detail-label">신청일자:</span>
+                                <span className="detail-value">{reservation.column_3}</span>
+                              </div>
+                            )}
+                            
+                            {/* 예약 취소하기 버튼 - 취소 상태가 아니고 결제대기일 때만 노출 */}
+                            {isPaymentWaiting && reservation.column_1 && !isCancelled && (
+                              <div className="detail-actions">
+                                <button 
+                                  className="cancel-reservation-btn-detail"
+                                  onClick={() => handleDobongCancelReservation(reservation)}
+                                >
+                                  <span className="cancel-icon">🗑️</span>
+                                  <span>예약 취소하기</span>
+                                </button>
+                                <p className="cancel-notice">
+                                  ⚠️ 취소 후에는 복구할 수 없습니다
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="no-history">
+                    <p>
+                      {dobongFilterType === 'pending' 
+                        ? '결제 대기 중인 내역이 없습니다.' 
+                        : dobongFilterType === 'cancelled'
+                          ? '취소된 내역이 없습니다.'
+                          : '예약 완료된 내역이 없습니다.'}
+                    </p>
+                    <button onClick={() => navigate('/reservation')}>
+                      예약하러 가기
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

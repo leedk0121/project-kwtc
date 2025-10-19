@@ -237,7 +237,7 @@ const VotePage: React.FC = () => {
                 </button>
                 <button
                     className="reserve-court-btn"
-                    onClick={() => navigate("/reservation")}
+                    onClick={() => window.open("/reservation", "_blank")}
                 >
                     코트 예약
                 </button>

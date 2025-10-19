@@ -227,15 +227,12 @@ export function PostList() {
                         <span className="pin-icon">📌</span>
                       )}
                     </div>
-                    
                     <h3 className="post-title">{post.title}</h3>
-                    
                     <div className="post-preview">
                       {post.content?.substring(0, 80)}
                       {post.content?.length > 80 && '...'}
                     </div>
                   </div>
-                  
                   <div className="post-meta">
                     <div className="post-author">
                       <span className="author-icon">👤</span>

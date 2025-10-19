@@ -530,8 +530,9 @@ input:checked + .slider:before {
   opacity: 0.6;
 }
 
-/* 필터 버튼 스타일 */
-.filter-buttons {
+/* 필터 버튼 스타일 (노원구 + 도봉구 공통) */
+.filter-buttons,
+.dobong-filter-buttons {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
@@ -539,7 +540,8 @@ input:checked + .slider:before {
   flex-wrap: wrap;
 }
 
-.filter-btn {
+.filter-btn,
+.dobong-filter-btn {
   padding: 10px 16px;
   background: white;
   color: #6b7280;
@@ -552,12 +554,19 @@ input:checked + .slider:before {
   white-space: nowrap;
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.dobong-filter-btn:hover {
   background: #f9fafb;
   border-color: #d1d5db;
 }
 
 .filter-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.dobong-filter-btn.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-color: #667eea;
@@ -576,7 +585,9 @@ input:checked + .slider:before {
   gap: 16px;
 }
 
-.history-item {
+/* 노원구 + 도봉구 공통 history-item 스타일 */
+.history-item,
+.dobong-item {
   background: white;
   border-radius: 16px;
   padding: 20px;
@@ -584,13 +595,59 @@ input:checked + .slider:before {
   transition: all 0.3s;
 }
 
-.history-item:hover {
+.history-item:hover,
+.dobong-item:hover {
   border-color: #667eea;
   box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
   transform: translateY(-2px);
 }
 
-.history-main-info {
+/* 결제대기 상태 강조 (노원구) */
+.history-item:has(.status-payment-waiting) {
+  border-left: 5px solid #f59e0b;
+  background: #FFF8DE;
+}
+
+/* 예약 상태별 좌측 색상 바 (도봉구) */
+.dobong-item.status-completed {
+  border-left: 5px solid #10b981;
+}
+
+.dobong-item.status-pending {
+  border-left: 5px solid #f59e0b;
+  background: #FFF8DE;
+}
+
+/* 도봉구 상태별 스타일 */
+.dobong-item.status-pending .reservation-status,
+.reservation-status.status-pending {
+  background: linear-gradient(135deg, #FFF8DE 0%, #fde68a 100%);
+  color: #92400e;
+}
+
+.dobong-item.status-completed .reservation-status,
+.reservation-status.status-completed {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+/* 시간경과취소 스타일 - 빨간색 */
+.dobong-item.status-time-cancelled {
+  border-left: 5px solid #ef4444;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+}
+
+.dobong-item.status-time-cancelled .reservation-status,
+.reservation-status.status-time-cancelled {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 2px solid #ef4444;
+  font-weight: 700;
+}
+
+/* 노원구 + 도봉구 공통 헤더 스타일 */
+.history-main-info,
+.dobong-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -600,7 +657,8 @@ input:checked + .slider:before {
   gap: 12px;
 }
 
-.court-name {
+.court-name,
+.facility-name {
   font-size: 18px;
   font-weight: 700;
   color: #1f2937;
@@ -608,7 +666,9 @@ input:checked + .slider:before {
   flex: 1;
 }
 
-.status {
+/* 노원구 + 도봉구 공통 상태 뱃지 스타일 */
+.status,
+.reservation-status {
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -618,6 +678,7 @@ input:checked + .slider:before {
   flex-shrink: 0;
 }
 
+/* 노원구 상태별 스타일 */
 .status-confirmed {
   background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
   color: #065f46;
@@ -629,7 +690,7 @@ input:checked + .slider:before {
 }
 
 .status-pending {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(135deg, #FFF8DE 0%, #fde68a 100%);
   color: #92400e;
 }
 
@@ -639,7 +700,7 @@ input:checked + .slider:before {
 }
 
 .status-payment-waiting {
-  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+  background: linear-gradient(135deg, #FFF8DE 0%, #fcd34d 100%);
   color: #78350f;
   border: 2px solid #fbbf24;
   animation: pulse 2s infinite;
@@ -659,11 +720,18 @@ input:checked + .slider:before {
   font-weight: 700;
 }
 
-.history-item:has(.status-payment-waiting) {
-  border-left: 5px solid #f59e0b;
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+/* 도봉구 상태별 스타일 - 중복 제거 */
+.dobong-item.pending .reservation-status {
+  background: linear-gradient(135deg, #FFF8DE 0%, #fde68a 100%);
+  color: #92400e;
 }
 
+.dobong-item.completed .reservation-status {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+/* 노원구 예약 시간 정보 */
 .reservation-times {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   border-radius: 12px;
@@ -717,11 +785,14 @@ input:checked + .slider:before {
   letter-spacing: 0.5px;
 }
 
+/* 노원구 상세보기 버튼 */
+.history-item-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .toggle-details-btn {
-  width: auto;
   padding: 8px 16px;
-  margin-top: 0;
-  margin-left: auto;
   background: #f3f4f6;
   color: #374151;
   border: 2px solid #e5e7eb;
@@ -745,13 +816,18 @@ input:checked + .slider:before {
   transform: scale(0.98);
 }
 
-.history-details {
+/* 노원구 + 도봉구 공통 상세 정보 스타일 */
+.history-details,
+.dobong-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   margin-top: 16px;
   padding-top: 16px;
   border-top: 2px solid #f3f4f6;
+}
+
+.history-details {
   animation: slideDown 0.3s ease-out;
 }
 
@@ -766,7 +842,8 @@ input:checked + .slider:before {
   }
 }
 
-.detail-row {
+.detail-row,
+.dobong-details .detail-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -776,35 +853,41 @@ input:checked + .slider:before {
   background: #f9fafb;
   border-radius: 10px;
   transition: background 0.3s;
+  border-bottom: none;
 }
 
-.detail-row:hover {
+.detail-row:hover,
+.dobong-details .detail-row:hover {
   background: #f3f4f6;
 }
 
-.detail-label {
+.detail-label,
+.dobong-details .label {
   font-size: 12px;
   color: #6b7280;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  opacity: 1;
 }
 
-.detail-value {
+.detail-value,
+.dobong-details .value {
   font-size: 16px;
   color: #1f2937;
   font-weight: 700;
   text-align: right;
 }
 
+/* 노원구 예약 취소 액션 */
 .detail-actions {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(135deg, #FFF8DE 0%, #fde68a 100%);
   border-radius: 12px;
   border: 2px solid #fbbf24;
   margin-top: 8px;
@@ -856,6 +939,80 @@ input:checked + .slider:before {
 /* 기존 취소 버튼 스타일 제거 */
 .cancel-reservation-btn {
   display: none;
+}
+
+/* 도봉구 액션 링크 */
+.dobong-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid #f3f4f6;
+}
+
+.action-link {
+  flex: 1;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.action-link:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.no-history {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.no-history p {
+  color: #6b7280;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.no-history button {
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.no-history button:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* 안내 문구 스타일 */
+.history-tip {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  max-width: 400px;
+  padding: 8px 16px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px dashed #d1d5db;
+  margin: 0 auto 20px auto;
 }
 
 /* 모바일 최적화 (768px 이하) */
@@ -913,12 +1070,14 @@ input:checked + .slider:before {
     font-size: 15px;
   }
   
-  .filter-buttons {
+  .filter-buttons,
+  .dobong-filter-buttons {
     padding: 0 16px;
     gap: 6px;
   }
   
-  .filter-btn {
+  .filter-btn,
+  .dobong-filter-btn {
     padding: 8px 12px;
     font-size: 12px;
     flex: 1;
@@ -929,11 +1088,13 @@ input:checked + .slider:before {
     gap: 12px;
   }
   
-  .history-item {
+  .history-item,
+  .dobong-item {
     padding: 16px 16px 12px 16px;
   }
   
-  .history-main-info {
+  .history-main-info,
+  .dobong-header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
@@ -942,12 +1103,14 @@ input:checked + .slider:before {
     padding-bottom: 12px;
   }
   
-  .court-name {
+  .court-name,
+  .facility-name {
     font-size: 15px;
     flex: 1;
   }
   
-  .status {
+  .status,
+  .reservation-status {
     font-size: 11px;
     padding: 5px 10px;
     flex-shrink: 0;
@@ -986,22 +1149,26 @@ input:checked + .slider:before {
     font-size: 11px;
   }
   
-  .history-details {
+  .history-details,
+  .dobong-details {
     grid-template-columns: 1fr;
     gap: 10px;
     margin-top: 12px;
     padding-top: 12px;
   }
   
-  .detail-row {
+  .detail-row,
+  .dobong-details .detail-row {
     padding: 10px;
   }
   
-  .detail-label {
+  .detail-label,
+  .dobong-details .label {
     font-size: 11px;
   }
   
-  .detail-value {
+  .detail-value,
+  .dobong-details .value {
     font-size: 14px;
   }
   
@@ -1024,7 +1191,22 @@ input:checked + .slider:before {
     padding: 6px;
   }
   
-  /* ...existing mobile styles... */
+  .dobong-actions {
+    gap: 6px;
+    padding-top: 12px;
+  }
+  
+  .action-link {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .history-tip {
+    max-width: 100%;
+    margin: 0 16px 16px 16px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
 }
 
 /* 작은 모바일 (480px 이하) */
@@ -1049,30 +1231,36 @@ input:checked + .slider:before {
     font-size: 1rem;
   }
   
-  .filter-buttons {
+  .filter-buttons,
+  .dobong-filter-buttons {
     padding: 0 12px;
     gap: 6px;
   }
   
-  .filter-btn {
+  .filter-btn,
+  .dobong-filter-btn {
     padding: 6px 10px;
     font-size: 11px;
   }
   
-  .history-item {
+  .history-item,
+  .dobong-item {
     padding: 12px 12px 10px 12px;
   }
   
-  .history-main-info {
+  .history-main-info,
+  .dobong-header {
     justify-content: space-between;
   }
   
-  .court-name {
+  .court-name,
+  .facility-name {
     font-size: 14px;
     flex: 1;
   }
   
-  .status {
+  .status,
+  .reservation-status {
     font-size: 10px;
     padding: 4px 8px;
     flex-shrink: 0;
@@ -1083,7 +1271,8 @@ input:checked + .slider:before {
     font-size: 11px;
   }
   
-  .detail-value {
+  .detail-value,
+  .dobong-details .value {
     font-size: 13px;
   }
   
@@ -1104,5 +1293,15 @@ input:checked + .slider:before {
     font-size: 11px;
   }
   
-  /* ...existing small mobile styles... */
+  .action-link {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .history-tip {
+    max-width: 100%;
+    margin: 0 12px 12px 12px;
+    padding: 6px 10px;
+    font-size: 10px;
+  }
 }
