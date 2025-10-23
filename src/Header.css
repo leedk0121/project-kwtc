@@ -221,3 +221,7 @@ body {
     text-align: right;
     letter-spacing: 2px;
 }
+
+.home_link img {
+  filter: brightness(0) saturate(100%) invert(89%) sepia(22%) saturate(749%) hue-rotate(340deg) brightness(104%) contrast(98%);
+}

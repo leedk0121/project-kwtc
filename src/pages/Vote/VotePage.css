@@ -7,6 +7,7 @@
   background: #f8fafc;
   min-height: 100vh;
   font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
+  position: relative; /* 추가된 코드 */
 }
 
 /* 페이지 헤더 추가 */
@@ -236,7 +237,7 @@
 
 .vote-where {
   max-width: 180px;
-  font-size: 0.8em;
+  font-size: 11px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;

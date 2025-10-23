@@ -36,10 +36,30 @@
   font-weight: 500;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
+  margin-top: 0 !important; /* 위 마진 제거 */
 }
 
 .edit-btn:hover {
   background: #22c55e;
+  transform: translateY(-2px);
+}
+
+.profile-edit-btn {
+  background: #3b82f6; /* 파란색 */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  margin-top: 0 !important;
+}
+
+.profile-edit-btn:hover {
+  background: #2563eb; /* 더 진한 파란색 */
   transform: translateY(-2px);
 }
 

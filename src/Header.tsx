@@ -64,7 +64,13 @@ function Header() {
                 <Link className='action_link' id='vote_button' to="/participate">참여</Link>
             </div>
             <div>
-                <Link className='home_link' id='home_button' to="/">Home</Link>
+                <Link className='home_link' id='home_button' to="/">  
+                    <img
+                        src="/home-btn.png"
+                        alt="Home"
+                        style={{ width: 28, height: 28, verticalAlign: 'middle' }}
+                    />
+                </Link>
             </div>
             <div className='login_register_container'>
                 <HeaderRegister />

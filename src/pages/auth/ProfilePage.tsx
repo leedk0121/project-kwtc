@@ -171,7 +171,7 @@ function ProfilePage() {
       <div className="profile-header">
         <div className="header-actions">
           {!isEditing ? (
-            <button className="edit-btn" onClick={() => setIsEditing(true)}>
+            <button className="profile-edit-btn" onClick={() => setIsEditing(true)}>
               ✏️ 편집
             </button>
           ) : (

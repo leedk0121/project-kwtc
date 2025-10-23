@@ -12,18 +12,16 @@ function IntroPage() {
     const fetchLeaders = async () => {
         setLoading(true);
         try {
-            // 1. leader_profile 데이터 가져오기 (order_num 기준으로 정렬)
             const { data: leaderData, error: leaderError } = await supabase
                 .from('leader_profile')
                 .select('user_id, position, position_description, order_num')
-                .order('order_num', { ascending: true }); // order_num이 낮을수록 위로
+                .order('order_num', { ascending: true });
 
             if (leaderError) {
                 console.error('Error fetching leader_profile:', leaderError);
                 return;
             }
 
-            // 2. profile 데이터 가져오기 (id 필드 사용)
             const userIds = leaderData.map(leader => leader.user_id);
             const { data: profileData, error: profileError } = await supabase
                 .from('profile')
@@ -35,7 +33,6 @@ function IntroPage() {
                 return;
             }
 
-            // 3. 데이터 병합 (id와 user_id 매칭)
             const mergedData = leaderData.map(leader => {
                 const profile = profileData.find(p => p.id === leader.user_id);
                 return {
@@ -58,7 +55,6 @@ function IntroPage() {
         }
     }, [selected]);
 
-    // 포지션별 배지 스타일 결정
     const getPositionBadgeClass = (position) => {
         switch (position.toLowerCase()) {
             case '회장':
@@ -82,7 +78,11 @@ function IntroPage() {
         <div className="intro-page">
             <div className="intro-header">
                 <h1 className="intro-title">
-                    <span className="title-icon">🎾</span>
+                    <img
+                        src="/megaphone-icon.png"
+                        alt="소개 아이콘"
+                        className="intro-title-icon"
+                    />
                     KWTC 소개
                 </h1>
                 <p className="intro-subtitle">광운대학교 테니스 동아리를 소개합니다</p>
@@ -180,10 +180,9 @@ function IntroPage() {
                                         <div className="info-content">
                                             <h4>인스타그램</h4>
                                             <a 
-                                                href="https://instagram.com/kwtc_official" 
-                                                target="_blank" 
+                                                href="https://instagram.com/kwtc_official"
+                                                target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="instagram-link"
                                             >
                                                 @kwtc_official
                                             </a>

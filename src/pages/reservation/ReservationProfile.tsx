@@ -725,7 +725,7 @@ export default function ReservationProfile() {
       }
 
       if (result.success) {
-        alert('✅ ' + (result.message || '예약이 취소되었습니다.'));
+        alert('예약이 취소되었습니다.');
         loadDobongReservationHistory();
       } else {
         throw new Error(result.error || result.message || '취소 실패');
@@ -873,8 +873,13 @@ export default function ReservationProfile() {
 
   return (
     <div className="reservation-profile-container">
-      <button className="back-btn" onClick={() => navigate('/reservation')}>
-        ← 예약 페이지로 돌아가기
+      <button className="ur-back-btn" onClick={() => navigate('/reservation')}>
+        <img
+          src="/back-icon.png"
+          alt="뒤로가기"
+          className="back-icon-img"
+          style={{ width: 24, height: 24, verticalAlign: 'middle'}}
+        />
       </button>
 
       <div className="profile-header">
@@ -1031,6 +1036,7 @@ export default function ReservationProfile() {
               {/* 안내 문구 추가 */}
               <div className="history-tip">
                 <div className="tip-text">
+                  💡 예약 내역이 안보인다면 페이지를 새로고침 해주세요.<br/>
                   💡 결제는 노원구 시설관리공단에서 직접 해야됩니다.
                 </div>
                 <a 
@@ -1254,16 +1260,16 @@ export default function ReservationProfile() {
 
               {/* 예약 내역 리스트 */}
               <div className="history-list">
-                {/* 헤더 예약 데이터도 리스트에 포함 */}
+                {/* 헤더 예약 데이터도 리스트에 포함 (일반 데이터와 동일 기능) */}
                 {!loadingDobongHistory && dobongFilterType === 'pending' && dobongHeaders.pending && dobongHeaders.pending.length > 14 && !dobongHeaders.pending[9]?.includes('취소') && !dobongHeaders.pending[9]?.includes('완료') && (
-                  <div className="history-item dobong-item status-pending">
+                  <div className={`history-item dobong-item status-pending`}>
                     <div className="history-main-info">
                       <div className="facility-name">
                         {dobongHeaders.pending[12]
                           ? dobongHeaders.pending[12].substring(7, 12)
                           : '시설명 없음'}
                       </div>
-                      <div className="reservation-status">
+                      <div className="reservation-status status-pending">
                         {dobongHeaders.pending[9] || '상태 없음'}
                       </div>
                     </div>
@@ -1280,130 +1286,80 @@ export default function ReservationProfile() {
                         </div>
                       </div>
                     </div>
-                    <div className="dobong-details">
-                      <div className="detail-row">
-                        <span className="detail-label">예약번호:</span>
-                        <span className="detail-value">{dobongHeaders.pending[8]}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">신청일자:</span>
-                        <span className="detail-value">{dobongHeaders.pending[10]}</span>
-                      </div>
+                    {/* 상세정보 접기/펼치기 버튼 */}
+                    <div className="history-item-actions">
+                      <button
+                        className="toggle-details-btn"
+                        onClick={() => {
+                          const newExpanded = new Set(expandedDobongItems);
+                          if (newExpanded.has(-1)) {
+                            newExpanded.delete(-1);
+                          } else {
+                            newExpanded.add(-1);
+                          }
+                          setExpandedDobongItems(newExpanded);
+                        }}
+                      >
+                        {expandedDobongItems.has(-1) ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
+                      </button>
+                      {/* 취소하기 버튼 - 결제대기 상태일 때만 노출 */}
+                      {dobongHeaders.pending[9] === '예약대기' && dobongHeaders.pending[8] && (
+                        <button
+                          className="cancel-reservation-btn-detail"
+                          onClick={() => handleDobongCancelReservation({
+                            type: 'pending',
+                            column_1: dobongHeaders.pending[8],
+                            column_2: dobongHeaders.pending[9],
+                            column_3: dobongHeaders.pending[10],
+                            column_5: dobongHeaders.pending[12],
+                            column_6: dobongHeaders.pending[13],
+                            column_7: dobongHeaders.pending[14]
+                          })}
+                          style={{ marginLeft: '12px' }}
+                        >
+                          <span className="cancel-icon">🗑️</span>
+                          <span>취소하기</span>
+                        </button>
+                      )}
                     </div>
+                    {/* 상세 정보 */}
+                    {expandedDobongItems.has(-1) && (
+                      <div className="dobong-details">
+                        <div className="detail-row">
+                          <span className="detail-label">예약번호:</span>
+                          <span className="detail-value">{dobongHeaders.pending[8]}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">신청일자:</span>
+                          <span className="detail-value">{dobongHeaders.pending[10]}</span>
+                        </div>
+                        {/* 예약 취소하기 버튼 - 결제대기 상태일 때만 노출 */}
+                        {dobongHeaders.pending[9] === '예약대기' && dobongHeaders.pending[8] && (
+                          <div className="detail-actions">
+                            <button
+                              className="cancel-reservation-btn-detail"
+                              onClick={() => handleDobongCancelReservation({
+                                type: 'pending',
+                                column_1: dobongHeaders.pending[8],
+                                column_2: dobongHeaders.pending[9],
+                                column_3: dobongHeaders.pending[10],
+                                column_5: dobongHeaders.pending[12],
+                                column_6: dobongHeaders.pending[13],
+                                column_7: dobongHeaders.pending[14]
+                              })}
+                            >
+                              <span className="cancel-icon">🗑️</span>
+                              <span>예약 취소하기</span>
+                            </button>
+                            <p className="cancel-notice">
+                              ⚠️ 취소 후에는 복구할 수 없습니다
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
-                {!loadingDobongHistory && dobongFilterType === 'cancelled' && dobongHeaders.pending && dobongHeaders.pending.length > 14 && dobongHeaders.pending[9]?.includes('취소') && (
-                  <div className="history-item dobong-item status-time-cancelled">
-                    <div className="history-main-info">
-                      <div className="facility-name">
-                        {dobongHeaders.pending[12]
-                          ? dobongHeaders.pending[12].substring(7, 12)
-                          : '시설명 없음'}
-                      </div>
-                      <div className="reservation-status">
-                        {dobongHeaders.pending[9] || '상태 없음'}
-                      </div>
-                    </div>
-                    <div className="reservation-times">
-                      <div className="times-header">📅 예약 일정</div>
-                      <div className="time-summary">
-                        <div className="summary-date">
-                          <span className="summary-icon">📆</span>
-                          <strong>{dobongHeaders.pending[13]}</strong>
-                        </div>
-                        <div className="summary-time">
-                          <span className="summary-icon">⏰</span>
-                          <strong>{dobongHeaders.pending[14]}</strong>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dobong-details">
-                      <div className="detail-row">
-                        <span className="detail-label">예약번호:</span>
-                        <span className="detail-value">{dobongHeaders.pending[8]}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">신청일자:</span>
-                        <span className="detail-value">{dobongHeaders.pending[10]}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {!loadingDobongHistory && dobongFilterType === 'completed' && dobongHeaders.pending && dobongHeaders.pending.length > 14 && dobongHeaders.pending[9]?.includes('완료') && (
-                  <div className="history-item dobong-item status-completed">
-                    <div className="history-main-info">
-                      <div className="facility-name">
-                        {dobongHeaders.pending[12]
-                          ? dobongHeaders.pending[12].substring(7, 12)
-                          : '시설명 없음'}
-                      </div>
-                      <div className="reservation-status">
-                        {dobongHeaders.pending[9] || '상태 없음'}
-                      </div>
-                    </div>
-                    <div className="reservation-times">
-                      <div className="times-header">📅 예약 일정</div>
-                      <div className="time-summary">
-                        <div className="summary-date">
-                          <span className="summary-icon">📆</span>
-                          <strong>{dobongHeaders.pending[13]}</strong>
-                        </div>
-                        <div className="summary-time">
-                          <span className="summary-icon">⏰</span>
-                          <strong>{dobongHeaders.pending[14]}</strong>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dobong-details">
-                      <div className="detail-row">
-                        <span className="detail-label">예약번호:</span>
-                        <span className="detail-value">{dobongHeaders.pending[8]}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">신청일자:</span>
-                        <span className="detail-value">{dobongHeaders.pending[10]}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {!loadingDobongHistory && dobongFilterType === 'completed' && dobongHeaders.completed && dobongHeaders.completed.length > 14 && dobongHeaders.completed[9]?.includes('완료') && (
-                  <div className="history-item dobong-item status-completed">
-                    <div className="history-main-info">
-                      <div className="facility-name">
-                        {dobongHeaders.completed[12]
-                          ? dobongHeaders.completed[12].substring(7, 12)
-                          : '시설명 없음'}
-                      </div>
-                      <div className="reservation-status">
-                        {dobongHeaders.completed[9] || '상태 없음'}
-                      </div>
-                    </div>
-                    <div className="reservation-times">
-                      <div className="times-header">📅 예약 일정</div>
-                      <div className="time-summary">
-                        <div className="summary-date">
-                          <span className="summary-icon">📆</span>
-                          <strong>{dobongHeaders.completed[13]}</strong>
-                        </div>
-                        <div className="summary-time">
-                          <span className="summary-icon">⏰</span>
-                          <strong>{dobongHeaders.completed[14]}</strong>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dobong-details">
-                      <div className="detail-row">
-                        <span className="detail-label">예약번호:</span>
-                        <span className="detail-value">{dobongHeaders.completed[8]}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">신청일자:</span>
-                        <span className="detail-value">{dobongHeaders.completed[10]}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* 실제 예약 데이터 리스트 */}
                 {loadingDobongHistory ? (
                   <div className="loading-history">예약 내역을 불러오는 중...</div>

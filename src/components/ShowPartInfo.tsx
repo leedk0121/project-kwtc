@@ -132,23 +132,22 @@ const ShowPartInfo = ({ partInfo, onClose }: { partInfo: any; onClose: () => voi
     setLoading(false);
   };
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-date">{partInfo.date}</div>
+    <div className="part-info-modal-overlay">
+      <div className="part-info-modal-content">
+        <div className="part-info-modal-date">{partInfo.date}</div>
         <ul>
-          <li className="modal-info-item">
+          <li className="part-info-modal-info-item">
             {hostName}님의 코트 - {partInfo.where} {partInfo.court_number} 번
           </li>
         </ul>
-        <div className='modal-info'>
-            <div className="modal-info-item">&#9654; {partInfo.start_time?.slice(0, 5)} ~ {partInfo.end_time?.slice(0, 5)}</div>
+        <div className='part-info-modal-info'>
+            <div className="part-info-modal-info-item">&#9654; {partInfo.start_time?.slice(0, 5)} ~ {partInfo.end_time?.slice(0, 5)}</div>
             {partInfo.min_tier !== null && (
-              <div className="modal-info-item">&#9654; 최소 티어: {partInfo.min_tier} Tier</div>
+              <div className="part-info-modal-info-item">&#9654; 최소 티어: {partInfo.min_tier} Tier</div>
             )}
-            <div className="modal-info-item">&#9654; 현재 인원: {partInfo.participant_num} / {partInfo.max_people}</div>
-            {/* 참가자 정보 표시 */}
+            <div className="part-info-modal-info-item">&#9654; 현재 인원: {partInfo.participant_num} / {partInfo.max_people}</div>
             {participantsInfo.length > 0 && (
-              <div className="modal-info-item" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+              <div className="part-info-modal-info-item" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
                 {participantsInfo.map((p, idx) => (
                   <div key={p.id} style={{
                     display: 'flex',
@@ -163,7 +162,7 @@ const ShowPartInfo = ({ partInfo, onClose }: { partInfo: any; onClose: () => voi
                   }}>
                     <img src={p.image_url || '/base_profile.png'} alt={p.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '1px solid #ddd' }} />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span style={{ fontWeight: 500 }}>{p.name} ({p.rank_all})</span>
+                      <span style={{ fontWeight: 500}}>{p.name} #{p.rank_all}</span>
                       <span style={{ color: '#666', fontSize: '13px', marginTop: '2px' }}>{p.major}</span>
                     </div>
                   </div>
@@ -173,13 +172,13 @@ const ShowPartInfo = ({ partInfo, onClose }: { partInfo: any; onClose: () => voi
         </div>
         <button
           onClick={onClose}
-          className="modal-close-btn"
+          className="part-info-modal-close-btn"
         >
           &#10006;
         </button>
-        <div className="modal-bottom-center">
+        <div className="part-info-modal-bottom-center">
           <button
-            className="modal-participate-btn"
+            className="part-info-modal-participate-btn"
             onClick={handleParticipate}
             disabled={
               loading ||
@@ -195,7 +194,7 @@ const ShowPartInfo = ({ partInfo, onClose }: { partInfo: any; onClose: () => voi
           >
             {loading ? '처리중...' : '참여하기'}
           </button>
-          <button className="modal-cancel-btn" style={{marginLeft: '12px'}} onClick={handleCancel} disabled={loading}>참여 취소</button>
+          <button className="part-info-modal-cancel-btn" style={{marginLeft: '12px'}} onClick={handleCancel} disabled={loading}>참여 취소</button>
         </div>
       </div>
     </div>

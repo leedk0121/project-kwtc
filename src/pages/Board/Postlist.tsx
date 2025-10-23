@@ -119,9 +119,9 @@ export function PostList() {
 
   if (loading) {
     return (
-      <div className="post-list-container">
-        <div className="loading-wrapper">
-          <div className="loading-spinner"></div>
+      <div className="board-list-container">
+        <div className="board-loading-wrapper">
+          <div className="board-loading-spinner"></div>
           <p>게시글을 불러오는 중...</p>
         </div>
       </div>
@@ -129,26 +129,26 @@ export function PostList() {
   }
 
   return (
-    <div className='post-list-container'>
+    <div className='board-list-container'>
       {/* VotePage 스타일의 페이지 헤더 */}
-      <div className="post-page-header">
-        <h1 className="post-page-title">
-          <span className="title-icon">📝</span>
+      <div className="board-page-header">
+        <h1 className="board-page-title">
+          <span className="board-title-icon">📝</span>
           게시판
         </h1>
-        <p className="post-page-subtitle">자유롭게 의견을 나누는 공간입니다.</p>
+        <p className="board-page-subtitle">자유롭게 의견을 나누는 공간입니다.</p>
       </div>
 
       {/* VotePage 스타일의 액션 버튼들 */}
-      <div className="post-action-buttons">
+      <div className="board-action-buttons">
         <button 
-          className="search-toggle-btn"
+          className="board-search-toggle-btn"
           onClick={toggleSearch}
         >
           🔍 {showSearch ? '검색 닫기' : '검색'}
         </button>
         <button 
-          className="write-btn"
+          className="board-write-btn"
           onClick={() => navigate('/board/new')}
         >
           ✏️ 글 작성
@@ -157,20 +157,20 @@ export function PostList() {
 
       {/* 검색창을 조건부로 렌더링 */}
       {showSearch && (
-        <div className="search-section">
-          <form onSubmit={handleSearch} className="search-form">
-            <div className="search-input-wrapper">
+        <div className="board-search-section">
+          <form onSubmit={handleSearch} className="board-search-form">
+            <div className="board-search-input-wrapper">
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="제목으로 검색해주세요..."
-                className="search-input"
+                className="board-search-input"
               />
               {search && (
                 <button 
                   type="button" 
-                  className="clear-btn"
+                  className="board-clear-btn"
                   onClick={clearSearch}
                 >
                   ✕
@@ -179,7 +179,7 @@ export function PostList() {
             </div>
             <button 
               type="submit" 
-              className="search-btn"
+              className="board-search-btn"
               disabled={searchLoading}
             >
               {searchLoading ? '🔄' : '🔍'}
@@ -188,14 +188,14 @@ export function PostList() {
         </div>
       )}
 
-      <div className="post-list-content">
+      <div className="board-list-content">
         {posts.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📭</div>
+          <div className="board-empty-state">
+            <div className="board-empty-icon">📭</div>
             <h3>게시글이 없습니다</h3>
             <p>로그인 하지 않으면 글을 볼 수 없습니다.</p>
             <button 
-              className="empty-write-btn"
+              className="board-empty-write-btn"
               onClick={() => navigate('/board/new')}
             >
               글 작성하기
@@ -205,41 +205,41 @@ export function PostList() {
           <>
             {/* 검색을 실행했을 때만 통계 표시 */}
             {hasSearched && (
-              <div className="post-stats">
+              <div className="board-post-stats">
                 <span>총 {posts.length}개의 게시글</span>
                 {search && <span>'{search}' 검색 결과</span>}
               </div>
             )}
             
-            <div className="post-list">
+            <div className="board-list">
               {pagedPosts.map(post => (
                 <div 
                   key={post.id} 
-                  className={`post-item ${post.post_type}`}
+                  className={`board-item board-${post.post_type}`}
                   onClick={() => navigate(`/board/${post.id}`)}
                 >
-                  <div className="post-main">
-                    <div className="post-header">
-                      <span className={`post-badge ${post.post_type}`}>
+                  <div className="board-main">
+                    <div className="board-header">
+                      <span className={`board-badge board-${post.post_type}`}>
                         {post_type_kr[post.post_type] || post.post_type}
                       </span>
                       {post.post_type === 'announcement' && (
-                        <span className="pin-icon">📌</span>
+                        <span className="board-pin-icon">📌</span>
                       )}
                     </div>
-                    <h3 className="post-title">{post.title}</h3>
-                    <div className="post-preview">
+                    <h3 className="board-title">{post.title}</h3>
+                    <div className="board-preview">
                       {post.content?.substring(0, 80)}
                       {post.content?.length > 80 && '...'}
                     </div>
                   </div>
-                  <div className="post-meta">
-                    <div className="post-author">
-                      <span className="author-icon">👤</span>
+                  <div className="board-meta">
+                    <div className="board-author">
+                      <span className="board-author-icon">👤</span>
                       {post.user_name || 'Unknown'}
                     </div>
-                    <div className="post-date">
-                      <span className="date-icon">🕒</span>
+                    <div className="board-date">
+                      <span className="board-date-icon">🕒</span>
                       {formatDate(post.created_at)}
                     </div>
                   </div>
@@ -248,37 +248,37 @@ export function PostList() {
             </div>
 
             {totalPages > 1 && (
-              <div className="pagination">
+              <div className="board-pagination">
                 <button
-                  className="pagination-btn"
+                  className="board-pagination-btn"
                   onClick={() => setPage(1)}
                   disabled={page === 1}
                 >
                   ⏪
                 </button>
                 <button
-                  className="pagination-btn"
+                  className="board-pagination-btn"
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
                 >
                   ◀
                 </button>
                 
-                <div className="pagination-info">
-                  <span className="current-page">{page}</span>
-                  <span className="page-separator">/</span>
-                  <span className="total-pages">{totalPages}</span>
+                <div className="board-pagination-info">
+                  <span className="board-current-page">{page}</span>
+                  <span className="board-page-separator">/</span>
+                  <span className="board-total-pages">{totalPages}</span>
                 </div>
                 
                 <button
-                  className="pagination-btn"
+                  className="board-pagination-btn"
                   onClick={() => setPage(page + 1)}
                   disabled={page === totalPages}
                 >
                   ▶
                 </button>
                 <button
-                  className="pagination-btn"
+                  className="board-pagination-btn"
                   onClick={() => setPage(totalPages)}
                   disabled={page === totalPages}
                 >

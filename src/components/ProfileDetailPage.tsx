@@ -50,6 +50,20 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
     // 현재 사용자의 티어 정보 가져오기
     const currentTierInfo = profile ? tierInfo[profile.rank_tier as keyof typeof tierInfo] : null;
 
+    // 연락처 포맷 함수
+    const formatPhone = (phone: string) => {
+        // 숫자만 추출
+        const digits = phone.replace(/\D/g, '');
+        if (digits.length === 11) {
+            // 010-1234-5678
+            return `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7,11)}`;
+        } else if (digits.length === 10) {
+            // 02-1234-5678 또는 011-123-4567
+            return `${digits.slice(0,3)}-${digits.slice(3,6)}-${digits.slice(6,10)}`;
+        }
+        return phone;
+    };
+
     if (loading) {
         return (
             <div className="profile-detail-loading">
@@ -136,7 +150,7 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
                             <span>🎂</span>
                         </div>
                         <div className="profile-detail-stat-content">
-                            <h3 className="profile-detail-stat-label">생년월일</h3>
+                            <h3 className="profile-detail-stat-label">생일</h3>
                             <p className="profile-detail-stat-value">{profile.birthday}</p>
                         </div>
                     </div>
@@ -147,7 +161,7 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
                         </div>
                         <div className="profile-detail-stat-content">
                             <h3 className="profile-detail-stat-label">연락처</h3>
-                            <p className="profile-detail-stat-value">{profile.phone}</p>
+                            <p className="profile-detail-stat-value">{formatPhone(profile.phone)}</p>
                         </div>
                     </div>
                     

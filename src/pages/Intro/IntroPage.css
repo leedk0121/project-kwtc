@@ -24,6 +24,14 @@
   gap: 16px;
 }
 
+.intro-title-icon {
+    width: 257px;
+    height: 201px;
+    vertical-align: middle;
+    margin-bottom: 8px;
+    transform: rotate(20deg);
+}
+
 .title-icon {
   font-size: 40px;
   /* animation: bounce 2s infinite; */
@@ -449,7 +457,7 @@
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .intro-header {
-    padding: 30px 15px;
+    padding: 0px 15px 30px 15px;
   }
   
   .intro-title {

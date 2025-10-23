@@ -7,21 +7,34 @@
   font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
 }
 
-.back-btn {
-  background: #6366f1;
+.ur-back-btn {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 2000;
+  background: #3b82f6;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 5px 20px;
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 20px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+  transition: background 0.3s, box-shadow 0.3s;
 }
 
-.back-btn:hover {
-  background: #4f46e5;
-  transform: translateY(-1px);
+.ur-back-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.18);
+}
+
+.back-icon-img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0) invert(1);
+  vertical-align: middle;
 }
 
 .loading {
@@ -213,6 +226,7 @@
   cursor: pointer;
   font-size: 18px;
   padding: 4px;
+  margin-top: -7px;
   transition: transform 0.2s;
 }
 
