@@ -36,7 +36,6 @@ function AdminRoleManager() {
       // 승인된 사용자만 필터링
       const approvedUsers = users.filter(user => user.approved === true);
       setProfiles(approvedUsers);
-      console.log('✅ 승인된 사용자 목록 조회 완료:', approvedUsers.length, '명');
     } catch (error: any) {
       console.error('사용자 조회 오류:', error);
       alert(`사용자 조회 실패: ${error.message}`);

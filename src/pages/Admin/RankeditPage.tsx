@@ -10,6 +10,7 @@ function RankedEditPage() {
     const [search, setSearch] = useState('');
     const [checkedIds, setCheckedIds] = useState<string[]>([]);
     const [tierInputs, setTierInputs] = useState<{ [id: string]: string }>({});
+    const [raketInputs, setRaketInputs] = useState<{ [id: string]: string }>({});
     const [rankInputs, setRankInputs] = useState<{ [id: string]: string }>({});
 
     useEffect(() => {
@@ -18,7 +19,6 @@ function RankedEditPage() {
         } else if (listType === 'all') {
             fetchAllUsers();
         }
-        // eslint-disable-next-line
     }, [listType]);
 
     const fetchRankedUsers = async () => {
@@ -29,7 +29,7 @@ function RankedEditPage() {
         if (!error && data) setUsers(data);
         setCheckedIds([]);
         setTierInputs({});
-        setRankInputs({});
+        setRaketInputs({});
         setLoading(false);
     };
 
@@ -41,9 +41,6 @@ function RankedEditPage() {
                 .select('id, name, birthday, phone, major, stnum, image_url');
             if (allError) {
                 console.error('전체 유저 데이터 로딩 오류:', allError.message, allError.details);
-            }
-            if (!allData || allData.length === 0) {
-                console.warn('전체 유저 데이터가 비어있음:', allData);
             }
             const { data: rankedData, error: rankedError } = await supabase
                 .from('ranked_user')
@@ -59,7 +56,7 @@ function RankedEditPage() {
                 setCheckedIds([]);
             }
             setTierInputs({});
-            setRankInputs({});
+            setRaketInputs({});
         } finally {
             setLoading(false);
         }
@@ -118,6 +115,10 @@ function RankedEditPage() {
         setTierInputs(prev => ({ ...prev, [id]: value }));
     };
 
+    const handleRaketChange = (id: string, value: string) => {
+        setRaketInputs(prev => ({ ...prev, [id]: value }));
+    };
+
     const handleRankChange = (id: string, value: string) => {
         setRankInputs(prev => ({ ...prev, [id]: value }));
     };
@@ -145,7 +146,7 @@ function RankedEditPage() {
                         };
                         // rank_tier와 rank_detail은 입력된 값이 있을 때만 포함
                         const tierValue = tierInputs[user.id];
-                        const detailValue = rankInputs[user.id];
+                        const detailValue = raketInputs[user.id];
                         
                         if (tierValue !== undefined && tierValue !== '') {
                             userObj.rank_tier = tierValue;
@@ -190,10 +191,11 @@ function RankedEditPage() {
 
     const handleUpdateRanked = async () => {
         if (filteredUsers.length === 0) return;
-        const selectedUsers = filteredUsers.map(user => ({
+        const selectedUsers = filteredUsers.map((user, idx) => ({
             id: user.id,
             rank_tier: tierInputs[user.id] ?? user.rank_tier ?? '',
-            rank_detail: rankInputs[user.id] ?? user.rank_detail ?? ''
+            rank_detail: rankInputs[user.id] ?? user.rank_detail ?? '',
+            raket: (idx < 3) ? (raketInputs[user.id] ?? user.raket ?? 'none') : undefined
         }));
         const { error } = await supabase
             .from('ranked_user')
@@ -289,7 +291,7 @@ function RankedEditPage() {
 
             <div className="rank-edit-rankedit-notice">
                 💡 테린이 티어의 티어값은 0 입니다. <br />
-                💡 저장 버튼은 2번 눌러 주세요.
+                💡 라켓 브랜드는 저장할때마다 선택해야합니다.
             </div>
 
             <div className="rank-edit-rankedit-controls">
@@ -403,6 +405,25 @@ function RankedEditPage() {
                                                         onChange={e => handleRankChange(user.id, e.target.value)}
                                                     />
                                                 </div>
+                                                {index < 3 && (
+                                                    <div className="rank-edit-user-raket">
+                                                        <label>라켓:</label>
+                                                        <select
+                                                            value={
+                                                                raketInputs[user.id] !== undefined
+                                                                    ? raketInputs[user.id]
+                                                                    : (user.raket ?? 'none')
+                                                            }
+                                                            onChange={e => handleRaketChange(user.id, e.target.value)}
+                                                        >
+                                                            <option value="none">none</option>
+                                                            <option value="yonex">yonex</option>
+                                                            <option value="wilson">wilson</option>
+                                                            <option value="head">head</option>
+                                                            <option value="babolat">babolat</option>
+                                                        </select>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="rank-edit-user-check-top">
                                                 <input

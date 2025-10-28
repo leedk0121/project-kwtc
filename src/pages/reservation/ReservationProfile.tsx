@@ -299,10 +299,7 @@ export default function ReservationProfile() {
         throw new Error('로그인이 필요합니다');
       }
 
-      console.log('📡 노원구 예약 내역 크롤링 시작...');
-
       const functionUrl = `${supabase.supabaseUrl}/functions/v1/crawl-nowon-reservation`;
-      console.log('📡 요청 URL:', functionUrl);
 
       const response = await fetch(functionUrl, {
         method: 'POST',
@@ -312,8 +309,6 @@ export default function ReservationProfile() {
         },
       });
 
-      console.log('📥 응답 상태:', response.status, response.statusText);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('❌ 응답 오류:', errorData);
@@ -321,16 +316,13 @@ export default function ReservationProfile() {
       }
 
       const result = await response.json();
-      console.log('✅ 크롤링 결과:', result);
-      
+
       if (result.data && Array.isArray(result.data)) {
-        console.log('📦 API 응답 데이터 직접 사용:', result.data.length);
         setReservationHistory(result.data);
         return;
       }
-      
+
       if (result.userId) {
-        console.log('📦 Storage에서 데이터 다운로드 시작...');
         
         const { data: storageData, error: storageError } = await supabase.storage
           .from('reservation-data')
@@ -343,11 +335,9 @@ export default function ReservationProfile() {
 
         const fileContent = await storageData.text();
         const jsonData = JSON.parse(fileContent);
-        
+
         const reservations = jsonData.reservations || [];
         setReservationHistory(reservations);
-        
-        console.log('✅ State 업데이트 완료');
       } else {
         throw new Error('사용자 ID가 응답에 없습니다.');
       }
@@ -373,10 +363,8 @@ export default function ReservationProfile() {
         throw new Error('로그인이 필요합니다');
       }
 
-      console.log('📡 도봉구 예약 내역 크롤링 시작...');
-
       const PROXY_URL = 'http://kwtc.dothome.co.kr/get_reservation_list.php';
-      
+
       const response = await fetch(PROXY_URL, {
         method: 'POST',
         headers: {
@@ -390,15 +378,12 @@ export default function ReservationProfile() {
         })
       });
 
-      console.log('📥 응답 상태:', response.status, response.statusText);
-
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
 
       const result = await response.json();
-      console.log('✅ 크롤링 결과:', result);
-      
+
       if (result.success && result.data) {
         // 예약 대기 + 예약 완료 데이터 통합
         const pendingReservations = result.data.pending?.reservations || [];
@@ -410,11 +395,7 @@ export default function ReservationProfile() {
           pending: result.data.pending?.headers,
           completed: result.data.completed?.headers,
         });
-        
-        console.log('📦 예약 대기:', pendingReservations.length);
-        console.log('📦 예약 완료:', completedReservations.length);
-        console.log('📦 전체:', allReservations.length);
-        
+
         setDobongReservationHistory(allReservations);
         
         // Storage에 저장
@@ -453,8 +434,6 @@ export default function ReservationProfile() {
           
           if (uploadError) {
             console.error('Storage 업로드 실패:', uploadError);
-          } else {
-            console.log('✅ Storage 저장 완료:', fileName);
           }
         } catch (storageError) {
           console.error('Storage 처리 오류:', storageError);
@@ -511,8 +490,6 @@ export default function ReservationProfile() {
         dobong_id: accountInfo.dobong_id,
         dobong_pass: accountInfo.dobong_pass
       } : null);
-
-      console.log('✅ 테니스장 계정 정보가 성공적으로 수정되었습니다.');
     } catch (error) {
       console.error('계정 정보 저장 오류:', error);
       throw error;
@@ -552,8 +529,6 @@ export default function ReservationProfile() {
         ...prev,
         reservation_alert: checked
       } : null);
-
-      console.log(`✅ 알림 설정이 ${checked ? '활성화' : '비활성화'}되었습니다.`);
     } catch (error) {
       console.error('알림 설정 저장 오류:', error);
     }
@@ -575,8 +550,6 @@ export default function ReservationProfile() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      console.log('프로필 이미지 업로드 기능은 준비 중입니다.');
     } catch (error) {
       console.error('이미지 업로드 오류:', error);
     }
@@ -613,9 +586,6 @@ export default function ReservationProfile() {
         return;
       }
 
-      console.log('🔄 예약 취소 요청 시작...');
-      console.log('seq:', seq, 'totalPrice:', totalPrice);
-
       const functionUrl = `${supabase.supabaseUrl}/functions/v1/cancel-nowon-reservation`;
 
       const response = await fetch(functionUrl, {
@@ -630,8 +600,6 @@ export default function ReservationProfile() {
         })
       });
 
-      console.log('📥 응답 상태:', response.status);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('❌ 취소 오류:', errorData);
@@ -639,7 +607,6 @@ export default function ReservationProfile() {
       }
 
       const result = await response.json();
-      console.log('✅ 취소 성공:', result);
 
       alert('예약이 취소되었습니다.');
       
@@ -716,13 +683,6 @@ export default function ReservationProfile() {
       }
 
       const result = await response.json();
-      console.log('✅ 취소 결과:', result);
-
-      if (result.debug_log && result.debug_log.length > 0) {
-        console.group('🔍 취소 디버그 로그');
-        result.debug_log.forEach((log: string) => console.log(log));
-        console.groupEnd();
-      }
 
       if (result.success) {
         alert('예약이 취소되었습니다.');

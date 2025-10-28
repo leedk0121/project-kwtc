@@ -30,7 +30,6 @@ function Showmember() {
 
     return (
         <div className="showmember-container">
-            {/* <h2 className="showmember-title">Member Information</h2> */}
             <ul className="showmember-list">
                 {rows.map((row, idx) => (
                     <li key={idx} className="showmember-row">
@@ -56,7 +55,6 @@ function Showmember() {
                                 </button>
                             </div>
                         ))}
-                        {/* 2명이 안될 때 빈 칸 추가 */}
                         {row.length < 2 && <div className="showmember-item empty"></div>}
                     </li>
                 ))}

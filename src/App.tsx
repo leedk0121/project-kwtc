@@ -48,8 +48,8 @@ function App() {
                 <Route path="/board/new" element={<LayoutWithHeader><NewPost /></LayoutWithHeader>} />
                 <Route path="/ranking" element={<LayoutWithHeader><RankingPage /></LayoutWithHeader>} />
                 <Route path="/intro" element={<LayoutWithHeader><IntroPage /></LayoutWithHeader>} />
-                <Route path="/participate" element={<LayoutWithHeader><VotePage /></LayoutWithHeader>} />
-                <Route path="/participate/add" element={<LayoutWithHeader><VoteAdd /></LayoutWithHeader>} />
+                <Route path="/event" element={<LayoutWithHeader><VotePage /></LayoutWithHeader>} />
+                <Route path="/event/add" element={<LayoutWithHeader><VoteAdd /></LayoutWithHeader>} />
                 <Route path="/login" element={<LayoutWithHeader><Auth /></LayoutWithHeader>} />
                 <Route path="/signup" element={<LayoutWithHeader><Signup /></LayoutWithHeader>} />
                 <Route path="/profile/my" element={<LayoutWithHeader><ProfilePage /></LayoutWithHeader>} />

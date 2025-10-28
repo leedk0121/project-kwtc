@@ -221,10 +221,10 @@ const VotePage: React.FC = () => {
             {/* 페이지 헤더 추가 */}
             <div className="vote-page-header">
                 <h1 className="vote-page-title">
-                    <span className="title-icon">📅</span>
-                    일정 관리
+                    <span className="vote-title-icon">📅</span>
+                    KWTC 일정
                 </h1>
-                <p className="vote-page-subtitle">KWTC 테니스 일정을 확인하고 참여해보세요</p>
+                <p className="vote-page-subtitle">테니스 일정을 공유하고 참여해보세요</p>
             </div>
 
             {/* 버튼 영역 */}

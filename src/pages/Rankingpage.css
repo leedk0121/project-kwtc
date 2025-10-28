@@ -91,12 +91,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.tier-nav-btn.tier-1 { border-color: #FFD700; }
-.tier-nav-btn.tier-2 { border-color: #B9F2FF; }
-.tier-nav-btn.tier-3 { border-color: #E6E6FA; }
+.tier-nav-btn.tier-1 { border-color: #B9F2FF; }
+.tier-nav-btn.tier-2 { border-color: #d1b3ff; }
+.tier-nav-btn.tier-3 { border-color: #50C878; }
 .tier-nav-btn.tier-4 { border-color: #FFE135; }
 .tier-nav-btn.tier-5 { border-color: #C0C0C0; }
-.tier-nav-btn.tier-0 { border-color: #98FB98; }
+.tier-nav-btn.tier-0 { border-color: #CD7F32; }
 
 .tier-icon {
   font-size: 16px;
@@ -238,6 +238,7 @@
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
   background-clip: padding-box;
+  padding-top: 10px !important; /* 탑 패딩 제거 */
 }
 
 @keyframes rainbow-border {
@@ -303,14 +304,14 @@
   gap: 5px;
 }
 
-.member-card.top-rank .profile-image-wrapper {
+.member-card.top-rank .rank-profile-image-wrapper {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .member-card.top-rank .profile-image {
-  width: 120px;
-  height: 120px;
+  width: 140px;    /* 기존 120px → 140px */
+  height: 140px;   /* 기존 120px → 140px */
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid white;
@@ -321,7 +322,7 @@
   font-size: 22px;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0 0 6px 0;
+  margin: 0 0 0 0;
 }
 
 .member-card.top-rank .member-major {
@@ -393,8 +394,8 @@
 }
 
 .member-card.regular-rank .profile-image {
-  width: 50px;
-  height: 50px;
+  width: 60px;     /* 기존 50px → 60px */
+  height: 60px;    /* 기존 50px → 60px */
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid white;
@@ -463,8 +464,8 @@
 }
 
 .terini-card .profile-image {
-  width: 50px;
-  height: 50px;
+  width: 60px;     /* 기존 50px → 60px */
+  height: 60px;    /* 기존 50px → 60px */
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid white;
@@ -510,6 +511,17 @@
   font-weight: 600;
   color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.rank-page-title {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 
 /* 반응형 디자인에서 테린이 카드도 동일하게 적용 */
@@ -601,16 +613,22 @@
     width: 45px;
     height: 45px;
   }
+
+  .rank-page-title {
+    font-size: 28px;
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 @media (max-width: 480px) {
-  .page-title {
-    font-size: 28px !important;
-    margin: 0 0 12px 0;
+
+  .rank-page-header {
+    padding: 30px 15px;
   }
   
   .tier-nav-btn {
-    padding: 4px 8px;
+    padding: 1px 2px;
   }
   
   .tier-name {
@@ -634,8 +652,8 @@
   }
   
   .member-card.top-rank .profile-image {
-    width: 130px;
-    height: 130px;
+    width: 140px;    /* 기존 120px → 140px */
+    height: 140px;   /* 기존 120px → 140px */
   }
   
   .member-card.top-rank .member-name {
@@ -806,7 +824,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3)); /* 그림자 효과 추가 */
+  /* filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3)); 그림자 효과 추가 */
 }
 
 /* 모달 스타일 수정 - Showmember와 동일하게 */
@@ -879,4 +897,148 @@
     padding: 20px;
     border-radius: 12px;
   }
+}
+
+.tier-nav-btn.tier-1 .tier-icon img {
+  margin: 1px 3px;
+}
+.tier-nav-btn.tier-2 .tier-icon img{
+  margin-bottom: -9px;
+  margin-left: 2px;
+}
+.tier-nav-btn.tier-3 .tier-icon img {
+  margin-bottom: -8px;
+  margin-left: 2px;
+}
+
+.tier-nav-btn.tier-4 .tier-icon img,
+.tier-nav-btn.tier-5 .tier-icon img,
+.tier-nav-btn.tier-0 .tier-icon img {
+  margin-top: 4px;
+  margin-left: 1px;
+}
+
+/* 메달 이미지 wrapper */
+.rank-medal-img-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* 메달 이미지 크기 */
+.rank-top-medal,
+.rank-second-medal,
+.rank-third-medal {
+  height: 80px;
+  vertical-align: middle;
+  aspect-ratio: auto;
+}
+
+/* 티어 아이콘(섹션 헤더) */
+.tier-icon-img {
+  width: 100px;
+  height: 100px;
+}
+
+/* 티어 네비게이션 아이콘 */
+.tier-nav-icon {
+  width: 45px;
+  height: 45px;
+}
+
+/* 등수 숫자 디자인 개선 - 경계선(테두리) 더 부드럽고 은은하게 */
+.rank-medal-number {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 900;
+  font-size: 3.2rem;
+  font-family: 'Paperlogy', 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 3px;
+  line-height: 1.05;
+  z-index: 2;
+  /* 입체감 */
+  text-shadow:
+    0 2px 8px #0002,
+    0 0 2px #0002,
+    0 4px 16px rgba(0,0,0,0.10),
+    0 1px 0 #fff8,
+    0 0 18px currentColor;
+  /* 내부 그림자 효과 */
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+  transition: color 0.2s, text-shadow 0.2s;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+  /* 부드러운 테두리 */
+  -webkit-text-stroke: 1.5px #8884;
+  text-stroke: 1.5px #8884;
+}
+
+/* 1등: 금색 그라데이션 + glow + 부드러운 테두리 */
+.rank-medal-number-1 {
+  background: linear-gradient(180deg, #fffbe6 0%, #ffe066 60%, #bfa900 100%);
+  color: #ffe066;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px #bfa90088;
+  text-stroke: 1.5px #bfa90088;
+  text-shadow:
+    0 0 10px #ffe06688,
+    0 2px 8px #bfa90044,
+    0 0 2px #bfa90044;
+}
+
+/* 2등: 은색 그라데이션 + glow + 부드러운 테두리 */
+.rank-medal-number-2 {
+  background: linear-gradient(180deg, #fafdff 0%, #e0e0e0 60%, #7a8fa3 100%);
+  color: #e0e0e0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px #7a8fa388;
+  text-stroke: 1.5px #7a8fa388;
+  text-shadow:
+    0 0 10px #b0c4de66,
+    0 2px 8px #7a8fa344,
+    0 0 2px #7a8fa344;
+}
+
+/* 3등: 동색 그라데이션 + glow + 부드러운 테두리 */
+.rank-medal-number-3 {
+  background: linear-gradient(180deg, #fff2e0 0%, #ffb366 60%, #b87333 100%);
+  color: #ffb366;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px #b8733388;
+  text-stroke: 1.5px #b8733388;
+  text-shadow:
+    0 0 10px #ffb36666,
+    0 2px 8px #b8733344,
+    0 0 2px #b8733344;
+}
+
+.rank-page-header {
+  background: white;
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.rank-title-icon {
+  font-size: 40px;
+}
+
+.rank-page-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: #64748b;
+  font-weight: 400;
 }

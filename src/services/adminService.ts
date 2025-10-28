@@ -142,27 +142,3 @@ export const adminService = {
     }
   }
 };
-
-// HOC는 adminHOC.tsx 파일로 분리했습니다
-// import { withAdminAuth } from './adminHOC';
-
-// 사용 예시:
-/*
-import { adminService } from '../services/adminService';
-import { withAdminAuth } from '../services/adminHOC';
-
-// 관리자 권한 추가
-await adminService.setAdminRole('user-id', true);
-
-// 사용자 승인
-await adminService.approveUser('user-id');
-
-// 사용자 삭제
-await adminService.deleteUser('user-id');
-
-// 모든 사용자 조회
-const users = await adminService.getAllUsers();
-
-// HOC로 페이지 보호
-export default withAdminAuth(AdminRoleManager);
-*/

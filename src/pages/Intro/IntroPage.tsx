@@ -76,16 +76,12 @@ function IntroPage() {
 
     return (
         <div className="intro-page">
-            <div className="intro-header">
-                <h1 className="intro-title">
-                    <img
-                        src="/megaphone-icon.png"
-                        alt="소개 아이콘"
-                        className="intro-title-icon"
-                    />
+            <div className="intro-page-header">
+                <h1 className="intro-page-title">
+                    <span className="intro-title-icon">📢</span>
                     KWTC 소개
                 </h1>
-                <p className="intro-subtitle">광운대학교 테니스 동아리를 소개합니다</p>
+                <p className="intro-page-subtitle">KWTC 동아리, 임원진과 멤버들을 소개합니다</p>
             </div>
 
             <div className="intro-navigation">

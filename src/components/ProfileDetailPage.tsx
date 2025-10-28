@@ -37,14 +37,14 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
         return `#${rank}`;
     };
 
-    // 티어 색상 정보 - 플래티넘 원래 색상으로 복원
+    // 티어 색상 정보
     const tierInfo = {
-        1: { name: 'Master', color: '#FFE066', icon: '👑', gradient: 'linear-gradient(135deg, #FFF2CC, #FFE066)' },
-        2: { name: 'Diamond', color: '#CCE7FF', icon: '💎', gradient: 'linear-gradient(135deg, #F0F8FF, #CCE7FF)' },
-        3: { name: 'Platinum', color: '#E6E6FA', icon: '⭐', gradient: 'linear-gradient(135deg, #E6E6FA, #DDA0DD)' }, /* 원래 색상 복원 */
-        4: { name: 'Gold', color: '#FFF2AA', icon: '🥇', gradient: 'linear-gradient(135deg, #FFFACD, #FFF2AA)' },
-        5: { name: 'Silver', color: '#E8E8E8', icon: '🥈', gradient: 'linear-gradient(135deg, #F5F5F5, #E8E8E8)' },
-        0: { name: 'Terini', color: '#D4F4D4', icon: '🌱', gradient: 'linear-gradient(135deg, #F0FFF0, #D4F4D4)' }
+        1: { name: 'Challenger', color: '#B9F2FF', icon: '/rank-tier-icon/tier_challenger.png', gradient: 'linear-gradient(135deg, #B9F2FF, #87CEEB)' },
+        2: { name: 'Master', color: '#B9F2FF', icon: '/rank-tier-icon/tier_master.png', gradient: 'linear-gradient(135deg, #e1d5fa, #b39ddb)' },
+        3: { name: 'Emerald', color: '#50C878', icon: '/rank-tier-icon/tier_emerald.png', gradient: 'linear-gradient(135deg, #E6E6FA, #50C878)' },
+        4: { name: 'Gold', color: '#FFE135', icon: '/rank-tier-icon/tier_gold.png', gradient: 'linear-gradient(135deg, #FFE135, #DAA520)' },
+        5: { name: 'Silver', color: '#C0C0C0', icon: '/rank-tier-icon/tier_silver.png', gradient: 'linear-gradient(135deg, #C0C0C0, #A9A9A9)' },
+        0: { name: 'Bronze', color: '#CD7F32', icon: '/rank-tier-icon/tier_bronze.png', gradient: 'linear-gradient(135deg, #CD7F32, #A0522D)' }
     };
 
     // 현재 사용자의 티어 정보 가져오기
@@ -102,10 +102,13 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
                 {/* Rank positioned at top left */}
                 <div className="profile-detail-rank">
                     <div className="profile-detail-rank-container">
-                        {/* <span className="profile-detail-rank-label">전체 랭킹</span> */}
                         <div className="profile-detail-rank-value-wrapper">
-                            {profile.rank_all <= 3 ? (
-                                <span className="profile-detail-rank-medal">{getRankDisplay(profile.rank_all)}</span>
+                            {profile.rank_all === 1 ? (
+                                <span className="profile-detail-rank-medal">🥇</span>
+                            ) : profile.rank_all === 2 ? (
+                                <span className="profile-detail-rank-medal">🥈</span>
+                            ) : profile.rank_all === 3 ? (
+                                <span className="profile-detail-rank-medal">🥉</span>
                             ) : (
                                 <>
                                     <span className="profile-detail-rank-hash">#</span>
@@ -118,20 +121,31 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
                 
                 {/* Profile Image */}
                 <div className="profile-detail-image-section">
-                    <div 
-                        className="profile-detail-image-wrapper"
-                        style={{ 
-                            background: 'linear-gradient(135deg, #ffffff, #f8f8f8)',
-                            boxShadow: `0 8px 32px rgba(255, 255, 255, 0.7)`
-                        }}
-                    >
-                        <img
-                            className="profile-detail-image"
-                            src={profile.image_url || "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"}
-                            alt={`${profile.name}의 프로필`}
-                        />
-                        <div className="profile-detail-image-border"></div>
-                    </div>
+                    {profile.rank_all === 123 ? (
+                        <div className="profile-detail-image-wrapper oni-bookmark-bg">
+                            <img
+                                className="profile-detail-image oni-large-image"
+                                src={profile.image_url || "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"}
+                                alt={`${profile.name}의 프로필`}
+                            />
+                            <div className="profile-detail-image-border"></div>
+                        </div>
+                    ) : (
+                        <div 
+                            className="profile-detail-image-wrapper"
+                            style={{ 
+                                background: 'linear-gradient(135deg, #ffffff, #f8f8f8)',
+                                boxShadow: `0 8px 32px rgba(255, 255, 255, 0.7)`
+                            }}
+                        >
+                            <img
+                                className="profile-detail-image"
+                                src={profile.image_url || "https://aftlhyhiskoeyflfiljr.supabase.co/storage/v1/object/public/profile-image/base_profile.png"}
+                                alt={`${profile.name}의 프로필`}
+                            />
+                            <div className="profile-detail-image-border"></div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Basic Info */}
@@ -165,9 +179,13 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
                         </div>
                     </div>
                     
-                    <div className={`profile-detail-stat-card profile-detail-tier-card tier-${profile.rank_tier}`}>
+                                        <div className={`profile-detail-stat-card profile-detail-tier-card tier-${profile.rank_tier}`}>
                         <div className="profile-detail-stat-icon">
-                            {currentTierInfo?.icon || tierInfo[0].icon}
+                            <img
+                                src={currentTierInfo?.icon || tierInfo[0].icon}
+                                alt={currentTierInfo?.name || tierInfo[0].name}
+                                style={{ width: 50, height: 50 }}
+                            />
                         </div>
                         <div className="profile-detail-stat-content">
                             <div className="profile-detail-stat-label">티어</div>

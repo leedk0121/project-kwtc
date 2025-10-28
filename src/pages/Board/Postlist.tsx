@@ -134,9 +134,9 @@ export function PostList() {
       <div className="board-page-header">
         <h1 className="board-page-title">
           <span className="board-title-icon">📝</span>
-          게시판
+          KWTC 게시판
         </h1>
-        <p className="board-page-subtitle">자유롭게 의견을 나누는 공간입니다.</p>
+        <p className="board-page-subtitle">KWTC에 대한 다양한 정보를 공유해보세요</p>
       </div>
 
       {/* VotePage 스타일의 액션 버튼들 */}

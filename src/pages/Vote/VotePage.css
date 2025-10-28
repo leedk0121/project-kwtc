@@ -30,9 +30,33 @@
   gap: 16px;
 }
 
-.title-icon {
+.vote-page-header {
+  background: white;
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.vote-title-icon {
   font-size: 40px;
-  /* animation: bounce 2s infinite; */
+}
+
+.vote-page-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.vote-page-title {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 
 /* @keyframes bounce {
@@ -156,7 +180,7 @@
   width: 100%;
   max-width: 700px;
   font-size: 1.1rem;
-  background-image: url('/calender_background.png');
+  background-image: url('/kwtc_court.png');
   background-size: cover;
   background-position: center;
   position: relative;
@@ -543,6 +567,7 @@
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
+  
   .vote-page-header {
     padding: 30px 15px;
   }
@@ -645,8 +670,11 @@
 }
 
 @media (max-width: 480px) {
+
   .vote-page-title {
     font-size: 28px;
+    flex-direction: column;
+    gap: 8px;
   }
   
   .calendar-container {

@@ -318,11 +318,11 @@
 
 .rank-edit-user-tier input,
 .rank-edit-user-rank input {
-  width: 70px;
-  padding: 8px 12px;
+  width: 48px; /* 기존 70px에서 더 작게 */
+  padding: 6px 8px; /* 패딩도 줄임 */
   border: 2px solid #e5e7eb;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 13px; /* 폰트도 살짝 줄임 */
   transition: all 0.3s ease;
 }
 
@@ -520,6 +520,8 @@
 
   .rank-edit-user-tier input,
   .rank-edit-user-rank input {
-    width: 80px;
+    width: 32px; /* 모바일에서도 작게 */
+    padding: 6px 8px;
+    font-size: 13px;
   }
 }

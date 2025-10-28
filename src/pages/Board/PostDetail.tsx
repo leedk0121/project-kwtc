@@ -35,7 +35,7 @@ export function PostDetail() {
         <div id='post_detail_title'>{post.title}</div>
       </div>
       <div id='post_detail_meta'>
-        {post.profile?.name || 'Unknown'} {new Date(post.created_at).toLocaleString()}
+        {new Date(post.created_at).toLocaleString()} / {post.user_name || 'Unknown'}
       </div>
       <div id='post_detail_content'>
         {post.content.split('\n').map((line, idx) => (

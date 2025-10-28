@@ -9,7 +9,7 @@ function Header() {
     if (location.pathname.startsWith('/board')) {
         pageText = 'BOARD';
     } 
-    else if (location.pathname.startsWith('/participate')) {
+    else if (location.pathname.startsWith('/event')) {
         pageText = 'PARTICIPATE';
     } else {
         switch (location.pathname) {
@@ -50,7 +50,7 @@ function Header() {
                     {pageText === 'BOARD' && <span className="page_board">BOARD</span>}
                     {pageText === 'RANKING' && <span className="page_ranking">RANKING</span>}
                     {pageText === 'INTRO' && <span className="page_intro">INTRO</span>}
-                    {pageText === 'PARTICIPATE' && <span className="page_participate">PARTICIPE</span>}
+                    {pageText === 'PARTICIPATE' && <span className="page_participate">EVENT</span>}
                     {pageText === 'LOGIN' && <span className="page_login">LOGIN</span>}
                     {pageText === 'SIGNUP' && <span className="page_signup">REGISTER</span>}
                     {pageText === 'PROFILE' && <span className="page_profile">PROFILE</span>}
@@ -61,7 +61,7 @@ function Header() {
                 <Link className='action_link' id='board_button' to="/board">게시판</Link>
                 <Link className='action_link' id='ranking_button' to="/ranking">랭킹</Link>
                 <Link className='action_link' id='intro_button' to="/intro">소개</Link>
-                <Link className='action_link' id='vote_button' to="/participate">참여</Link>
+                <Link className='action_link' id='vote_button' to="/event">일정</Link>
             </div>
             <div>
                 <Link className='home_link' id='home_button' to="/">  

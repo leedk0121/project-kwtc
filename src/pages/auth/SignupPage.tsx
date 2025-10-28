@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 
 const tennisPlayers = [
   "페더러", "나달", "조코비치", "머레이", "알카라즈", "프리츠", "치치파스","루네","벤 쉘튼", "즈베레프"
-  // 원하는 선수 이름을 추가하세요
 ];
 
 function Signup() {
@@ -24,7 +23,7 @@ function Signup() {
   useEffect(() => {
     const interval = setInterval(() => {
       setPlayerIdx(prev => (prev + 1) % tennisPlayers.length);
-    }, 5000); // 5초마다 변경
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -61,20 +60,19 @@ function Signup() {
       alert('생년월일을 입력하세요.');
       return;
     }
-    
-    // 회원가입 (이메일/비밀번호)
+
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       alert(error.message);
       return;
     }
-    // user id 가져오기
+
     const userId = data?.user?.id;
     if (!userId) {
       alert('회원가입 후 사용자 정보를 가져올 수 없습니다.');
       return;
     }
-    // 추가 정보 저장 (profile 테이블에 user_id 포함)
+
     const { error: insertError } = await supabase.from('profile').insert([
       { 
         id: userId, 
@@ -91,8 +89,7 @@ function Signup() {
       alert(insertError.message);
       return;
     }
-    
-    // tennis_reservation_profile 테이블에도 user_id 저장
+
     const { error: reservationError } = await supabase.from('tennis_reservation_profile').insert([
       { 
         user_id: userId
@@ -100,9 +97,8 @@ function Signup() {
     ]);
     if (reservationError) {
       console.error('예약 프로필 생성 실패:', reservationError);
-      // 예약 프로필 생성 실패해도 회원가입은 완료되도록 처리
     }
-    
+
     alert('회원가입이 완료되었습니다! 관리자 승인 이후 로그인 가능합니다.');
     navigate('/login');
   };

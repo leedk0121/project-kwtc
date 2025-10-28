@@ -6,36 +6,25 @@ import "./Rankingpage.css";
 function RankingPage() {
     const [users, setUsers] = useState<any[]>([]);
     const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
-    const [masterTierIcon, setMasterTierIcon] = useState<string>(''); // URL로 변경
     const tiers = [1, 2, 3, 4, 5];
     const tierRefs = useRef<(HTMLDivElement | null)[]>(Array(tiers.length).fill(null));
 
-    // 티어별 정보 객체
+    // 티어별 정보 객체 (아이콘 경로를 public 폴더 기준으로 지정)
     const tierInfo = {
-        1: { name: 'Master', color: '#B9F2FF', icon: masterTierIcon, gradient: 'linear-gradient(135deg, #B9F2FF, #87CEEB)' },
-        2: { name: 'Diamond', color: '#B9F2FF', icon: '💎', gradient: 'linear-gradient(135deg, #B9F2FF, #87CEEB)' },
-        3: { name: 'Platinum', color: '#E6E6FA', icon: '⭐', gradient: 'linear-gradient(135deg, #E6E6FA, #DDA0DD)' },
-        4: { name: 'Gold', color: '#FFE135', icon: '🥇', gradient: 'linear-gradient(135deg, #FFE135, #DAA520)' },
-        5: { name: 'Silver', color: '#C0C0C0', icon: '🥈', gradient: 'linear-gradient(135deg, #C0C0C0, #A9A9A9)' },
-        0: { name: 'Terini', color: '#98FB98', icon: '🌱', gradient: 'linear-gradient(135deg, #98FB98, #90EE90)' }
+        1: { name: 'Challenger', color: '#B9F2FF', icon: '/rank-tier-icon/tier_challenger.png', gradient: 'linear-gradient(135deg, #B9F2FF, #87CEEB)' },
+        2: { name: 'Master', color: '#d1b3ff', icon: '/rank-tier-icon/tier_master.png', gradient: 'linear-gradient(135deg, #d1b3ff, #b39ddb)' }, // 연한 보라색 계열
+        3: { name: 'Emerald', color: '#50C878', icon: '/rank-tier-icon/tier_emerald.png', gradient: 'linear-gradient(135deg, #E6E6FA, #50C878)' },
+        4: { name: 'Gold', color: '#FFE135', icon: '/rank-tier-icon/tier_gold.png', gradient: 'linear-gradient(135deg, #FFE135, #DAA520)' },
+        5: { name: 'Silver', color: '#C0C0C0', icon: '/rank-tier-icon/tier_silver.png', gradient: 'linear-gradient(135deg, #C0C0C0, #A9A9A9)' },
+        0: { name: 'Bronze', color: '#CD7F32', icon: '/rank-tier-icon/tier_bronze.png', gradient: 'linear-gradient(135deg, #CD7F32, #A0522D)' }
     };
 
     useEffect(() => {
         const fetchData = async () => {
-            // Master 티어 아이콘 가져오기 (스토리지에서)
-            const { data: iconUrlData } = supabase
-                .storage
-                .from('tier_icon')
-                .getPublicUrl('tier_chall.png');
-            
-            if (iconUrlData?.publicUrl) {
-                setMasterTierIcon(iconUrlData.publicUrl);
-            }
-
             // 유저 데이터 가져오기
             const { data, error } = await supabase
                 .from('ranked_user')
-                .select('id, major, name, stnum, rank_tier, rank_detail, rank_all, image_url')
+                .select('id, major, name, stnum, rank_tier, rank_detail, rank_all, image_url, raket') // raket 추가
                 .order('rank_tier', { ascending: true })
                 .order('rank_detail', { ascending: true });
             if (!error && data) setUsers(data);
@@ -71,21 +60,66 @@ function RankingPage() {
         }
     };
 
-    const getRankMedal = (rank: number) => {
-        if (rank === 1) return '🥇🥇🥇';
-        if (rank === 2) return '🥈🥈🥈';
-        if (rank === 3) return '🥉🥉🥉';
+    const getRankMedal = (rank: number, raket?: string) => {
+        if (rank === 1) {
+            return (
+                <span className="rank-medal-img-wrapper rank-medal-only">
+                    <span className="rank-medal-number rank-medal-number-1">1</span>
+                    <img
+                        src={
+                            raket && raket !== 'none'
+                                ? `/rank-top/rank-top-${raket}.png`
+                                : `/rank-top/rank-top.png`
+                        }
+                        alt={`${raket && raket !== 'none' ? raket + ' 라켓' : '1등 메달'}`}
+                        className="rank-top-medal"
+                    />
+                </span>
+            );
+        }
+        if (rank === 2) {
+            return (
+                <span className="rank-medal-img-wrapper rank-medal-only">
+                    <span className="rank-medal-number rank-medal-number-2">2</span>
+                    <img
+                        src={
+                            raket && raket !== 'none'
+                                ? `/rank-second/rank-second-${raket}.png`
+                                : `/rank-second/rank-second.png`
+                        }
+                        alt={`${raket && raket !== 'none' ? raket + ' 라켓' : '2등 메달'}`}
+                        className="rank-second-medal"
+                    />
+                </span>
+            );
+        }
+        if (rank === 3) {
+            return (
+                <span className="rank-medal-img-wrapper rank-medal-only">
+                    <span className="rank-medal-number rank-medal-number-3">3</span>
+                    <img
+                        src={
+                            raket && raket !== 'none'
+                                ? `/rank-third/rank-third-${raket}.png`
+                                : `/rank-third/rank-third.png`
+                        }
+                        alt={`${raket && raket !== 'none' ? raket + ' 라켓' : '3등 메달'}`}
+                        className="rank-third-medal"
+                    />
+                </span>
+            );
+        }
         return null;
     };
 
     return (
         <div className="ranking-page">
             <div className="ranking-header">
-                <h1 className="page-title">
-                    <span className="title-icon">🏆</span>
+                <h1 className="rank-page-title">
+                    <span className="rank-title-icon">🏆</span>
                     KWTC 랭킹
                 </h1>
-                <p className="page-subtitle">KWTC 테니스 실력 랭킹을 확인하세요</p>
+                <p className="rank-page-subtitle">KWTC 멤버들의 테니스 랭킹을 보여줍니다</p>
             </div>
 
             <div className="tier-navigation">
@@ -97,11 +131,7 @@ function RankingPage() {
                             onClick={() => handleTierScroll(idx)}
                         >
                             <span className="tier-icon">
-                                {tier === 1 && masterTierIcon ? (
-                                    <img src={masterTierIcon} alt="Master" style={{ width: '48px', height: '48px' }} />
-                                ) : (
-                                    tierInfo[tier as keyof typeof tierInfo].icon
-                                )}
+                                <img src={tierInfo[tier as keyof typeof tierInfo].icon} alt={tierInfo[tier as keyof typeof tierInfo].name} className="tier-nav-icon" />
                             </span>
                             <span className="tier-name">{tierInfo[tier as keyof typeof tierInfo].name}</span>
                         </button>
@@ -110,7 +140,9 @@ function RankingPage() {
                         className="tier-nav-btn tier-0"
                         onClick={handleTeriniScroll}
                     >
-                        <span className="tier-icon">{tierInfo[0].icon}</span>
+                        <span className="tier-icon">
+                            <img src={tierInfo[0].icon} alt={tierInfo[0].name} className="tier-nav-icon" />
+                        </span>
                         <span className="tier-name">{tierInfo[0].name}</span>
                     </button>
                 </div>
@@ -125,11 +157,7 @@ function RankingPage() {
                         >
                             <div className="tier-info">
                                 <span className="tier-icon-large">
-                                    {tier === 1 && masterTierIcon ? (
-                                        <img src={masterTierIcon} alt="Master" style={{ width: '80px', height: '80px' }} />
-                                    ) : (
-                                        tierInfo[tier as keyof typeof tierInfo].icon
-                                    )}
+                                    <img src={tierInfo[tier as keyof typeof tierInfo].icon} alt={tierInfo[tier as keyof typeof tierInfo].name} className="tier-icon-img" />
                                 </span>
                                 <div className="tier-text">
                                     <h2 className="tier-title">{tierInfo[tier as keyof typeof tierInfo].name}</h2>
@@ -164,25 +192,10 @@ function RankingPage() {
                                             style={{ cursor: 'pointer' }}
                                           >
                                             <div className="member-rank-section">
-                                              {getRankMedal(user.rank_all) ? (
-                                                // 1-3등은 메달만 표시
-                                                <span className="rank-medal-only">{getRankMedal(user.rank_all)}</span>
-                                              ) : (
-                                                // 4등 이상은 기존 방식
-                                                <>
-                                                  <div 
-                                                    className="rank-badge"
-                                                    style={{ background: tierInfo[tier as keyof typeof tierInfo].gradient }}
-                                                  >
-                                                    <span className="rank-number">#{user.rank_all}</span>
-                                                  </div>
-                                                  <span className="rank-detail">({user.rank_detail})</span>
-                                                </>
-                                              )}
+                                              {getRankMedal(user.rank_all, user.raket)}
                                             </div>
-                                            
                                             <div className="member-profile">
-                                              <div className="profile-image-wrapper">
+                                              <div className="rank-profile-image-wrapper">
                                                 <img
                                                   src={
                                                     user.image_url ||
@@ -199,8 +212,8 @@ function RankingPage() {
                                               
                                               <div className="member-info">
                                                 <h3 className="member-name">{user.name}</h3>
-                                                <p className="member-major">{user.major}</p>
-                                                <p className="member-stnum">#{user.stnum}</p>
+                                                <span className="member-major">{user.major}</span>
+                                                <span className="member-stnum"> #{user.stnum}</span>
                                               </div>
                                             </div>
                                           </div>
@@ -234,7 +247,7 @@ function RankingPage() {
                                             </div>
                                             
                                             <div className="member-profile">
-                                              <div className="profile-image-wrapper">
+                                              <div className="rank-profile-image-wrapper">
                                                 <img
                                                   src={
                                                     user.image_url ||
@@ -273,10 +286,12 @@ function RankingPage() {
                         style={{ background: tierInfo[0].gradient }}
                     >
                         <div className="tier-info">
-                            <span className="tier-icon-large">{tierInfo[0].icon}</span>
+                            <span className="tier-icon-large">
+                                <img src={tierInfo[0].icon} alt={tierInfo[0].name} className="tier-icon-img" />
+                            </span>
                             <div className="tier-text">
                                 <h2 className="tier-title">{tierInfo[0].name}</h2>
-                                <span className="tier-subtitle">새싹 테린이</span>
+                                <span className="tier-subtitle">테린이</span>
                             </div>
                         </div>
                         <div className="tier-count">
@@ -306,12 +321,12 @@ function RankingPage() {
                                                     className="rank-badge terini-badge"
                                                     style={{ background: tierInfo[0].gradient }}
                                                 >
-                                                    <span className="terini-text">새싹</span>
+                                                    <span className="terini-text">테린이</span>
                                                 </div>
                                             </div>
                                             
                                             <div className="member-profile">
-                                                <div className="profile-image-wrapper">
+                                                <div className="rank-profile-image-wrapper">
                                                     <img
                                                         src={
                                                             user.image_url ||

@@ -36,7 +36,6 @@ function LoginApprove() {
     try {
       const users = await adminService.getAllUsers();
       setProfiles(users || []);
-      console.log('✅ 사용자 목록 조회 완료:', users.length, '명');
     } catch (error) {
       console.error('프로필 조회 오류:', error);
       alert('프로필을 불러오는데 실패했습니다.');
