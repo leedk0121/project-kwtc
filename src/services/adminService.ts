@@ -1,6 +1,6 @@
 // src/services/adminService.ts
 
-import { supabase } from '../pages/auth/supabaseClient';
+import { supabase } from '../pages/Auth/supabaseClient';
 
 /**
  * Service Role을 사용하는 관리자 작업 서비스

@@ -1,59 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../auth/supabaseClient';
-import type { Post } from './Posttypes';
+import { usePosts } from './hooks';
+import { POST_TYPE_KR, formatDate } from './utils';
 import './Postlist.css';
 
 export function PostList() {
   const [search, setSearch] = useState("");
-  const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [showSearch, setShowSearch] = useState(false); // 검색창 표시 여부 추가
+  const [showSearch, setShowSearch] = useState(false);
   const POSTS_PER_PAGE = 10;
   const navigate = useNavigate();
-  
-  const post_type_kr: { [key: string]: string } = {
-    announcement: '공지',
-    tour: '대회',
-    normal: '자유',
-  };
+
+  const { posts, loading, fetchPosts, searchPosts } = usePosts();
 
   useEffect(() => {
     fetchPosts();
-  }, []);
-
-  const sortPosts = (postsData: Post[]) => {
-    return postsData.sort((a, b) => {
-      // 공지사항을 맨 위로
-      if (a.post_type === 'announcement' && b.post_type !== 'announcement') {
-        return -1;
-      }
-      if (a.post_type !== 'announcement' && b.post_type === 'announcement') {
-        return 1;
-      }
-      // 같은 타입이면 최신순으로 정렬
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  };
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('posts')
-      .select('id, user_id, title, content, created_at, post_type, user_name')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error(error);
-    } else if (data) {
-      const sortedPosts = sortPosts(data);
-      setPosts(sortedPosts);
-    }
-    setLoading(false);
-  };
+  }, [fetchPosts]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,20 +26,11 @@ export function PostList() {
       setHasSearched(false);
       return;
     }
-    
+
     setSearchLoading(true);
     setHasSearched(true);
-    const { data, error } = await supabase
-      .from('posts')
-      .select('id, user_id, title, content, created_at, post_type, user_name')
-      .ilike('title', `%${search}%`)
-      .order('created_at', { ascending: false });
-    
-    if (!error && data) {
-      const sortedPosts = sortPosts(data);
-      setPosts(sortedPosts);
-      setPage(1);
-    }
+    await searchPosts(search);
+    setPage(1);
     setSearchLoading(false);
   };
 
@@ -89,7 +44,6 @@ export function PostList() {
   const toggleSearch = () => {
     setShowSearch(!showSearch);
     if (showSearch) {
-      // 검색창을 닫을 때 검색 초기화
       setSearch("");
       setHasSearched(false);
       fetchPosts();
@@ -98,26 +52,12 @@ export function PostList() {
   };
 
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
-  const pagedPosts = posts.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE);
+  const pagedPosts = useMemo(() =>
+    posts.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE),
+    [posts, page]
+  );
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 24) {
-      return `${diffInHours}시간 전`;
-    } else if (diffInHours < 48) {
-      return '1일 전';
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        month: 'short',
-        day: 'numeric'
-      });
-    }
-  };
-
-  if (loading) {
+  if (loading && posts.length === 0) {
     return (
       <div className="board-list-container">
         <div className="board-loading-wrapper">
@@ -130,7 +70,6 @@ export function PostList() {
 
   return (
     <div className='board-list-container'>
-      {/* VotePage 스타일의 페이지 헤더 */}
       <div className="board-page-header">
         <h1 className="board-page-title">
           <span className="board-title-icon">📝</span>
@@ -139,15 +78,14 @@ export function PostList() {
         <p className="board-page-subtitle">KWTC에 대한 다양한 정보를 공유해보세요</p>
       </div>
 
-      {/* VotePage 스타일의 액션 버튼들 */}
       <div className="board-action-buttons">
-        <button 
+        <button
           className="board-search-toggle-btn"
           onClick={toggleSearch}
         >
           🔍 {showSearch ? '검색 닫기' : '검색'}
         </button>
-        <button 
+        <button
           className="board-write-btn"
           onClick={() => navigate('/board/new')}
         >
@@ -155,7 +93,6 @@ export function PostList() {
         </button>
       </div>
 
-      {/* 검색창을 조건부로 렌더링 */}
       {showSearch && (
         <div className="board-search-section">
           <form onSubmit={handleSearch} className="board-search-form">
@@ -168,8 +105,8 @@ export function PostList() {
                 className="board-search-input"
               />
               {search && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="board-clear-btn"
                   onClick={clearSearch}
                 >
@@ -177,8 +114,8 @@ export function PostList() {
                 </button>
               )}
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="board-search-btn"
               disabled={searchLoading}
             >
@@ -194,7 +131,7 @@ export function PostList() {
             <div className="board-empty-icon">📭</div>
             <h3>게시글이 없습니다</h3>
             <p>로그인 하지 않으면 글을 볼 수 없습니다.</p>
-            <button 
+            <button
               className="board-empty-write-btn"
               onClick={() => navigate('/board/new')}
             >
@@ -203,25 +140,24 @@ export function PostList() {
           </div>
         ) : (
           <>
-            {/* 검색을 실행했을 때만 통계 표시 */}
             {hasSearched && (
               <div className="board-post-stats">
                 <span>총 {posts.length}개의 게시글</span>
                 {search && <span>'{search}' 검색 결과</span>}
               </div>
             )}
-            
+
             <div className="board-list">
               {pagedPosts.map(post => (
-                <div 
-                  key={post.id} 
+                <div
+                  key={post.id}
                   className={`board-item board-${post.post_type}`}
                   onClick={() => navigate(`/board/${post.id}`)}
                 >
                   <div className="board-main">
                     <div className="board-header">
                       <span className={`board-badge board-${post.post_type}`}>
-                        {post_type_kr[post.post_type] || post.post_type}
+                        {POST_TYPE_KR[post.post_type] || post.post_type}
                       </span>
                       {post.post_type === 'announcement' && (
                         <span className="board-pin-icon">📌</span>
@@ -263,13 +199,13 @@ export function PostList() {
                 >
                   ◀
                 </button>
-                
+
                 <div className="board-pagination-info">
                   <span className="board-current-page">{page}</span>
                   <span className="board-page-separator">/</span>
                   <span className="board-total-pages">{totalPages}</span>
                 </div>
-                
+
                 <button
                   className="board-pagination-btn"
                   onClick={() => setPage(page + 1)}

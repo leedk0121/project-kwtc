@@ -3,25 +3,25 @@ import Header from './Header';
 import BoardPage from './pages/Board/BoardPage.tsx';
 import RankingPage from './pages/RankingPage.tsx';
 import IntroPage from './pages/Intro/IntroPage.tsx';
-import VotePage from './pages/Vote/VotePage.tsx';
+import EventPage from './pages/Event/EventPage.tsx';
 import HomePage from './pages/HomePage.tsx';
-import Auth from './pages/auth/Auth.tsx';
-import Signup from './pages/auth/SignupPage.tsx';
-import ProfilePage from './pages/auth/ProfilePage.tsx';
+import Auth from './pages/Auth/Auth.tsx';
+import Signup from './pages/Auth/SignupPage.tsx';
+import ProfilePage from './pages/Auth/ProfilePage.tsx';
 import { NewPost } from './pages/Board/NewPost';
 import { PostDetail } from './pages/Board/PostDetail';
-import UnifiedreservationPage from './pages/reservation/UnifiedreservationPage.tsx';
-import VoteAdd from './pages/Vote/VoteaddPage.tsx';
-import ReservationProfile from './pages/reservation/ReservationProfile';
+import UnifiedreservationPage from './pages/Reservation/UnifiedreservationPage.tsx';
+import EventAdd from './pages/Event/EventAddPage.tsx';
+import ReservationProfile from './pages/Reservation/ReservationProfile.tsx';
 import AdminPage from './pages/Admin/AdminPage.tsx';
 import RankedEditPage from './pages/Admin/RankeditPage.tsx';
 import PostEditPage from './pages/Admin/PostEditPage.tsx';
 import LeadereditPage from './pages/Admin/LeadereditPage.tsx';
 import LoginApprove from './pages/Admin/Loginapprovepage.tsx';
 import AdminRoleManager from './pages/Admin/AdminRoleManager.tsx';
-import MajorManagePage from './pages/Admin/MajorManagePage';
+import MajorManagePage from './pages/Admin/MajorManagePage.tsx';
 import './App.css';
-import ReservationSuccessPage from './pages/reservation/ReservationSuccessPage';
+import ReservationSuccessPage from './pages/Reservation/ReservationSuccessPage.tsx';
 
 // 헤더가 있는 레이아웃
 function LayoutWithHeader({ children }: { children: React.ReactNode }) {
@@ -48,8 +48,8 @@ function App() {
                 <Route path="/board/new" element={<LayoutWithHeader><NewPost /></LayoutWithHeader>} />
                 <Route path="/ranking" element={<LayoutWithHeader><RankingPage /></LayoutWithHeader>} />
                 <Route path="/intro" element={<LayoutWithHeader><IntroPage /></LayoutWithHeader>} />
-                <Route path="/event" element={<LayoutWithHeader><VotePage /></LayoutWithHeader>} />
-                <Route path="/event/add" element={<LayoutWithHeader><VoteAdd /></LayoutWithHeader>} />
+                <Route path="/event" element={<LayoutWithHeader><EventPage /></LayoutWithHeader>} />
+                <Route path="/event/add" element={<LayoutWithHeader><EventAdd /></LayoutWithHeader>} />
                 <Route path="/login" element={<LayoutWithHeader><Auth /></LayoutWithHeader>} />
                 <Route path="/signup" element={<LayoutWithHeader><Signup /></LayoutWithHeader>} />
                 <Route path="/profile/my" element={<LayoutWithHeader><ProfilePage /></LayoutWithHeader>} />

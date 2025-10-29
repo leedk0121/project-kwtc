@@ -1,6 +1,7 @@
-import { supabase } from '../auth/supabaseClient.tsx';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePosts } from './hooks';
+import { POST_TYPE_OPTIONS } from './utils';
 import './NewPost.css';
 
 export function NewPost() {
@@ -8,71 +9,24 @@ export function NewPost() {
   const [content, setContent] = useState('');
   const [postType, setPostType] = useState('normal');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
-  const createPost = async () => {
-    if (!title.trim() || !content.trim()) {
-      alert("제목과 내용을 모두 입력해주세요.");
-      return;
-    }
+  const { createPost, uploading } = usePosts();
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
+  const handleCreatePost = async () => {
+    const result = await createPost(title, content, postType, imageFiles);
 
-    let imageUrls: string[] = [];
-    if (imageFiles.length > 0) {
-      setUploading(true);
-      for (const file of imageFiles) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
-        const { data, error } = await supabase.storage
-          .from('post-images')
-          .upload(fileName, file);
-
-        if (error) {
-          console.error('Supabase upload error:', error);
-          alert('이미지 업로드 실패: ' + error.message);
-          setUploading(false);
-          return;
-        }
-        const publicUrl = supabase.storage.from('post-images').getPublicUrl(fileName).data.publicUrl;
-        imageUrls.push(publicUrl);
-      }
-      setUploading(false);
-    }
-
-    const { error } = await supabase.from('posts').insert({
-      user_id: user.id,
-      title,
-      content,
-      post_type: postType,
-      image_urls: imageUrls,
-    });
-
-    if (error) alert(error.message);
-    else {
-      alert("게시글 등록 완료!");
-      setTitle('');
-      setContent('');
-      setPostType('normal');
-      setImageFiles([]);
+    if (result.success) {
+      alert(result.message);
       navigate('/board');
+    } else {
+      alert(result.message || '게시글 등록에 실패했습니다.');
     }
   };
 
   const removeImage = (index: number) => {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
-
-  const postTypeOptions = [
-    { value: 'normal', label: '자유', icon: '💬', color: '#3b82f6' },
-    { value: 'announcement', label: '공지', icon: '📢', color: '#ef4444' },
-    { value: 'tour', label: '대회', icon: '🏆', color: '#f59e0b' }
-  ];
 
   return (
     <div className='newpost-container'>
@@ -92,8 +46,8 @@ export function NewPost() {
               글 종류
             </h3>
             <div className="post-type-options">
-              {postTypeOptions.map((option) => (
-                <label 
+              {POST_TYPE_OPTIONS.map((option) => (
+                <label
                   key={option.value}
                   className={`post-type-option ${postType === option.value ? 'selected' : ''}`}
                   style={{ '--accent-color': option.color } as React.CSSProperties}
@@ -214,7 +168,7 @@ export function NewPost() {
             <button
               type="button"
               className="submit-btn"
-              onClick={createPost}
+              onClick={handleCreatePost}
               disabled={uploading || !title.trim() || !content.trim()}
             >
               {uploading ? (

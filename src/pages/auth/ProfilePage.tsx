@@ -1,161 +1,81 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient.tsx';
+import { useState } from 'react';
+import { useAuth, useProfile } from './hooks';
+import type { Profile } from './hooks/useProfile';
 import './ProfilePage.css';
 
 function ProfilePage() {
-  const navigate = useNavigate();
-  const [profile, setProfile] = useState<{
-    id: string;
-    name: string;
-    major: string;
-    email: string;
-    phone: string;
-    stnum: string;
-    birthday: string;
-    image_url?: string;
-  } | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const { signOut } = useAuth();
+  const { profile, loading, uploading, setProfile, updateProfile, uploadImage, refetchProfile } = useProfile();
   const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('profile')
-        .select('id, name, major, email, phone, stnum, birthday, image_url')
-        .eq('id', user.id)
-        .single();
-      if (!error && data) setProfile(data);
-    };
-    fetchProfile();
-  }, []);
 
   const handleLogout = async () => {
     const confirmLogout = window.confirm('정말 로그아웃 하시겠습니까?');
     if (confirmLogout) {
-      await supabase.auth.signOut();
-      // 로컬 스토리지 정리
-      localStorage.removeItem('user_id');
-      localStorage.removeItem('user_name');
-      localStorage.removeItem('user_major');
-      localStorage.removeItem('user_stnum');
-      localStorage.removeItem('user_image_url');
-      window.location.href = '/login';
+      const result = await signOut();
+      if (result.success) {
+        window.location.href = '/login';
+      } else {
+        alert(result.message);
+      }
     }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !profile) return;
-    setUploading(true);
+
     const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${profile.stnum}_${Date.now()}.${fileExt}`;
+    const result = await uploadImage(file);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      alert('사용자 정보를 가져올 수 없습니다.');
-      setUploading(false);
-      return;
+    if (!result.success) {
+      alert(result.message);
     }
-
-    // 기존 이미지 삭제
-    if (profile.image_url) {
-      const urlParts = profile.image_url.split('/');
-      const oldFileName = urlParts[urlParts.length - 1];
-      await supabase.storage
-        .from('profile-image')
-        .remove([oldFileName]);
-    }
-
-    const { error: uploadError } = await supabase.storage
-      .from('profile-image')
-      .upload(fileName, file);
-
-    if (uploadError) {
-      alert('이미지 업로드 실패: ' + uploadError.message);
-      setUploading(false);
-      return;
-    }
-
-    const { data } = supabase.storage
-      .from('profile-image')
-      .getPublicUrl(fileName);
-
-    const imageUrl = data.publicUrl;
-
-    const { error: updateError } = await supabase
-      .from('profile')
-      .update({ image_url: imageUrl })
-      .eq('id', profile.id);
-
-    if (!updateError) {
-      setProfile({ ...profile, image_url: imageUrl });
-      // 로컬 스토리지 업데이트
-      localStorage.setItem('user_image_url', imageUrl);
-    }
-    setUploading(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!profile) return;
+    if (!editedProfile) return;
     const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
+    setEditedProfile({ ...editedProfile, [name]: value });
+  };
+
+  const handleEdit = () => {
+    setEditedProfile(profile);
+    setIsEditing(true);
   };
 
   const handleSave = async () => {
-    if (!profile) return;
+    if (!editedProfile) return;
+
     setSaving(true);
-    
-    const { error } = await supabase
-      .from('profile')
-      .update({
-        name: profile.name,
-        major: profile.major,
-        email: profile.email,
-        phone: profile.phone,
-        stnum: profile.stnum,
-        birthday: profile.birthday,
-        image_url: profile.image_url,
-      })
-      .eq('id', profile.id);
-      
-    if (error) {
-      alert('저장 실패: ' + error.message);
-    } else {
-      // 로컬 스토리지 업데이트
-      localStorage.setItem('user_name', profile.name);
-      localStorage.setItem('user_major', profile.major);
-      localStorage.setItem('user_stnum', profile.stnum);
-      if (profile.image_url) {
-        localStorage.setItem('user_image_url', profile.image_url);
-      }
-      
-      alert('저장되었습니다!');
+    const result = await updateProfile({
+      name: editedProfile.name,
+      major: editedProfile.major,
+      email: editedProfile.email,
+      phone: editedProfile.phone,
+      stnum: editedProfile.stnum,
+      birthday: editedProfile.birthday
+    });
+
+    if (result.success) {
+      alert(result.message);
       setIsEditing(false);
+      setEditedProfile(null);
+    } else {
+      alert(result.message);
     }
     setSaving(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    // 원래 데이터로 되돌리기 위해 다시 fetch
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('profile')
-        .select('id, name, major, email, phone, stnum, birthday, image_url')
-        .eq('id', user.id)
-        .single();
-      if (!error && data) setProfile(data);
-    };
-    fetchProfile();
+    setEditedProfile(null);
+    refetchProfile();
   };
 
-  if (!profile) {
+  const displayProfile = isEditing ? editedProfile : profile;
+
+  if (loading && !profile) {
     return (
       <div className="profile-container">
         <div className="loading-wrapper">
@@ -166,12 +86,22 @@ function ProfilePage() {
     );
   }
 
+  if (!displayProfile) {
+    return (
+      <div className="profile-container">
+        <div className="loading-wrapper">
+          <p>프로필 정보를 찾을 수 없습니다.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="profile-container">
       <div className="profile-header">
         <div className="header-actions">
           {!isEditing ? (
-            <button className="profile-edit-btn" onClick={() => setIsEditing(true)}>
+            <button className="profile-edit-btn" onClick={handleEdit}>
               ✏️ 편집
             </button>
           ) : (
@@ -179,8 +109,8 @@ function ProfilePage() {
               <button className="cancel-btn" onClick={handleCancel}>
                 취소
               </button>
-              <button 
-                className="save-btn" 
+              <button
+                className="save-btn"
                 onClick={handleSave}
                 disabled={saving}
               >
@@ -196,8 +126,8 @@ function ProfilePage() {
           <div className="profile-image-section">
             <div className="profile-image-wrapper">
               <div className="profile-image">
-                {profile.image_url ? (
-                  <img src={profile.image_url} alt="프로필 이미지" />
+                {displayProfile.image_url ? (
+                  <img src={displayProfile.image_url} alt="프로필 이미지" />
                 ) : (
                   <div className="default-avatar">
                     <span>👤</span>
@@ -220,9 +150,9 @@ function ProfilePage() {
               </div>
             </div>
             <div className="profile-name-section">
-              <h2>{profile.name}</h2>
-              <p className="profile-major">{profile.major}</p>
-              <p className="profile-student-id">학번: {profile.stnum}</p>
+              <h2>{displayProfile.name}</h2>
+              <p className="profile-major">{displayProfile.major}</p>
+              <p className="profile-student-id">학번: {displayProfile.stnum}</p>
             </div>
           </div>
 
@@ -233,57 +163,57 @@ function ProfilePage() {
                 <div className="form-group">
                   <label>이름</label>
                   {isEditing ? (
-                    <input 
-                      name="name" 
-                      value={profile.name} 
+                    <input
+                      name="name"
+                      value={displayProfile.name}
                       onChange={handleChange}
                       className="form-input"
                     />
                   ) : (
-                    <div className="form-value">{profile.name}</div>
+                    <div className="form-value">{displayProfile.name}</div>
                   )}
                 </div>
 
                 <div className="form-group">
                   <label>학과</label>
                   {isEditing ? (
-                    <input 
-                      name="major" 
-                      value={profile.major} 
+                    <input
+                      name="major"
+                      value={displayProfile.major}
                       onChange={handleChange}
                       className="form-input"
                     />
                   ) : (
-                    <div className="form-value">{profile.major}</div>
+                    <div className="form-value">{displayProfile.major}</div>
                   )}
                 </div>
 
                 <div className="form-group">
                   <label>학번</label>
                   {isEditing ? (
-                    <input 
-                      name="stnum" 
-                      value={profile.stnum} 
+                    <input
+                      name="stnum"
+                      value={displayProfile.stnum}
                       onChange={handleChange}
                       className="form-input"
                     />
                   ) : (
-                    <div className="form-value">{profile.stnum}</div>
+                    <div className="form-value">{displayProfile.stnum}</div>
                   )}
                 </div>
 
                 <div className="form-group">
                   <label>생년월일</label>
                   {isEditing ? (
-                    <input 
-                      name="birthday" 
-                      value={profile.birthday} 
+                    <input
+                      name="birthday"
+                      value={displayProfile.birthday}
                       onChange={handleChange}
                       className="form-input"
                       type="date"
                     />
                   ) : (
-                    <div className="form-value">{profile.birthday}</div>
+                    <div className="form-value">{displayProfile.birthday}</div>
                   )}
                 </div>
               </div>
@@ -295,30 +225,30 @@ function ProfilePage() {
                 <div className="form-group full-width">
                   <label>이메일</label>
                   {isEditing ? (
-                    <input 
-                      name="email" 
-                      value={profile.email} 
+                    <input
+                      name="email"
+                      value={displayProfile.email}
                       onChange={handleChange}
                       className="form-input"
                       type="email"
                     />
                   ) : (
-                    <div className="form-value">{profile.email}</div>
+                    <div className="form-value">{displayProfile.email}</div>
                   )}
                 </div>
 
                 <div className="form-group full-width">
                   <label>전화번호</label>
                   {isEditing ? (
-                    <input 
-                      name="phone" 
-                      value={profile.phone} 
+                    <input
+                      name="phone"
+                      value={displayProfile.phone}
                       onChange={handleChange}
                       className="form-input"
                       type="tel"
                     />
                   ) : (
-                    <div className="form-value">{profile.phone}</div>
+                    <div className="form-value">{displayProfile.phone}</div>
                   )}
                 </div>
               </div>

@@ -1,0 +1,809 @@
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: auto; /* 페이지 전체에 스크롤바 표시 */
+}
+
+.unified-reservation-container {
+  max-width: 100%;
+  margin: 11px auto;
+  padding: 24px 12px;
+  background: #f8fafc;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
+  position: relative;
+}
+
+/* Back 버튼 스타일 */
+.home-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  z-index: 10;
+}
+
+.home-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.home-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* User Info 버튼 스타일 */
+.user-info {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 10px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  z-index: 10;
+}
+
+.user-info:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.user-info:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.mypage-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.mypage-btn:hover {
+  background: #4338ca;
+}
+
+.unified-reservation-container h1 {
+  text-align: center;
+  color: #2563eb;
+  margin-top: 60px;
+  margin-bottom: 16px;
+}
+
+.unified-reservation-container p {
+  text-align: center;
+  color: #64748b;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.calendar {
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  max-width: 500px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.nav-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #1d4ed8;
+}
+
+.calendar h2 {
+  margin: 0;
+  color: #334155;
+  font-size: 1.2rem;
+}
+
+.calendar table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar th, .calendar td {
+  width: 14.2%;
+  height: 40px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.calendar th {
+  background: #e0e7ff;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.calendar td {
+  background: #f1f5f9;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1rem;
+}
+
+.calendar td:hover {
+  background: #c7d2fe;
+}
+
+.calendar td[style*="background: #e0e7ff"] {
+  background: #6366f1 !important;
+  color: #fff;
+  font-weight: bold;
+}
+
+.calendar td:empty {
+  background: transparent;
+  cursor: default;
+}
+
+.calendar div {
+  text-align: center;
+  color: #2563eb;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.reservation-list {
+  margin-top: 16px;
+  width: 100%;
+  padding: 0;
+}
+
+.reservation-list h3 {
+  margin-bottom: 12px;
+  padding: 0 8px;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.no-reservation-message {
+  margin-top: 16px;
+  text-align: center;
+  color: #64748b;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* 테이블 래퍼 */
+.reservation-table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  /* border-radius: 12px; */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background: white;
+}
+
+/* 예약 테이블 */
+.reservation-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 0;
+  background: #fff;
+  min-width: 800px;
+}
+
+.reservation-table th,
+.reservation-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 4px; /* 10px 8px에서 6px 4px로 변경 */
+  text-align: center;
+  min-width: 70px;
+  line-height: 1.2; /* 1.5에서 1.2로 변경 */
+  height: 28px; /* 40px에서 28px로 변경 */
+  font-size: 13px; /* 14px에서 13px로 변경 */
+}
+
+.reservation-table th {
+  background: #6366f1; /* 그라데이션 제거 */
+  color: white;
+  height: 32px; /* 44px에서 32px로 변경 */
+  font-size: 13px; /* 14px에서 13px로 변경 */
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  border: none;
+}
+
+/* 첫 번째 헤더 (시간) */
+.reservation-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.reservation-table th:last-child {
+  /* border-top-right-radius: 12px; */
+}
+
+/* 시간 열 고정 */
+.time-cell {
+  position: sticky;
+  left: 0;
+  background-color: #fff;
+  z-index: 10;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  font-weight: 700;
+  color: #374151;
+  min-width: 85px !important;
+  width: 85px !important;
+  font-size: 12px; /* 추가 */
+  padding: 4px 2px; /* 추가 */
+}
+
+.time-header {
+  position: sticky;
+  left: 0;
+  background: #6366f1 !important; /* 그라데이션 제거 */
+  z-index: 11;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+  min-width: 85px !important;
+  width: 85px !important;
+  padding: 6px 2px; /* 추가 */
+}
+
+/* 코트별 헤더 색상 */
+.court-header-bulam {
+  background: #3b82f6 !important; /* 그라데이션 제거 */
+}
+
+.court-header-choan {
+  background: #10b981 !important; /* 그라데이션 제거 */
+}
+
+.court-header-madeul {
+  background: #f59e0b !important; /* 그라데이션 제거 */
+}
+
+.court-header-dobong {
+  background: #ec4899 !important; /* 그라데이션 제거 */
+  min-width: 100px !important;
+  width: 100px !important;
+}
+
+/* 셀 배경색 */
+.cell-unavailable {
+  background: #d1d5db; /* #9ca3af에서 #d1d5db로 변경 (더 연한 회색) */
+  color: #6b7280; /* white에서 #6b7280으로 변경 (진한 회색 텍스트) */
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+.cell-available-bulam {
+  background: #bfdbfe; /* #dbeafe에서 #bfdbfe로 변경 (더 진한 파랑) */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #3b82f6; /* 파란색 테두리 추가 */
+}
+
+.cell-available-bulam:hover {
+  background: #93c5fd; /* #bfdbfe에서 #93c5fd로 변경 */
+  transform: scale(1.02);
+  border-color: #2563eb;
+}
+
+.cell-available-choan {
+  background: #a7f3d0; /* #d1fae5에서 #a7f3d0로 변경 (더 진한 초록) */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #10b981; /* 초록색 테두리 추가 */
+}
+
+.cell-available-choan:hover {
+  background: #6ee7b7; /* #a7f3d0에서 #6ee7b7로 변경 */
+  transform: scale(1.02);
+  border-color: #059669;
+}
+
+.cell-available-madeul {
+  background: #fde68a; /* #fef3c7에서 #fde68a로 변경 (더 진한 노랑) */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #f59e0b; /* 주황색 테두리 추가 */
+}
+
+.cell-available-madeul:hover {
+  background: #fcd34d; /* #fde68a에서 #fcd34d로 변경 */
+  transform: scale(1.02);
+  border-color: #d97706;
+}
+
+.cell-available-dobong {
+  background: #fbcfe8; /* #fce7f3에서 #fbcfe8로 변경 (더 진한 핑크) */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px !important;
+  width: 100px !important;
+  border: 2px solid #ec4899; /* 핑크색 테두리 추가 */
+}
+
+.cell-available-dobong:hover {
+  background: #f9a8d4; /* #fbcfe8에서 #f9a8d4로 변경 */
+  transform: scale(1.02);
+  border-color: #db2777;
+}
+
+.cell-other-bulam {
+  background: #f0f9ff;
+}
+
+.cell-other-choan {
+  background: #f0fdf4;
+}
+
+.cell-other-madeul {
+  background: #fffbeb;
+}
+
+.cell-other-dobong {
+  background: #fdf2f8;
+  min-width: 100px !important;
+  width: 100px !important;
+}
+
+/* 체크박스 스타일 */
+.reservation-checkbox {
+  width: 14px; /* 16px에서 14px로 변경 */
+  height: 14px; /* 16px에서 14px로 변경 */
+  cursor: pointer;
+  accent-color: #2563eb;
+  transform: scale(1.1); /* 1.2에서 1.1로 변경 */
+}
+
+/* 선택된 예약 표시 */
+.selected-reservations {
+  margin-top: 16px;
+  padding: 16px;
+  background: #eff6ff; /* 그라데이션 제거 */
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.selected-reservations h4 {
+  margin: 0 0 12px 0;
+  color: #1e40af;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selected-reservation-item {
+  font-size: 13px;
+  color: #1f2937;
+  margin-bottom: 6px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+  font-weight: 500;
+}
+
+/* 캐시 정보 */
+.cache-info {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.cache-info-fresh {
+  color: #059669;
+  background: #d1fae5;
+  border: 1px solid #10b981;
+}
+
+.cache-info-stale {
+  color: #dc2626;
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+}
+
+.cache-info-warning {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 버튼 영역 */
+.button-area {
+  text-align: center;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 새로고침 & 예약하기 버튼 공통 스타일 */
+.refresh-btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 새로고침 버튼 스타일 */
+.refresh-btn:not([disabled]):nth-child(1) {
+  background: #3b82f6;
+  color: white;
+}
+
+.refresh-btn:not([disabled]):nth-child(1):hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.refresh-btn:not([disabled]):nth-child(1):active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 예약하기 버튼 스타일 */
+.refresh-btn:not([disabled]):nth-child(2) {
+  background: #10b981;
+  color: white;
+}
+
+.refresh-btn:not([disabled]):nth-child(2):hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.refresh-btn:not([disabled]):nth-child(2):active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* 비활성화 상태 */
+.refresh-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 버튼 내 아이콘 크기 */
+.refresh-btn span {
+  font-size: 18px;
+}
+
+/* 진행 상태 */
+.progress-info {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.progress-info div {
+  margin-bottom: 4px;
+}
+
+.progress-info div:last-child {
+  margin-bottom: 0;
+}
+
+/* 팁 메시지 */
+.tip-message {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  max-width: 400px;
+  padding: 8px 16px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px dashed #d1d5db;
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 768px) {
+  .unified-reservation-container {
+    padding: 16px 8px;
+  }
+
+  .home-btn {
+    top: 12px;
+    left: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .user-info {
+    top: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .mypage-btn {
+    top: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .unified-reservation-container h1 {
+    margin-top: 50px;
+    font-size: 22px;
+  }
+
+  .reservation-table th,
+  .reservation-table td {
+    min-width: 50px;
+    padding: 5px 3px;
+    font-size: 11px;
+    height: 24px;
+  }
+
+  .time-cell,
+  .time-header {
+    min-width: 70px !important;
+    width: 70px !important;
+    font-size: 11px;
+  }
+
+  .court-header-dobong,
+  .cell-available-dobong,
+  .cell-other-dobong {
+    min-width: 80px !important;
+    width: 80px !important;
+  }
+
+  /* 모바일에서도 버튼 가로 배치 유지 */
+  .button-row {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .refresh-btn {
+    min-width: 140px;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .refresh-btn span {
+    font-size: 16px;
+  }
+}
+
+/* 스크롤바 스타일 */
+.reservation-table-wrapper::-webkit-scrollbar {
+  height: 10px;
+}
+
+.reservation-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 5px;
+}
+
+.reservation-table-wrapper::-webkit-scrollbar-thumb {
+  background: #6366f1; /* 그라데이션 제거 */
+  border-radius: 5px;
+}
+
+.reservation-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5; /* 그라데이션 제거 */
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #1f2937;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.modal-description {
+  color: #6b7280;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.account-section {
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.account-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #374151;
+  font-size: 1.2rem;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #4b5563;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.input-group input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.modal-btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.modal-btn-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.modal-info {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f0f9ff;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.modal-info p {
+  margin: 5px 0;
+  color: #1e40af;
+  font-size: 0.9rem;
+}

@@ -1,33 +1,47 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { supabase } from '../auth/supabaseClient';
+import { usePosts } from './hooks';
+import { POST_TYPE_KR, formatFullDate } from './utils';
 import type { Post } from './Posttypes';
 import './PostDetail.css';
 
 export function PostDetail() {
   const { id } = useParams();
-  const navigate = useNavigate(); // 추가
+  const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
-    const post_type_kr: { [key: string]: string } = {
-        announcement: '공지',
-        tour: '대회',
-        normal: '자유',
-    };
 
+  const { fetchPostById, loading } = usePosts();
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('id, title, content, created_at, post_type, user_name, image_urls')
-        .eq('id', id)
-        .single();
-      if (!error && data) setPost(data);
-    };
-    fetchPost();
-  }, [id]);
+    if (id) {
+      fetchPostById(id).then(result => {
+        if (result.success && result.data) {
+          setPost(result.data);
+        }
+      });
+    }
+  }, [id, fetchPostById]);
 
-  if (!post) return <div>로딩중...</div>;
+  if (loading) {
+    return (
+      <div className="post-detail-ctn">
+        <div>로딩중...</div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="post-detail-ctn">
+        <div>게시글을 찾을 수 없습니다.</div>
+        <div id='post-detail-button-ctn'>
+          <button id="post-detail-button" onClick={() => navigate('/board')}>
+            목록으로
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="post-detail-ctn">
@@ -35,7 +49,7 @@ export function PostDetail() {
         <div id='post_detail_title'>{post.title}</div>
       </div>
       <div id='post_detail_meta'>
-        {new Date(post.created_at).toLocaleString()} / {post.user_name || 'Unknown'}
+        {formatFullDate(post.created_at)} / {post.user_name || 'Unknown'}
       </div>
       <div id='post_detail_content'>
         {post.content.split('\n').map((line, idx) => (
@@ -58,7 +72,9 @@ export function PostDetail() {
         </div>
       )}
       <div id='post-detail-button-ctn'>
-        <button id="post-detail-button" onClick={() => navigate('/board')}>목록으로</button>
+        <button id="post-detail-button" onClick={() => navigate('/board')}>
+          목록으로
+        </button>
       </div>
     </div>
   );

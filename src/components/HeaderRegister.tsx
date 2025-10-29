@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { supabase } from '../pages/auth/supabaseClient';
+import { supabase } from '../pages/Auth/supabaseClient';
 import './HeaderRegister.css'
 
 function HeaderRegister() {

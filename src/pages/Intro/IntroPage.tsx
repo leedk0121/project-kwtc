@@ -1,78 +1,20 @@
-import "./IntroPage.css";
+import "./styles/intro-shared.css";
 import { useState, useEffect } from "react";
 import Showmember from '../../components/Showmember';
-import { supabase } from "../auth/supabaseClient";
+import { useLeaders } from './hooks';
+import { getPositionBadgeClass, CLUB_INFO } from './utils';
+
+type TabType = "club" | "leader" | "member";
 
 function IntroPage() {
-    const [selected, setSelected] = useState("club");
-    const [leaders, setLeaders] = useState([]);
-    const [loading, setLoading] = useState(false);
-
-    // 임원진 데이터 가져오기
-    const fetchLeaders = async () => {
-        setLoading(true);
-        try {
-            const { data: leaderData, error: leaderError } = await supabase
-                .from('leader_profile')
-                .select('user_id, position, position_description, order_num')
-                .order('order_num', { ascending: true });
-
-            if (leaderError) {
-                console.error('Error fetching leader_profile:', leaderError);
-                return;
-            }
-
-            const userIds = leaderData.map(leader => leader.user_id);
-            const { data: profileData, error: profileError } = await supabase
-                .from('profile')
-                .select('id, name, major, image_url')
-                .in('id', userIds);
-
-            if (profileError) {
-                console.error('Error fetching profiles:', profileError);
-                return;
-            }
-
-            const mergedData = leaderData.map(leader => {
-                const profile = profileData.find(p => p.id === leader.user_id);
-                return {
-                    ...leader,
-                    profile: profile || null
-                };
-            });
-
-            setLeaders(mergedData);
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [selected, setSelected] = useState<TabType>("club");
+    const { leaders, loading, fetchLeaders } = useLeaders();
 
     useEffect(() => {
         if (selected === "leader") {
             fetchLeaders();
         }
-    }, [selected]);
-
-    const getPositionBadgeClass = (position) => {
-        switch (position.toLowerCase()) {
-            case '회장':
-            case 'president':
-                return 'president';
-            case '부회장':
-            case 'vice-president':
-                return 'vice-president';
-            case '총무':
-            case 'treasurer':
-                return 'treasurer';
-            case '운영진':
-            case 'manager':
-                return 'manager';
-            default:
-                return 'member';
-        }
-    };
+    }, [selected, fetchLeaders]);
 
     return (
         <div className="intro-page">
@@ -93,7 +35,7 @@ function IntroPage() {
                         <span className="tab-icon">🏛️</span>
                         <span className="tab-text">동아리</span>
                     </button>
-                    
+
                     <button
                         className={`nav-tab ${selected === "leader" ? "active" : ""}`}
                         onClick={() => setSelected("leader")}
@@ -101,7 +43,7 @@ function IntroPage() {
                         <span className="tab-icon">👑</span>
                         <span className="tab-text">임원진</span>
                     </button>
-                    
+
                     <button
                         className={`nav-tab ${selected === "member" ? "active" : ""}`}
                         onClick={() => setSelected("member")}
@@ -122,10 +64,10 @@ function IntroPage() {
                                     <img src="kwtclogo.png" className="club-logo" alt="KWTC Logo" />
                                     <div className="logo-glow"></div>
                                 </div>
-                                <h2 className="club-name">KWTC</h2>
-                                <p className="club-tagline">광운대학교 테니스 동아리</p>
+                                <h2 className="club-name">{CLUB_INFO.name}</h2>
+                                <p className="club-tagline">{CLUB_INFO.fullName}</p>
                             </div>
-                            
+
                             <div className="club-description">
                                 <div className="description-card">
                                     <h3 className="description-title">
@@ -133,54 +75,53 @@ function IntroPage() {
                                         동아리 소개
                                     </h3>
                                     <p className="description-text">
-                                        광운대학교 테니스 동아리 KWTC는 1978년에 처음 창립된 광운대학교의 중앙동아리입니다. 
-                                        45년의 오랜 전통과 역사를 자랑하며, 수많은 테니스 애호가들과 함께 성장해왔습니다.
+                                        {CLUB_INFO.description}
                                     </p>
                                 </div>
-                                
+
                                 <div className="info-grid">
                                     <div className="info-item">
                                         <div className="info-icon">🗓️</div>
                                         <div className="info-content">
                                             <h4>창립년도</h4>
-                                            <p>1978년</p>
+                                            <p>{CLUB_INFO.foundedYear}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="info-item">
                                         <div className="info-icon">🏫</div>
                                         <div className="info-content">
                                             <h4>소속</h4>
-                                            <p>광운대학교 중앙동아리</p>
+                                            <p>{CLUB_INFO.affiliation}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="info-item">
                                         <div className="info-icon">🎾</div>
                                         <div className="info-content">
                                             <h4>종목</h4>
-                                            <p>테니스</p>
+                                            <p>{CLUB_INFO.sport}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="info-item">
                                         <div className="info-icon">👨‍👩‍👧‍👦</div>
                                         <div className="info-content">
                                             <h4>활동</h4>
-                                            <p>정기 연습, 대회 참가</p>
+                                            <p>{CLUB_INFO.activities}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="info-item instagram-item">
                                         <div className="info-icon">📱</div>
                                         <div className="info-content">
                                             <h4>인스타그램</h4>
-                                            <a 
-                                                href="https://instagram.com/kwtc_official"
+                                            <a
+                                                href={CLUB_INFO.instagram.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                                                @kwtc_official
+                                                {CLUB_INFO.instagram.handle}
                                             </a>
                                         </div>
                                     </div>
@@ -200,7 +141,7 @@ function IntroPage() {
                                 </h3>
                                 <p className="section-subtitle">KWTC를 이끌어가는 임원진들을 소개합니다</p>
                             </div>
-                            
+
                             {loading ? (
                                 <div className="loading-spinner">로딩 중...</div>
                             ) : (
@@ -208,11 +149,11 @@ function IntroPage() {
                                     {leaders.map((leader) => (
                                         <div key={leader.user_id} className="leader-item">
                                             <div className="leader-avatar">
-                                                <img 
-                                                    src={leader.profile?.image_url || "https://via.placeholder.com/80"} 
+                                                <img
+                                                    src={leader.profile?.image_url || "https://via.placeholder.com/80"}
                                                     alt={leader.position}
                                                     onError={(e) => {
-                                                        e.target.src = "https://via.placeholder.com/80";
+                                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/80";
                                                     }}
                                                 />
                                                 <div className={`leader-badge ${getPositionBadgeClass(leader.position)}`}>
@@ -232,7 +173,7 @@ function IntroPage() {
                                             </div>
                                         </div>
                                     ))}
-                                    
+
                                     {leaders.length === 0 && !loading && (
                                         <div className="no-data">
                                             <p>등록된 임원진 정보가 없습니다.</p>

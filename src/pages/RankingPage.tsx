@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { supabase } from "./auth/supabaseClient";
+import { supabase } from "./Auth/supabaseClient";
 import ProfileDetailPage from "../components/ProfileDetailPage";
 import "./Rankingpage.css";
 

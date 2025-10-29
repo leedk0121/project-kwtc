@@ -1,167 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from "../auth/supabaseClient.tsx";
+import React, { useState, useEffect, useMemo } from 'react';
 import { withAdminAuth } from '../../services/adminHOC';
+import { useLeaderProfiles } from './hooks';
+import { AdminLayout } from './components';
+import type { Profile } from './hooks/useLeaderProfiles';
 import './LeadereditPage.css';
 
-interface Profile {
-  id: string;
-  name: string;
-  major: string;
-  stnum: string;
-}
-
-interface LeaderProfile {
-  user_id: string;
-  position: string;
-  position_description: string;
-  order_num: number;
-}
-
 const LeadereditPage: React.FC = () => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [leaderProfiles, setLeaderProfiles] = useState<LeaderProfile[]>([]);
+  const {
+    profiles,
+    leaderProfiles,
+    loading,
+    fetchAll,
+    addLeaderRole,
+    removeLeaderRole,
+    getAvailableProfiles,
+    getLeaderProfilesWithDetails
+  } = useLeaderProfiles();
+
   const [showAddRoleForm, setShowAddRoleForm] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMember, setSelectedMember] = useState<Profile | null>(null);
   const [newRole, setNewRole] = useState({
     position: '',
     position_description: '',
-    user_id: '',
     order_num: 1
   });
 
-  // 프로필 데이터 가져오기
-  const fetchProfiles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profile')
-        .select('id, name, major, stnum');
-
-      if (error) throw error;
-      setProfiles(data || []);
-    } catch (error) {
-      console.error('Error fetching profiles:', error);
-    }
-  };
-
-  // 리더 프로필 데이터 가져오기
-  const fetchLeaderProfiles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('leader_profile')
-        .select('user_id, position, position_description, order_num')
-        .order('order_num', { ascending: true });
-
-      if (error) throw error;
-      setLeaderProfiles(data || []);
-    } catch (error) {
-      console.error('Error fetching leader profiles:', error);
-    }
-  };
-
-  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([fetchProfiles(), fetchLeaderProfiles()]);
-      setLoading(false);
-    };
+    fetchAll();
+  }, [fetchAll]);
 
-    loadData();
-  }, []);
+  const availableProfiles = useMemo(() => getAvailableProfiles(), [getAvailableProfiles]);
 
-  // 새 역할 추가
+  const filteredAvailableProfiles = useMemo(() => {
+    return availableProfiles.filter(profile =>
+      profile.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [availableProfiles, searchTerm]);
+
+  const leaderProfilesWithDetails = useMemo(() =>
+    getLeaderProfilesWithDetails(),
+    [getLeaderProfilesWithDetails]
+  );
+
   const handleAddRole = async () => {
-    if (newRole.position.trim() && newRole.position_description.trim() && newRole.user_id && newRole.order_num) {
-      try {
-        const { data, error } = await supabase
-          .from('leader_profile')
-          .insert([{
-            user_id: newRole.user_id,
-            position: newRole.position,
-            position_description: newRole.position_description,
-            order_num: newRole.order_num
-          }])
-          .select('user_id, position, position_description, order_num');
+    if (!selectedMember) {
+      alert('담당 멤버를 선택해주세요.');
+      return;
+    }
 
-        if (error) throw error;
+    if (!newRole.position.trim() || !newRole.position_description.trim()) {
+      alert('역할 이름과 설명을 모두 입력해주세요.');
+      return;
+    }
 
-        if (data && data.length > 0) {
-          // order_num에 따라 정렬된 상태로 추가
-          const updatedLeaderProfiles = [...leaderProfiles, data[0]]
-            .sort((a, b) => a.order_num - b.order_num);
-          
-          setLeaderProfiles(updatedLeaderProfiles);
-          setNewRole({ position: '', position_description: '', user_id: '', order_num: 1 });
-          setSelectedMember(null);
-          setSearchTerm('');
-          setShowAddRoleForm(false);
-        }
-      } catch (error) {
-        console.error('Error adding role:', error);
-        alert('역할 추가 중 오류가 발생했습니다.');
-      }
+    const result = await addLeaderRole(
+      selectedMember.id,
+      newRole.position,
+      newRole.position_description,
+      newRole.order_num
+    );
+
+    if (result.success) {
+      setNewRole({ position: '', position_description: '', order_num: 1 });
+      setSelectedMember(null);
+      setSearchTerm('');
+      setShowAddRoleForm(false);
     } else {
-      alert('모든 필드를 입력해주세요.');
+      alert(result.message || '역할 추가 중 오류가 발생했습니다.');
     }
   };
 
-  // 역할 삭제
   const handleRemoveRole = async (userId: string) => {
-    try {
-      const { error } = await supabase
-        .from('leader_profile')
-        .delete()
-        .eq('user_id', userId);
-
-      if (error) throw error;
-
-      setLeaderProfiles(leaderProfiles.filter(role => role.user_id !== userId));
-    } catch (error) {
-      console.error('Error removing role:', error);
-      alert('역할 삭제 중 오류가 발생했습니다.');
+    const result = await removeLeaderRole(userId);
+    if (!result.success) {
+      alert(result.message || '역할 삭제 중 오류가 발생했습니다.');
     }
   };
 
   const handleCancelAddRole = () => {
-    setNewRole({ position: '', position_description: '', user_id: '', order_num: 1 });
+    setNewRole({ position: '', position_description: '', order_num: 1 });
     setSelectedMember(null);
     setSearchTerm('');
     setShowAddRoleForm(false);
   };
 
-  // 이미 역할이 배정된 멤버들을 제외한 사용 가능한 멤버 목록
-  const availableProfiles = profiles.filter(profile => 
-    !leaderProfiles.some(leaderProfile => leaderProfile.user_id === profile.id)
-  );
-
-  // 검색 기능 - 이름으로 멤버 필터링 (역할 추가용)
-  const filteredAvailableProfiles = availableProfiles.filter(profile =>
-    profile.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // user_id로 프로필 정보 찾기
-  const getProfileByUserId = (userId: string) => {
-    return profiles.find(profile => profile.id === userId);
-  };
-
-  // 검색어 초기화
-  const handleClearSearch = () => {
-    setSearchTerm('');
-  };
-
-  // 멤버 선택 (역할 추가 폼에서)
   const handleSelectMemberForRole = (member: Profile) => {
     setSelectedMember(member);
-    setNewRole({ ...newRole, user_id: member.id });
     setSearchTerm('');
   };
 
-  // 선택된 멤버 제거
   const handleRemoveSelectedMember = () => {
     setSelectedMember(null);
-    setNewRole({ ...newRole, user_id: '' });
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
   };
 
   if (loading) {
@@ -173,18 +107,19 @@ const LeadereditPage: React.FC = () => {
   }
 
   return (
-    <div className="leader-edit-container">
-      <div className="leader-edit-header">
-        <h1 className="leader-edit-title">리더 편집 페이지</h1>
-        <button 
+    <AdminLayout
+      title="리더 편집 페이지"
+      backPath="/admin"
+      actions={
+        <button
           className="leader-edit-add-role-button"
           onClick={() => setShowAddRoleForm(true)}
           disabled={availableProfiles.length === 0}
         >
           + 역할 추가
         </button>
-      </div>
-
+      }
+    >
       {availableProfiles.length === 0 && !showAddRoleForm && (
         <div className="leader-edit-notice">
           모든 멤버에게 역할이 배정되었습니다.
@@ -194,7 +129,7 @@ const LeadereditPage: React.FC = () => {
       {showAddRoleForm && (
         <div className="leader-edit-add-role-form">
           <h3 className="leader-edit-form-title">새 역할 추가</h3>
-          
+
           <div className="leader-edit-form-group">
             <label className="leader-edit-label">역할 이름</label>
             <input
@@ -232,14 +167,14 @@ const LeadereditPage: React.FC = () => {
 
           <div className="leader-edit-form-group">
             <label className="leader-edit-label">담당 멤버</label>
-            
+
             {selectedMember ? (
               <div className="leader-edit-selected-member">
                 <div className="leader-edit-selected-member-info">
                   <span className="leader-edit-selected-member-name">{selectedMember.name}</span>
                   <span className="leader-edit-selected-member-details">({selectedMember.major} - {selectedMember.stnum})</span>
                 </div>
-                <button 
+                <button
                   className="leader-edit-remove-selected-button"
                   onClick={handleRemoveSelectedMember}
                   type="button"
@@ -258,7 +193,7 @@ const LeadereditPage: React.FC = () => {
                     placeholder="멤버 이름으로 검색..."
                   />
                   {searchTerm && (
-                    <button 
+                    <button
                       className="leader-edit-clear-search-button"
                       onClick={handleClearSearch}
                       type="button"
@@ -275,8 +210,8 @@ const LeadereditPage: React.FC = () => {
                     ) : (
                       <div className="leader-edit-member-options">
                         {filteredAvailableProfiles.slice(0, 5).map(profile => (
-                          <div 
-                            key={profile.id} 
+                          <div
+                            key={profile.id}
                             className="leader-edit-member-option"
                             onClick={() => handleSelectMemberForRole(profile)}
                           >
@@ -306,39 +241,36 @@ const LeadereditPage: React.FC = () => {
 
       <div className="leader-edit-roles-list">
         <h3 className="leader-edit-section-title">현재 역할</h3>
-        {leaderProfiles.length === 0 ? (
+        {leaderProfilesWithDetails.length === 0 ? (
           <div className="leader-edit-empty-state">
             추가된 역할이 없습니다. 새 역할을 추가해보세요.
           </div>
         ) : (
-          leaderProfiles.map(role => {
-            const profile = getProfileByUserId(role.user_id);
-            return (
-              <div key={role.user_id} className="leader-edit-role-card">
-                <div className="leader-edit-role-header">
-                  <div className="leader-edit-role-info">
-                    <h4 className="leader-edit-role-name">{role.position}</h4>
-                    <span className="leader-edit-role-order">순서: {role.order_num}</span>
-                  </div>
-                  <button 
-                    className="leader-edit-remove-button"
-                    onClick={() => handleRemoveRole(role.user_id)}
-                  >
-                    ✕
-                  </button>
+          leaderProfilesWithDetails.map(({ user_id, position, position_description, order_num, profile }) => (
+            <div key={user_id} className="leader-edit-role-card">
+              <div className="leader-edit-role-header">
+                <div className="leader-edit-role-info">
+                  <h4 className="leader-edit-role-name">{position}</h4>
+                  <span className="leader-edit-role-order">순서: {order_num}</span>
                 </div>
-                <p className="leader-edit-role-description">{role.position_description}</p>
-                {profile && (
-                  <div className="leader-edit-assigned-member">
-                    담당자: {profile.name} ({profile.major} - {profile.stnum})
-                  </div>
-                )}
+                <button
+                  className="leader-edit-remove-button"
+                  onClick={() => handleRemoveRole(user_id)}
+                >
+                  ✕
+                </button>
               </div>
-            );
-          })
+              <p className="leader-edit-role-description">{position_description}</p>
+              {profile && (
+                <div className="leader-edit-assigned-member">
+                  담당자: {profile.name} ({profile.major} - {profile.stnum})
+                </div>
+              )}
+            </div>
+          ))
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

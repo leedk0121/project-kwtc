@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../auth/supabaseClient";
-import "./VoteaddPage.css";
+import { useEventActions } from './hooks';
+import { HOUR_OPTIONS, MINUTE_OPTIONS, formatTimeString, validateEventForm } from './utils';
+import "./styles/event-shared.css";
 
-const VoteAdd: React.FC = () => {
+const EventAdd: React.FC = () => {
     const navigate = useNavigate();
-    const [title, setTitle] = useState("");
     const [where, setWhere] = useState("");
     const [courtNumber, setCourtNumber] = useState("");
     const [date, setDate] = useState("");
@@ -14,69 +14,51 @@ const VoteAdd: React.FC = () => {
     const [endHour, setEndHour] = useState("");
     const [endMinute, setEndMinute] = useState("");
     const [maxPeople, setMaxPeople] = useState<number | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
     const [minTier, setMinTier] = useState<number | null>(null);
     const [hostJoin, setHostJoin] = useState(true);
     const myId = localStorage.getItem("user_id");
 
-    const hours = Array.from({ length: 24 }, (_, i) => i + 1);
-    const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
+    const { loading, success, addEvent, setSuccess } = useEventActions();
 
-    // 필수 필드들이 모두 채워졌는지 확인하는 함수
     const isFormValid = () => {
-        return (
-            where.trim() !== "" &&
-            courtNumber.trim() !== "" &&
-            date !== "" &&
-            startHour !== "" &&
-            startMinute !== "" &&
-            endHour !== "" &&
-            endMinute !== "" &&
-            maxPeople !== null &&
-            maxPeople > 0
-        );
+        return validateEventForm({
+            where,
+            courtNumber,
+            date,
+            startHour,
+            startMinute,
+            endHour,
+            endMinute,
+            maxPeople
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!isFormValid()) {
             alert("모든 필수 항목을 입력해주세요.");
             return;
         }
-        
-        setLoading(true);
 
-        const startTime = `${startHour.padStart(2, "0")}:${startMinute.padStart(2, "0")}:00`;
-        const endTime = `${endHour.padStart(2, "0")}:${endMinute.padStart(2, "0")}:00`;
+        const startTime = formatTimeString(startHour, startMinute);
+        const endTime = formatTimeString(endHour, endMinute);
 
-        let participants: string[] = [];
-        let participants_num = 0;
-        if (hostJoin && myId) {
-            participants = [myId];
-            participants_num = 1;
-        }
+        const result = await addEvent({
+            where,
+            courtNumber,
+            date,
+            startTime,
+            endTime,
+            maxPeople: maxPeople!,
+            minTier,
+            hostJoin,
+            hostId: myId
+        });
 
-        const { error } = await supabase.from("vote").insert([
-            {
-                host: myId,
-                where,
-                court_number: courtNumber,
-                date,
-                start_time: startTime,
-                end_time: endTime,
-                max_people: maxPeople,
-                min_tier: minTier,
-                Participants: participants,
-                participant_num: participants_num,
-            }
-        ]);
-        setLoading(false);
-        if (!error) {
-            alert("일정 추가에 성공했습니다.");
-            setSuccess(true);
-            setTitle("");
+        if (result.success) {
+            alert(result.message);
+            // 폼 리셋
             setWhere("");
             setCourtNumber("");
             setDate("");
@@ -87,9 +69,9 @@ const VoteAdd: React.FC = () => {
             setMaxPeople(null);
             setMinTier(null);
             setHostJoin(false);
-            navigate("/participate");
+            navigate("/event");
         } else {
-            alert("일정 추가에 실패했습니다.");
+            alert(result.message);
         }
     };
 
@@ -98,17 +80,17 @@ const VoteAdd: React.FC = () => {
     };
 
     return (
-        <div className="vote-add-container">
-            <div className="vote-add-header">
-                <div className="vote-add-header-row">
-                    <h1 className="vote-add-title">일정 추가하기</h1>
+        <div className="event-add-container">
+            <div className="event-add-header">
+                <div className="event-add-header-row">
+                    <h1 className="event-add-title">일정 추가하기</h1>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="vote-add-form">
+            <form onSubmit={handleSubmit} className="event-add-form">
                 <div className="field-group">
                     <label className="field-label">장소 및 코트 정보</label>
-                    <div className="vote-add-place-row">
+                    <div className="event-add-place-row">
                         <input
                             type="text"
                             placeholder="테니스장 이름을 입력하세요"
@@ -141,14 +123,14 @@ const VoteAdd: React.FC = () => {
 
                 <div className="field-group">
                     <label className="field-label">시간</label>
-                    <div className="vote-add-time-row">
+                    <div className="event-add-time-row">
                         <select
                             value={startHour}
                             onChange={e => setStartHour(e.target.value)}
                             required
                         >
                             <option value="">시</option>
-                            {hours.map(h => (
+                            {HOUR_OPTIONS.map(h => (
                                 <option key={h} value={h}>{h}</option>
                             ))}
                         </select>
@@ -159,7 +141,7 @@ const VoteAdd: React.FC = () => {
                             required
                         >
                             <option value="">분</option>
-                            {minutes.map(m => (
+                            {MINUTE_OPTIONS.map(m => (
                                 <option key={m} value={m}>{m.toString().padStart(2, "0")}</option>
                             ))}
                         </select>
@@ -170,7 +152,7 @@ const VoteAdd: React.FC = () => {
                             required
                         >
                             <option value="">시</option>
-                            {hours.map(h => (
+                            {HOUR_OPTIONS.map(h => (
                                 <option key={h} value={h}>{h}</option>
                             ))}
                         </select>
@@ -181,7 +163,7 @@ const VoteAdd: React.FC = () => {
                             required
                         >
                             <option value="">분</option>
-                            {minutes.map(m => (
+                            {MINUTE_OPTIONS.map(m => (
                                 <option key={m} value={m}>{m.toString().padStart(2, "0")}</option>
                             ))}
                         </select>
@@ -190,7 +172,7 @@ const VoteAdd: React.FC = () => {
 
                 <div className="field-group">
                     <label className="field-label">참여 설정</label>
-                    <div className="vote-add-options-row">
+                    <div className="event-add-options-row">
                         <input
                             type="number"
                             placeholder="최대 참여 인원"
@@ -225,15 +207,15 @@ const VoteAdd: React.FC = () => {
                     />
                 </div>
 
-                <div className="vote-add-buttons">
-                    <button type="button" onClick={handleCancel} className="vote-add-cancel-btn" disabled={loading}>
+                <div className="event-add-buttons">
+                    <button type="button" onClick={handleCancel} className="event-add-cancel-btn" disabled={loading}>
                         취소
                     </button>
-                    
-                    <button 
-                        type="submit" 
-                        disabled={loading || !isFormValid()} 
-                        className={`vote-add-submit-btn ${!isFormValid() ? 'disabled' : ''}`}
+
+                    <button
+                        type="submit"
+                        disabled={loading || !isFormValid()}
+                        className={`event-add-submit-btn ${!isFormValid() ? 'disabled' : ''}`}
                     >
                         {loading ? (
                             <>
@@ -249,10 +231,10 @@ const VoteAdd: React.FC = () => {
                     </button>
                 </div>
 
-                {success && <div className="vote-add-success">일정이 성공적으로 추가되었습니다!</div>}
+                {success && <div className="event-add-success">일정이 성공적으로 추가되었습니다!</div>}
             </form>
         </div>
     );
 };
 
-export default VoteAdd;
+export default EventAdd;

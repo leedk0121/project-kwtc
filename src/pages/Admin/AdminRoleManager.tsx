@@ -1,253 +1,144 @@
-// src/pages/Admin/AdminRoleManager.tsx
-
-import { useState, useEffect } from 'react';
-import { adminService } from '../../services/adminService';
+import { useState, useMemo } from 'react';
 import { withAdminAuth } from '../../services/adminHOC';
-import './AdminRoleManager.css';
-
-interface Profile {
-  id: string;
-  name: string;
-  email: string;
-  major: string;
-  stnum: string;
-  is_admin: boolean;
-  approved: boolean;
-  created_at: string;
-  image_url?: string;
-}
+import { AdminLayout } from './components/AdminLayout';
+import { SearchFilter } from './components/SearchFilter';
+import { UserTable } from './components/UserTable';
+import { useAdminUsers } from './hooks/useAdminUsers';
+import { AdminUser, FilterType } from './types';
+import '../Admin/styles/admin-shared.css';
 
 function AdminRoleManager() {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'admin' | 'user'>('all');
+  const [filterType, setFilterType] = useState<FilterType>('all');
 
-  useEffect(() => {
-    fetchAllUsers();
-  }, []);
+  const {
+    users,
+    loading,
+    updating,
+    toggleAdminRole,
+    getStats
+  } = useAdminUsers({ filterApproved: true });
 
-  // 🔍 모든 사용자 가져오기 (Service Role 사용)
-  const fetchAllUsers = async () => {
-    setLoading(true);
-    try {
-      const users = await adminService.getAllUsers();
-      // 승인된 사용자만 필터링
-      const approvedUsers = users.filter(user => user.approved === true);
-      setProfiles(approvedUsers);
-    } catch (error: any) {
-      console.error('사용자 조회 오류:', error);
-      alert(`사용자 조회 실패: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const stats = getStats();
 
-  // 🔐 관리자 권한 토글
-  const toggleAdminRole = async (userId: string, currentAdminStatus: boolean) => {
-    const profile = profiles.find(p => p.id === userId);
-    if (!profile) return;
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch =
+        user.name.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        user.major.toLowerCase().includes(searchLower) ||
+        String(user.stnum).includes(searchTerm);
 
-    const confirmMessage = currentAdminStatus 
-      ? `${profile.name}님의 관리자 권한을 제거하시겠습니까?` 
-      : `${profile.name}님을 관리자로 지정하시겠습니까?`;
-    
+      const matchesFilter =
+        filterType === 'all' ||
+        (filterType === 'admin' && user.is_admin) ||
+        (filterType === 'user' && !user.is_admin);
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [users, searchTerm, filterType]);
+
+  const handleToggleAdmin = async (user: AdminUser) => {
+    const confirmMessage = user.is_admin
+      ? `${user.name}님의 관리자 권한을 제거하시겠습니까?`
+      : `${user.name}님을 관리자로 지정하시겠습니까?`;
+
     if (!window.confirm(confirmMessage)) return;
 
-    setUpdating(userId);
-    try {
-      const result = await adminService.setAdminRole(userId, !currentAdminStatus);
+    const result = await toggleAdminRole(user.id, user.is_admin);
 
-      if (result.success) {
-        alert(result.message);
-        
-        // 로컬 상태 업데이트
-        setProfiles(profiles.map(p => 
-          p.id === userId ? { ...p, is_admin: !currentAdminStatus } : p
-        ));
-      } else {
-        alert(result.message || '권한 변경에 실패했습니다.');
-      }
-    } catch (error: any) {
-      console.error('권한 변경 오류:', error);
-      alert(`권한 변경 실패: ${error.message}`);
-    } finally {
-      setUpdating(null);
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert(`실패: ${result.message}`);
     }
   };
 
-  // 🔍 필터링된 프로필 목록
-  const filteredProfiles = profiles.filter(profile => {
-    // 검색어 필터
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      profile.name.toLowerCase().includes(searchLower) ||
-      profile.email.toLowerCase().includes(searchLower) ||
-      profile.major.toLowerCase().includes(searchLower) ||
-      String(profile.stnum).includes(searchTerm);
+  const filterOptions = [
+    { value: 'all' as FilterType, label: `전체 (${stats.total})` },
+    { value: 'admin' as FilterType, label: `관리자 (${stats.admins})` },
+    { value: 'user' as FilterType, label: `일반 사용자 (${stats.users})` }
+  ];
 
-    // 타입 필터
-    const matchesType =
-      filterType === 'all' ||
-      (filterType === 'admin' && profile.is_admin) ||
-      (filterType === 'user' && !profile.is_admin);
-
-    return matchesSearch && matchesType;
-  });
-
-  // 통계
-  const stats = {
-    total: profiles.length,
-    admins: profiles.filter(p => p.is_admin).length,
-    users: profiles.filter(p => !p.is_admin).length
-  };
-
-  if (loading) {
-    return (
-      <div className="admin-role-manage-container">
-        <div className="admin-role-manage-loading">
-          <div className="admin-role-manage-spinner"></div>
-          <p>사용자 정보를 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+  const columns = [
+    {
+      header: '이름',
+      accessor: 'name' as keyof AdminUser,
+      width: '15%'
+    },
+    {
+      header: '이메일',
+      accessor: 'email' as keyof AdminUser,
+      width: '30%'
+    },
+    {
+      header: '학과',
+      accessor: 'major' as keyof AdminUser,
+      width: '20%'
+    },
+    {
+      header: '학번',
+      accessor: 'stnum' as keyof AdminUser,
+      width: '10%'
+    },
+    {
+      header: '권한',
+      accessor: (user: AdminUser) => (
+        <span className={user.is_admin ? 'badge badge-admin' : 'badge'}>
+          {user.is_admin ? '👑 관리자' : '일반 사용자'}
+        </span>
+      ),
+      width: '15%'
+    }
+  ];
 
   return (
-    <div className="admin-role-manage-container">
-      {/* 헤더 */}
-      <div className="admin-role-manage-header">
-        <h1>관리자 권한 관리</h1>
-        <p className="admin-role-manage-subtitle">사용자의 관리자 권한을 설정하거나 해제할 수 있습니다</p>
-      </div>
-
-      {/* 통계 카드 */}
-      <div className="admin-role-manage-stats">
-        <div className="admin-role-manage-stat-card admin-role-manage-total">
-          <span className="admin-role-manage-stat-icon">👥</span>
-          <div>
-            <span className="admin-role-manage-stat-label">전체 사용자</span>
-            <span className="admin-role-manage-stat-value">{stats.total}</span>
-          </div>
+    <AdminLayout
+      title="👑 관리자 권한 관리"
+      subtitle="사용자의 관리자 권한 부여 및 해제"
+    >
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{stats.total}</div>
+          <div className="stat-label">전체 사용자</div>
         </div>
-
-        <div className="admin-role-manage-stat-card admin-role-manage-admin">
-          <span className="admin-role-manage-stat-icon">👑</span>
-          <div>
-            <span className="admin-role-manage-stat-label">관리자</span>
-            <span className="admin-role-manage-stat-value">{stats.admins}</span>
-          </div>
+        <div className="stat-card">
+          <div className="stat-value">{stats.admins}</div>
+          <div className="stat-label">관리자</div>
         </div>
-
-        <div className="admin-role-manage-stat-card admin-role-manage-user">
-          <span className="admin-role-manage-stat-icon">👤</span>
-          <div>
-            <span className="admin-role-manage-stat-label">일반 사용자</span>
-            <span className="admin-role-manage-stat-value">{stats.users}</span>
-          </div>
+        <div className="stat-card">
+          <div className="stat-value">{stats.users}</div>
+          <div className="stat-label">일반 사용자</div>
         </div>
       </div>
 
-      {/* 검색 및 필터 */}
-      <div className="admin-role-manage-controls">
-        <div className="admin-role-manage-search-bar">
-          <span className="admin-role-manage-search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="이름, 이메일, 학과, 학번으로 검색"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <SearchFilter
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        filterType={filterType}
+        onFilterChange={setFilterType}
+        filterOptions={filterOptions}
+      />
 
-        <div className="admin-role-manage-filter-buttons">
+      <UserTable
+        users={filteredUsers}
+        columns={columns}
+        loading={loading}
+        updatingId={updating}
+        emptyMessage="조건에 맞는 사용자가 없습니다."
+        actions={(user) => (
           <button
-            className={`admin-role-manage-filter-btn ${filterType === 'all' ? 'admin-role-manage-active' : ''}`}
-            onClick={() => setFilterType('all')}
+            className={user.is_admin ? 'action-btn action-btn-danger' : 'action-btn action-btn-primary'}
+            onClick={() => handleToggleAdmin(user)}
+            disabled={updating === user.id}
           >
-            📋 전체
+            {user.is_admin ? '권한 제거' : '관리자 지정'}
           </button>
-          <button
-            className={`admin-role-manage-filter-btn ${filterType === 'admin' ? 'admin-role-manage-active' : ''}`}
-            onClick={() => setFilterType('admin')}
-          >
-            👑 관리자
-          </button>
-          <button
-            className={`admin-role-manage-filter-btn ${filterType === 'user' ? 'admin-role-manage-active' : ''}`}
-            onClick={() => setFilterType('user')}
-          >
-            👤 일반 사용자
-          </button>
-        </div>
-
-        <button className="admin-role-manage-refresh-btn" onClick={fetchAllUsers}>
-          🔄 새로고침
-        </button>
-      </div>
-
-      {/* 사용자 목록 */}
-      <div className="admin-role-manage-profiles-grid">
-        {filteredProfiles.length === 0 ? (
-          <div className="admin-role-manage-empty-state">
-            <p>검색 결과가 없습니다.</p>
-          </div>
-        ) : (
-          filteredProfiles.map((profile) => (
-            <div key={profile.id} className="admin-role-manage-profile-card">
-              {/* 프로필 헤더 */}
-              <div className="admin-role-manage-profile-header">
-                <div className="admin-role-manage-profile-image">
-                  <img 
-                    src={profile.image_url || '/default-avatar.png'} 
-                    alt={profile.name}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/default-avatar.png';
-                    }}
-                  />
-                  {profile.is_admin && (
-                    <span className="admin-role-manage-admin-crown">👑</span>
-                  )}
-                </div>
-                
-                <div className="admin-role-manage-profile-info">
-                  <h3 className="admin-role-manage-profile-name">{profile.name}</h3>
-                  <p className="admin-role-manage-profile-email">📧 {profile.email}</p>
-                  <p className="admin-role-manage-profile-detail">🎓 {profile.major}</p>
-                  <p className="admin-role-manage-profile-detail">🔢 {profile.stnum}</p>
-                </div>
-
-                <div className="admin-role-manage-profile-badges">
-                  <span className={`admin-role-manage-badge ${profile.is_admin ? 'admin-role-manage-badge-admin' : 'admin-role-manage-badge-user'}`}>
-                    {profile.is_admin ? '관리자' : '일반'}
-                  </span>
-                </div>
-              </div>
-
-              {/* 액션 버튼 - 관리자 권한 토글만 */}
-              <div className="admin-role-manage-profile-actions">
-                <button
-                  className={`admin-role-manage-action-btn ${profile.is_admin ? 'admin-role-manage-revoke' : 'admin-role-manage-grant'}`}
-                  onClick={() => toggleAdminRole(profile.id, profile.is_admin)}
-                  disabled={updating === profile.id}
-                >
-                  {updating === profile.id ? (
-                    '처리중...'
-                  ) : profile.is_admin ? (
-                    '🔓 권한 제거'
-                  ) : (
-                    '🔐 관리자 지정'
-                  )}
-                </button>
-              </div>
-            </div>
-          ))
         )}
-      </div>
-    </div>
+      />
+    </AdminLayout>
   );
 }
 
-// HOC로 관리자 권한 보호
 export default withAdminAuth(AdminRoleManager);

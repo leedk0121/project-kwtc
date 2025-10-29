@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Showpartinfo.css'
-import { supabase } from '../pages/auth/supabaseClient';
+import { supabase } from '../pages/Auth/supabaseClient';
 
 const ShowPartInfo = ({ partInfo, onClose }: { partInfo: any; onClose: () => void }) => {
   const [myTier, setMyTier] = useState<number | null>(null);
