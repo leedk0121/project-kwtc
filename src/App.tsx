@@ -1,28 +1,28 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './Header';
-import BoardPage from './pages/Board/BoardPage.tsx';
-import RankingPage from './pages/Ranking/RankingPage.tsx';
-import IntroPage from './pages/Intro/IntroPage.tsx';
-import EventPage from './pages/Event/EventPage.tsx';
-import HomePage from './pages/HomePage.tsx';
-import Auth from './pages/Auth/Auth.tsx';
-import Signup from './pages/Auth/SignupPage.tsx';
-import ProfilePage from './pages/Auth/ProfilePage.tsx';
+import BoardPage from './pages/Board/BoardPage';
+import RankingPage from './pages/Ranking/RankingPage';
+import IntroPage from './pages/Intro/IntroPage';
+import EventPage from './pages/Event/EventPage';
+import HomePage from './pages/HomePage';
+import Auth from './pages/Auth/Auth';
+import Signup from './pages/Auth/SignupPage';
+import ProfilePage from './pages/Auth/ProfilePage';
 import { NewPost } from './pages/Board/NewPost';
 import { PostDetail } from './pages/Board/PostDetail';
-import UnifiedreservationPage from './pages/Reservation/UnifiedreservationPage.tsx';
-import EventAdd from './pages/Event/EventAddPage.tsx';
-import ReservationProfile from './pages/Reservation/ReservationProfile.tsx';
-import AdminPage from './pages/Admin/AdminPage.tsx';
-import RankedEditPage from './pages/Admin/RankeditPageDnD.tsx';
-import RankParticipantPage from './pages/Admin/RankParticipantPage.tsx';
-import PostEditPage from './pages/Admin/PostEditPage.tsx';
-import LeadereditPage from './pages/Admin/LeadereditPage.tsx';
-import LoginApprove from './pages/Admin/LoginApprovePage.tsx';
-import AdminRoleManager from './pages/Admin/AdminRoleManager.tsx';
-import MajorManagePage from './pages/Admin/MajorManagePage.tsx';
+import UnifiedreservationPage from './pages/Reservation/UnifiedreservationPage';
+import EventAdd from './pages/Event/EventAddPage';
+import ReservationProfile from './pages/Reservation/ReservationProfile';
+import AdminPage from './pages/Admin/AdminPage';
+import RankedEditPage from './pages/Admin/RankeditPageDnD';
+import RankParticipantPage from './pages/Admin/RankParticipantPage';
+import PostEditPage from './pages/Admin/PostEditPage';
+import LeadereditPage from './pages/Admin/LeadereditPage';
+import LoginApprove from './pages/Admin/LoginApprovePage';
+import AdminRoleManager from './pages/Admin/AdminRoleManager';
+import MajorManagePage from './pages/Admin/MajorManagePage';
 import './App.css';
-import ReservationSuccessPage from './pages/Reservation/ReservationSuccessPage.tsx';
+import ReservationSuccessPage from './pages/Reservation/ReservationSuccessPage';
 
 // 헤더가 있는 레이아웃
 function LayoutWithHeader({ children }: { children: React.ReactNode }) {
