@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { withAdminAuth } from '../../services/adminHOC';
 import { AdminLayout } from './components/AdminLayout';
 import { useRankedUsers, RankedUser } from './hooks/useRankedUsers';
+import { supabase } from '../Auth/supabaseClient';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import '../Admin/styles/admin-shared.css';
 import './RankeditPage.css';
 
@@ -19,6 +21,7 @@ function RankedEditPage() {
     rankedIds,
     fetchRankedUsers,
     fetchAllUsers,
+    fetchUnrankedUsers,
     addUsersToRanking,
     deleteFromRanking,
     updateRankings,
@@ -65,7 +68,7 @@ function RankedEditPage() {
     return filtered;
   }, [users, search, mode]);
 
-  const handleModeChange = async (newMode: 'ranked' | 'all') => {
+  const handleModeChange = async (newMode: 'ranked' | 'all' | 'unranked') => {
     setSearch('');
     setCheckedIds([]);
     setTierInputs({});
@@ -74,8 +77,10 @@ function RankedEditPage() {
 
     if (newMode === 'ranked') {
       await fetchRankedUsers();
-    } else {
+    } else if (newMode === 'all') {
       await fetchAllUsers();
+    } else {
+      await fetchUnrankedUsers();
     }
   };
 
@@ -135,7 +140,17 @@ function RankedEditPage() {
     alert(result.message);
 
     if (result.success) {
-      const rankResult = await calculateAndSaveAllRanks(sortedAndFiltered);
+      // 업데이트된 최신 데이터를 가져온 후 전체 랭킹 계산
+      const { data: updatedUsers, error } = await supabase
+        .from('ranked_user')
+        .select('id, name, major, stnum, rank_tier, rank_detail, rank_all, raket, image_url, birthday, phone');
+
+      if (error) {
+        alert('최신 데이터 조회 실패: ' + error.message);
+        return;
+      }
+
+      const rankResult = await calculateAndSaveAllRanks(updatedUsers || []);
       alert(rankResult.message);
 
       setCheckedIds([]);
@@ -222,7 +237,7 @@ function RankedEditPage() {
         </>
       )}
 
-      {mode === 'all' && (
+      {(mode === 'all' || mode === 'unranked') && (
         <div className="rank-edit-user-check">
           <input
             type="checkbox"
@@ -240,7 +255,6 @@ function RankedEditPage() {
     <AdminLayout title="📊 랭킹 관리" subtitle={`총 ${sortedAndFiltered.length}명`}>
       <div className="rank-edit-rankedit-notice">
         💡 테린이 티어의 티어값은 0 입니다. <br />
-        💡 라켓 브랜드는 저장할때마다 선택해야합니다.
       </div>
 
       <div className="rank-edit-rankedit-controls">
@@ -256,6 +270,12 @@ function RankedEditPage() {
             className={`rank-edit-view-btn ${mode === 'all' ? 'active' : ''}`}
           >
             👥 전체 유저
+          </button>
+          <button
+            onClick={() => handleModeChange('unranked')}
+            className={`rank-edit-view-btn ${mode === 'unranked' ? 'active' : ''}`}
+          >
+            🆕 미랭킹 유저
           </button>
           <button
             onClick={handleRefresh}
@@ -274,7 +294,7 @@ function RankedEditPage() {
             onChange={e => setSearch(e.target.value)}
             className="rank-edit-search-input"
           />
-          {mode === 'all' && (
+          {(mode === 'all' || mode === 'unranked') && (
             <button
               onClick={handleAddUsers}
               className="rank-edit-action-btn rank-edit-add-btn"
@@ -305,13 +325,13 @@ function RankedEditPage() {
       </div>
 
       {loading ? (
-        <div className="rank-edit-loading-message">랭킹 정보를 불러오는 중...</div>
+        <LoadingSpinner message="랭킹 정보를 불러오는 중..." />
       ) : (
         <>
           {sortedAndFiltered.length > 0 && (
             <div className={`rank-edit-list-header ${mode}`}>
               <span className="rank-edit-header-profile">프로필 정보</span>
-              {mode === 'all' && (
+              {(mode === 'all' || mode === 'unranked') && (
                 <span className="rank-edit-header-check">추가</span>
               )}
               {mode === 'ranked' && (

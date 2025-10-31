@@ -18,8 +18,6 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🔄 예약 취소 Function 시작')
-    
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       throw new Error('인증 정보가 없습니다')
@@ -33,14 +31,11 @@ serve(async (req) => {
 
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) {
-      console.error('❌ 사용자 인증 실패:', userError)
+      console.error('사용자 인증 실패:', userError)
       throw new Error('사용자 인증 실패')
     }
 
-    console.log('✅ 사용자 인증 성공:', user.id)
-
     const { inRseq, totalPrice } = await req.json()
-    console.log('📋 요청 데이터:', { inRseq, totalPrice })
 
     if (!inRseq || totalPrice === undefined) {
       throw new Error('필수 파라미터가 누락되었습니다 (inRseq, totalPrice)')
@@ -54,20 +49,18 @@ serve(async (req) => {
       .single()
 
     if (profileError) {
-      console.error('❌ 프로필 조회 오류:', profileError)
+      console.error('프로필 조회 오류:', profileError)
       throw new Error('프로필 조회 실패')
     }
 
     if (!profileData?.nowon_id || !profileData?.nowon_pass) {
-      console.error('❌ 계정 정보 없음:', profileData)
+      console.error('계정 정보 없음')
       throw new Error('노원구 테니스장 계정 정보가 등록되지 않았습니다')
     }
 
     const { nowon_id, nowon_pass } = profileData
-    console.log('✅ 계정 정보 확인:', { nowon_id: nowon_id.substring(0, 3) + '***' })
 
-    // 1. 로그인 세션 생성
-    console.log('🔐 로그인 시도...')
+    // 로그인 세션 생성
     const loginResponse = await fetch('https://reservation.nowonsc.kr/member/loginAction', {
       method: 'POST',
       headers: {
@@ -81,26 +74,20 @@ serve(async (req) => {
       }),
     })
 
-    console.log('📥 로그인 응답 상태:', loginResponse.status)
-
     if (!loginResponse.ok) {
-      console.error('❌ 로그인 실패:', loginResponse.status, loginResponse.statusText)
+      console.error('로그인 실패:', loginResponse.status, loginResponse.statusText)
       throw new Error('로그인에 실패했습니다')
     }
 
     const setCookieHeaders = loginResponse.headers.getSetCookie()
     if (!setCookieHeaders || setCookieHeaders.length === 0) {
-      console.error('❌ 쿠키 없음')
+      console.error('쿠키 없음')
       throw new Error('세션 쿠키를 가져올 수 없습니다')
     }
 
     const cookies = setCookieHeaders.map(cookie => cookie.split(';')[0]).join('; ')
-    console.log('✅ 로그인 성공, 쿠키 개수:', setCookieHeaders.length)
 
-    // 2. 예약 취소 요청
-    console.log('🔄 예약 취소 요청 전송...')
-    console.log('📋 취소 파라미터:', { inRseq, totalPrice })
-    
+    // 예약 취소 요청
     const cancelResponse = await fetch('https://reservation.nowonsc.kr/mypage/reserveCancelAction', {
       method: 'POST',
       headers: {
@@ -115,14 +102,11 @@ serve(async (req) => {
       }),
     })
 
-    console.log('📥 취소 응답 상태:', cancelResponse.status)
-
     const cancelResult = await cancelResponse.text()
-    console.log('📄 취소 응답 본문 (처음 500자):', cancelResult.substring(0, 500))
 
     // HTTP 200이면 성공으로 간주 (노원구 서버는 성공시 200 반환)
     if (cancelResponse.ok || cancelResponse.status === 200) {
-      console.log('✅ 예약 취소 성공 (HTTP 200)')
+      console.log('예약 취소 성공')
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -137,14 +121,13 @@ serve(async (req) => {
         }
       )
     } else {
-      console.error('❌ 취소 요청 실패:', cancelResponse.status, cancelResponse.statusText)
+      console.error('취소 요청 실패:', cancelResponse.status, cancelResponse.statusText)
       throw new Error(`예약 취소 요청 실패: HTTP ${cancelResponse.status}`)
     }
 
   } catch (error) {
-    console.error('❌ 예약 취소 오류:', error)
-    console.error('❌ 오류 상세:', error.message, error.stack)
-    
+    console.error('예약 취소 오류:', error)
+
     return new Response(
       JSON.stringify({ 
         error: error.message || '예약 취소 중 오류가 발생했습니다',

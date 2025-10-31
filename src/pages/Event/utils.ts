@@ -7,6 +7,16 @@ export const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 export const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => i + 1);
 export const MINUTE_OPTIONS = Array.from({ length: 12 }, (_, i) => i * 5);
 
+// 티어 옵션 (숫자가 낮을수록 높은 티어)
+export const TIER_OPTIONS = [
+  { value: 1, label: 'Challenger', name: 'challenger' },
+  { value: 2, label: 'Master', name: 'master' },
+  { value: 3, label: 'Emerald', name: 'emerald' },
+  { value: 4, label: 'Gold', name: 'gold' },
+  { value: 5, label: 'Silver', name: 'silver' },
+  { value: 6, label: 'Bronze', name: 'bronze' }
+] as const;
+
 // 색상 매핑 (이벤트 타입별)
 export const EVENT_COLOR_MAP = {
   1: {

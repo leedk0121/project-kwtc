@@ -49,8 +49,6 @@ class NowonCrawler {
       formData.append('username', username)
       formData.append('password', password)
 
-      console.log('🔐 로그인 시도...')
-      
       const response = await fetch(`${this.baseUrl}/member/loginAction`, {
         method: 'POST',
         headers: {
@@ -65,14 +63,12 @@ class NowonCrawler {
       })
 
       this.saveCookies(response.headers)
-      console.log('🍪 로그인 후 쿠키:', this.getCookieString())
 
       if (response.status === 302 || response.status === 301) {
         const location = response.headers.get('location')
         if (location) {
-          console.log('🔄 리다이렉트:', location)
           const followUpUrl = location.startsWith('http') ? location : `${this.baseUrl}${location}`
-          
+
           const followUpResponse = await fetch(followUpUrl, {
             method: 'GET',
             headers: {
@@ -81,13 +77,11 @@ class NowonCrawler {
               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             }
           })
-          
+
           this.saveCookies(followUpResponse.headers)
-          console.log('🍪 리다이렉트 후 쿠키:', this.getCookieString())
         }
       }
 
-      console.log('🏃 스포츠 예약 페이지 방문...')
       const sportsMainResponse = await fetch(`${this.baseUrl}/sports/courtReserve`, {
         method: 'GET',
         headers: {
@@ -96,27 +90,24 @@ class NowonCrawler {
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         }
       })
-      
+
       this.saveCookies(sportsMainResponse.headers)
-      console.log('🍪 스포츠 페이지 후 쿠키:', this.getCookieString())
 
       if (response.ok || response.status === 302 || response.status === 301) {
-        console.log('✅ 노원구 로그인 성공')
+        console.log('노원구 로그인 성공')
         return true
       }
 
       return false
     } catch (error) {
-      console.error('❌ 노원 로그인 실패:', error)
+      console.error('노원 로그인 실패:', error)
       return false
     }
   }
 
   async fetchMseqFromReservationPage(cseq: string): Promise<void> {
-    // 🧪 테스트용 하드코딩
-    console.log('🧪 테스트 모드: mseq를 112938로 고정')
+    // 테스트용 하드코딩
     this.mseq = '112938'
-    console.log('✅ mseq 설정 완료:', this.mseq)
   }
 
   getMseq(): string {
@@ -142,11 +133,9 @@ class NowonCrawler {
     const parentSeq = parentSeqMap[courtName] || '1'
 
     // displayCourtNum이 "2코트" 형식이면 그대로, 아니면 "코트" 붙이기
-    const courtDisplay = String(displayCourtNum).includes('코트') 
-      ? displayCourtNum 
+    const courtDisplay = String(displayCourtNum).includes('코트')
+      ? displayCourtNum
       : `${displayCourtNum}코트`
-    
-    console.log('🔧 코트 번호:', displayCourtNum, '→', courtDisplay)
 
     return {
       cseq: cseq,
@@ -187,13 +176,6 @@ class NowonCrawler {
       // 모든 time_chk 추가 (여러 개)
       reservationDataList.forEach(data => {
         formData.append('time_chk', data.time_chk)
-      })
-
-      console.log('📤 [1단계] 예약 확인 요청 (배치)')
-      console.log('📋 예약 개수:', reservationDataList.length)
-      console.log('📋 time_chk 목록:')
-      reservationDataList.forEach((data, idx) => {
-        console.log(`  ${idx + 1}. ${data.time_chk}`)
       })
 
       const response = await fetch(`${this.baseUrl}/sports/courtReserve_confirm`, {
@@ -268,13 +250,13 @@ class NowonCrawler {
 
       // 3단계: payment 폼 제출 - 첫 번째 예약 데이터 사용
       const paymentResult = await this.submitPaymentForm(
-        confirmResult.voStr, 
-        confirmResult.timeStr, 
+        confirmResult.voStr,
+        confirmResult.timeStr,
         reservationDataList[0],
         confirmResult.memberInfo || {}
       )
       if (!paymentResult.success) {
-        console.warn('⚠️ payment 폼 제출 실패했지만 예약은 완료됨')
+        console.error('payment 폼 제출 실패 (예약은 완료됨)')
       }
 
       // 성공한 예약 상세 정보
@@ -290,7 +272,7 @@ class NowonCrawler {
       return { success: true, message: '예약이 완료되었습니다.', details }
 
     } catch (error: any) {
-      console.error('❌ 예약 실패:', error)
+      console.error('예약 실패:', error)
       return { success: false, message: error.message }
     }
   }
@@ -302,8 +284,6 @@ class NowonCrawler {
       Object.keys(reservationData).forEach(key => {
         formData.append(key, reservationData[key])
       })
-
-      console.log('📤 [1단계] 예약 확인 요청')
 
       const response = await fetch(`${this.baseUrl}/sports/courtReserve_confirm`, {
         method: 'POST',
@@ -349,14 +329,10 @@ class NowonCrawler {
         memberEmail: memberEmailInput?.getAttribute('value') || ''
       }
 
-      console.log('✅ [1단계] voStr:', voStr)
-      console.log('✅ [1단계] timeStr:', timeStr)
-      console.log('✅ [1단계] 회원 정보:', memberInfo)
-
       return { success: true, voStr, timeStr, memberInfo }
 
     } catch (error: any) {
-      console.error('❌ [1단계] 예약 확인 실패:', error)
+      console.error('[1단계] 예약 확인 실패:', error)
       return { success: false, message: error.message }
     }
   }
@@ -377,10 +353,6 @@ class NowonCrawler {
       formData.append('timeStr', timeStr)
       formData.append('parentSeq', '1')
 
-      console.log('📤 [2단계] 예약 완료 요청')
-      console.log('📋 전송 파라미터 수:', Array.from(formData.entries()).length)
-      console.log('📋 timeStr:', timeStr)
-
       const response = await fetch(`${this.baseUrl}/sports/courtReserveAction`, {
         method: 'POST',
         headers: {
@@ -395,15 +367,11 @@ class NowonCrawler {
         body: formData.toString()
       })
 
-      console.log('📥 [2단계] 응답 상태:', response.status)
-
       const responseText = await response.text()
-      console.log('📥 [2단계] 응답 길이:', responseText.length)
 
       // HTML 응답인지 확인
       if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
-        console.error('❌ HTML 응답 (JSON 아님)')
-        console.log('📄 에러 HTML 샘플:', responseText.substring(0, 300))
+        console.error('HTML 응답 수신 (예상: JSON)')
         return { success: false, message: `서버 에러 ${response.status}` }
       }
 
@@ -411,16 +379,15 @@ class NowonCrawler {
       let result
       try {
         result = JSON.parse(responseText)
-        console.log('📥 [2단계] JSON 응답:', result)
       } catch (e) {
-        console.error('❌ JSON 파싱 실패')
+        console.error('JSON 파싱 실패')
         return { success: false, message: '응답 파싱 실패' }
       }
 
       // 결과 해석
       if (result.result > 0) {
         const reservationId = result.result.toString()
-        console.log('✅ [2단계] 예약 완료! ID:', reservationId)
+        console.log('예약 완료 - ID:', reservationId)
         return { success: true, message: '예약이 신청되었습니다.', reservationId }
       } else if (result.result === 'err') {
         return { success: false, message: result.msg || '오전 10시부터 신청하실 수 있습니다.' }
@@ -433,7 +400,7 @@ class NowonCrawler {
       }
 
     } catch (error: any) {
-      console.error('❌ [2단계] 예약 완료 실패:', error)
+      console.error('[2단계] 예약 완료 실패:', error)
       return { success: false, message: error.message }
     }
   }
@@ -490,12 +457,6 @@ class NowonCrawler {
       // 날짜와 금액
       formData.append('msgProductDate', `${formattedDate} `)
       formData.append('priceTotal', `${parseInt(feeNormal).toLocaleString()}`)
-      
-      console.log('📤 [3단계] payment 폼 제출 (POST)')
-      console.log('📋 URL 길이:', url.length)
-      console.log('📋 timeStrList:', timeStrList)
-      console.log('📋 회원 정보:', memberInfo)
-      console.log('📋 memberToday:', memberToday)
 
       const response = await fetch(url, {
         method: 'POST',
@@ -510,18 +471,16 @@ class NowonCrawler {
         body: formData.toString()
       })
 
-      console.log('📥 [3단계] 응답 상태:', response.status)
-
       if (response.ok) {
-        console.log('✅ [3단계] payment 폼 제출 성공 - 카카오톡 발송됨!')
+        console.log('payment 폼 제출 성공')
         return { success: true }
       } else {
-        console.warn('⚠️ [3단계] 응답 상태가 200이 아님:', response.status)
+        console.error('payment 응답 상태:', response.status)
         return { success: true, message: `payment 응답: ${response.status}` }
       }
 
     } catch (error: any) {
-      console.error('❌ [3단계] payment 폼 제출 실패:', error)
+      console.error('[3단계] payment 폼 제출 실패:', error)
       return { success: false, message: error.message }
     }
   }
@@ -550,19 +509,19 @@ class NowonCrawler {
 
       // 3단계: payment 폼 제출 (POST) - 카카오톡 발송
       const paymentResult = await this.submitPaymentForm(
-        confirmResult.voStr, 
-        confirmResult.timeStr, 
+        confirmResult.voStr,
+        confirmResult.timeStr,
         reservationData,
         confirmResult.memberInfo || {}
       )
       if (!paymentResult.success) {
-        console.warn('⚠️ payment 폼 제출 실패했지만 예약은 완료됨')
+        console.error('payment 폼 제출 실패 (예약은 완료됨)')
       }
 
       return { success: true, message: '예약이 완료되었습니다.' }
 
     } catch (error: any) {
-      console.error('❌ 예약 실패:', error)
+      console.error('예약 실패:', error)
       return { success: false, message: error.message }
     }
   }
@@ -605,18 +564,12 @@ serve(async (req) => {
       groupedReservations.get(key)!.push(reservation)
     })
 
-    console.log(`📦 총 ${groupedReservations.size}개 그룹으로 묶음`)
-
     const allResults: any[] = []
 
     // 각 그룹별로 배치 예약
     for (const [key, group] of groupedReservations.entries()) {
-      console.log(`\n🎯 그룹 [${key}] 처리 중 (${group.length}개 예약)`)
-      
       // 각 예약을 포맷팅
       const formattedDataList = group.map(res => crawler.convertToReservationFormat(res))
-      
-      console.log('📝 배치 예약 데이터:', formattedDataList[0])
 
       // 배치로 예약 실행
       const result = await crawler.makeReservationBatch(formattedDataList, group)
@@ -657,9 +610,9 @@ serve(async (req) => {
           failed: allResults.length - successCount,
           groups: groupedReservations.size
         },
-        message: allSuccess 
-          ? `✅ 모든 예약 성공 (${successCount}/${allResults.length}, ${groupedReservations.size}개 그룹)` 
-          : `⚠️ 일부 예약 실패 (${successCount}/${allResults.length})`
+        message: allSuccess
+          ? `모든 예약 성공 (${successCount}/${allResults.length})`
+          : `일부 예약 실패 (${successCount}/${allResults.length})`
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -668,7 +621,7 @@ serve(async (req) => {
     )
 
   } catch (error: any) {
-    console.error('❌ 예약 오류:', error)
+    console.error('예약 오류:', error)
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       {

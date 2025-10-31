@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../Auth/supabaseClient';
 import { usePosts } from './hooks';
 import { POST_TYPE_KR, formatDate } from './utils';
 import './Postlist.css';
@@ -10,10 +11,19 @@ export function PostList() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const POSTS_PER_PAGE = 10;
   const navigate = useNavigate();
 
   const { posts, loading, fetchPosts, searchPosts } = usePosts();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -87,7 +97,14 @@ export function PostList() {
         </button>
         <button
           className="board-write-btn"
-          onClick={() => navigate('/board/new')}
+          onClick={() => {
+            if (!userId) {
+              alert('로그인이 필요한 서비스입니다.');
+              navigate('/login');
+              return;
+            }
+            navigate('/board/new');
+          }}
         >
           ✏️ 글 작성
         </button>
@@ -133,7 +150,14 @@ export function PostList() {
             <p>로그인 하지 않으면 글을 볼 수 없습니다.</p>
             <button
               className="board-empty-write-btn"
-              onClick={() => navigate('/board/new')}
+              onClick={() => {
+                if (!userId) {
+                  alert('로그인이 필요한 서비스입니다.');
+                  navigate('/login');
+                  return;
+                }
+                navigate('/board/new');
+              }}
             >
               글 작성하기
             </button>

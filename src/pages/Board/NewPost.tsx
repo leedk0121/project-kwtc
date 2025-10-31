@@ -35,6 +35,7 @@ export function NewPost() {
           <span className="title-icon">✏️</span>
           새 글 작성
         </h1>
+        <p className="page-subtitle">KWTC에 새로운 소식을 전해주세요</p>
       </div>
 
       <div className="newpost-content">

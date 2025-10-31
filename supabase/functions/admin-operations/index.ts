@@ -58,6 +58,7 @@ serve(async (req) => {
       .single()
 
     if (profileError || !userProfile?.is_admin) {
+      console.error('관리자 권한 없음:', user.email)
       return new Response(
         JSON.stringify({ success: false, message: '관리자 권한이 필요합니다.' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

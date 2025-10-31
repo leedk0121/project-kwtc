@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../Auth/supabaseClient";
 import ShowPartInfo from "../../components/ShowPartInfo";
 import { useEvents } from './hooks';
 import {
     WEEKDAYS,
+    TIER_OPTIONS,
     generateCalendarDays,
     formatDateString,
     isToday,
@@ -19,6 +20,7 @@ import "./styles/event-shared.css";
 const EventPage: React.FC = () => {
     const navigate = useNavigate();
     const [myId, setMyId] = useState<string | null>(null);
+    const selectedDateInfoRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -42,6 +44,25 @@ const EventPage: React.FC = () => {
     useEffect(() => {
         fetchEvents();
     }, [currentYear, currentMonth, fetchEvents]);
+
+    // 날짜 선택 시 일정 목록으로 자동 스크롤 (간단하고 빠른 방식)
+    useEffect(() => {
+        if (selectedDate && selectedDateInfoRef.current) {
+            // 약간의 지연을 주어 DOM이 렌더링된 후 스크롤
+            const timer = setTimeout(() => {
+                const element = selectedDateInfoRef.current;
+                if (element) {
+                    // scrollIntoView - 모든 브라우저에서 작동
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100); // 빠른 응답을 위해 100ms로 단축
+
+            return () => clearTimeout(timer);
+        }
+    }, [selectedDate, showMyEvents]);
 
     const calendarDays = generateCalendarDays(currentYear, currentMonth);
 
@@ -72,6 +93,12 @@ const EventPage: React.FC = () => {
     // EventInfoBox 컴포넌트
     const EventInfoBox = ({ event, idx }: { event: any; idx: number }) => {
         const colorStyle = getEventColorStyle(event.color);
+
+        const getTierName = (tierValue: number | null): string => {
+            if (tierValue === null) return '제한 없음';
+            const tier = TIER_OPTIONS.find(t => t.value === tierValue);
+            return tier ? tier.label : `${tierValue} Tier`;
+        };
 
         return (
             <div
@@ -114,7 +141,7 @@ const EventPage: React.FC = () => {
                     {event.min_tier !== null && (
                         <div className="event-info-item">
                             <span className="event-info-label">최소티어:</span>
-                            <span className="event-info-value">{event.min_tier} Tier</span>
+                            <span className="event-info-value">{getTierName(event.min_tier)}</span>
                         </div>
                     )}
 
@@ -144,18 +171,35 @@ const EventPage: React.FC = () => {
                     KWTC 일정
                 </h1>
                 <p className="event-page-subtitle">테니스 일정을 공유하고 참여해보세요</p>
+                <div className="event-page-desc" style={{ fontSize: "0.95em", color: "#888", marginTop: "4px" }}>
+                    ※ 코트 예약 버튼을 누르면 통합 예약 페이지로 이동합니다.
+                </div>
             </div>
 
             <div className="calendar-action-buttons">
                 <button
                     className="add-schedule-btn"
-                    onClick={() => navigate("add")}
+                    onClick={() => {
+                        if (!myId) {
+                            alert('로그인이 필요한 서비스입니다.');
+                            navigate('/login');
+                            return;
+                        }
+                        navigate("add");
+                    }}
                 >
                     일정 추가
                 </button>
                 <button
                     className="reserve-court-btn"
-                    onClick={() => window.open("/reservation", "_blank")}
+                    onClick={() => {
+                        if (!myId) {
+                            alert('로그인이 필요한 서비스입니다.');
+                            navigate('/login');
+                            return;
+                        }
+                        window.open("/reservation", "_blank");
+                    }}
                 >
                     코트 예약
                 </button>
@@ -225,7 +269,7 @@ const EventPage: React.FC = () => {
                 </table>
 
                 {selectedDate && (
-                    <div className="selected-date-info">
+                    <div ref={selectedDateInfoRef} className="selected-date-info">
                         <div className="selected-date-title-row">
                             <div className="selected-date-title">
                                 {showMyEvents

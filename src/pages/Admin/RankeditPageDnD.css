@@ -1,0 +1,256 @@
+.dnd-rankedit-container {
+  padding: 20px;
+}
+
+.dnd-rankedit-notice {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.dnd-rankedit-notice strong {
+  font-weight: 700;
+}
+
+.dnd-rankedit-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.dnd-save-btn,
+.dnd-reset-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dnd-save-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.dnd-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+.dnd-reset-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.dnd-reset-btn:hover {
+  background: #e5e7eb;
+}
+
+.dnd-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.dnd-tier-container {
+  background: white;
+  border: 3px solid;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.dnd-tier-container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dnd-tier-header {
+  padding: 16px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dnd-tier-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dnd-tier-count {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dnd-tier-dropzone {
+  padding: 12px;
+  min-height: 100px;
+  background: #f9fafb;
+  transition: background 0.2s;
+}
+
+.dnd-tier-dropzone.drag-over {
+  background: #e0e7ff;
+  border: 2px dashed #667eea;
+}
+
+.dnd-empty-tier {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 180px;
+  color: #9ca3af;
+  font-size: 14px;
+  font-style: italic;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background: white;
+}
+
+.dnd-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: grab;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.dnd-user-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.dnd-user-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: rotate(3deg);
+  z-index: 1000;
+}
+
+.dnd-user-rank {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dnd-user-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.dnd-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dnd-user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dnd-user-details {
+  font-size: 13px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dnd-drag-handle {
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.dnd-user-card:active .dnd-drag-handle {
+  cursor: grabbing;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .dnd-tier-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dnd-rankedit-actions {
+    flex-direction: column;
+  }
+
+  .dnd-save-btn,
+  .dnd-reset-btn {
+    width: 100%;
+  }
+
+  .dnd-user-card {
+    padding: 10px 12px;
+  }
+
+  .dnd-user-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dnd-user-rank {
+    min-width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .dnd-user-name {
+    font-size: 14px;
+  }
+
+  .dnd-user-details {
+    font-size: 12px;
+  }
+}
+
+/* 드래그 오버레이 스타일 */
+.dnd-user-card.dragging {
+  border: 2px solid #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+}

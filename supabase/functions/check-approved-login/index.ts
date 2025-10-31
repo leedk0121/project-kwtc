@@ -15,8 +15,6 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🔍 로그인 요청 시작')
-    
     // Supabase Admin Client (Service Role Key 사용)
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -24,10 +22,8 @@ serve(async (req) => {
     )
 
     const { email, password } = await req.json()
-    console.log('📧 이메일:', email)
 
     if (!email || !password) {
-      console.log('❌ 이메일 또는 비밀번호 누락')
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -47,7 +43,6 @@ serve(async (req) => {
     })
 
     if (authError) {
-      console.log('❌ 로그인 실패:', authError.message)
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -60,8 +55,6 @@ serve(async (req) => {
       )
     }
 
-    console.log('✅ 인증 성공, 사용자 ID:', authData.user.id)
-
     // 2. profile 테이블에서 approved 상태 확인
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profile')
@@ -70,8 +63,6 @@ serve(async (req) => {
       .single()
 
     if (profileError) {
-      console.log('❌ 프로필 조회 실패:', profileError.message)
-      
       // 로그아웃 처리
       await supabaseAdmin.auth.signOut()
       
@@ -87,12 +78,8 @@ serve(async (req) => {
       )
     }
 
-    console.log('📋 Approved 상태:', profile.approved)
-
     // 3. approved가 false인 경우
     if (!profile.approved) {
-      console.log('🚫 승인되지 않은 사용자')
-      
       // 로그아웃 처리
       await supabaseAdmin.auth.signOut()
       
@@ -110,8 +97,8 @@ serve(async (req) => {
     }
 
     // 4. 승인된 사용자 - 로그인 성공
-    console.log('✅ 로그인 성공 (승인된 사용자)')
-    
+    console.log('로그인 성공:', email)
+
     return new Response(
       JSON.stringify({ 
         success: true,
@@ -127,7 +114,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('💥 예상치 못한 오류:', error)
+    console.error('로그인 오류:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

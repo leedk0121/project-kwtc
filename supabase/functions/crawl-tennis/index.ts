@@ -82,7 +82,7 @@ class NowonCrawler {
           reserved = await reservedResponse.json()
         }
       } catch (e) {
-        console.log('예약 정보 조회 실패, 빈 배열 사용')
+        // 예약 정보 조회 실패시 빈 배열 사용
       }
 
       const reservedSet = new Set<string>()
@@ -170,7 +170,6 @@ async function getCachedData(year: number, month: number) {
       .download(fileName)
     
     if (error) {
-      console.log('캐시 파일 없음:', fileName)
       return null
     }
     
@@ -183,11 +182,9 @@ async function getCachedData(year: number, month: number) {
     const maxAge = 60 * 60 * 1000 // 1시간
     
     if (cacheAge > maxAge) {
-      console.log('캐시 만료:', fileName)
       return null
     }
-    
-    console.log('캐시 사용:', fileName)
+
     return cached
   } catch (error) {
     console.error('캐시 로드 오류:', error)
@@ -227,8 +224,7 @@ async function saveCachedData(year: number, month: number, data: any) {
       console.error('캐시 저장 오류:', error)
       return false
     }
-    
-    console.log('캐시 저장 완료:', fileName)
+
     return true
   } catch (error) {
     console.error('캐시 저장 오류:', error)
@@ -291,15 +287,12 @@ serve(async (req) => {
     }
 
     // 캐시가 없거나 forceRefresh면 크롤링 시작
-    console.log('노원구 크롤링 시작 - 날짜:', dates)
-
     const allResultsByDate: { [date: string]: any[] } = {}
 
     if (nowon_id && nowon_pass) {
-      console.log('노원 크롤링 시작...')
       const nowonCrawler = new NowonCrawler()
       const loginSuccess = await nowonCrawler.login(nowon_id, nowon_pass)
-      
+
       if (loginSuccess) {
         for (let i = 0; i < dates.length; i++) {
           const date = dates[i]
@@ -310,7 +303,7 @@ serve(async (req) => {
           ])
           allResultsByDate[date] = [...bul, ...ma, ...cho]
         }
-        console.log(`노원 크롤링 완료`)
+        console.log(`노원 크롤링 완료 - ${dates.length}개 날짜`)
       } else {
         console.error('노원 로그인 실패')
         return new Response(
@@ -319,7 +312,6 @@ serve(async (req) => {
         )
       }
     } else {
-      console.log('노원 계정 정보 없음')
       return new Response(
         JSON.stringify({ success: false, error: '노원 계정 정보 필요' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

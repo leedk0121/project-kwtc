@@ -28,27 +28,23 @@ class CookieManager {
       const [name, value] = cookiePart.split('=');
       if (name && value) {
         this.cookies.set(name.trim(), value.trim());
-        console.log(`  🍪 저장: ${name.trim()}=${value.trim().substring(0, 20)}...`);
       }
     });
-    
+
     const setCookieHeader = headers.get('set-cookie');
     if (setCookieHeader) {
       const [cookiePart] = setCookieHeader.split(';');
       const [name, value] = cookiePart.split('=');
       if (name && value) {
         this.cookies.set(name.trim(), value.trim());
-        console.log(`  🍪 저장 (단일): ${name.trim()}=${value.trim().substring(0, 20)}...`);
       }
     }
   }
 
   getCookieString(): string {
-    const cookieStr = Array.from(this.cookies.entries())
+    return Array.from(this.cookies.entries())
       .map(([name, value]) => `${name}=${value}`)
       .join('; ');
-    console.log(`  📋 전송할 쿠키: ${cookieStr.substring(0, 100)}...`);
-    return cookieStr;
   }
 
   hasCookie(name: string): boolean {
@@ -59,12 +55,8 @@ class CookieManager {
 async function loginNowon(username: string, password: string): Promise<{ cookies: string, html: string } | null> {
   try {
     const cookieManager = new CookieManager();
-    
-    console.log('🔐 노원구 로그인 시도...');
-    console.log(`   ID: ${username}`);
-    
+
     // 1단계: 로그인 페이지 접속 (초기 쿠키 받기)
-    console.log('\n1️⃣ 로그인 페이지 접속...');
     const loginPageRes = await fetch(`${BASE_URL}/member/login`, {
       method: 'GET',
       headers: {
@@ -72,19 +64,15 @@ async function loginNowon(username: string, password: string): Promise<{ cookies
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       }
     });
-    
+
     cookieManager.saveCookies(loginPageRes.headers);
-    console.log(`   응답: ${loginPageRes.status}`);
 
     // 2단계: 로그인 폼 제출
-    console.log('\n2️⃣ 로그인 폼 제출...');
     const formData = new URLSearchParams();
     formData.append('memberId', username);
     formData.append('memberPassword', password);
     formData.append('save_id', 'on');
     formData.append('url', '/');
-
-    console.log(`   폼 데이터: memberId=${username}, memberPassword=***, save_id=on, url=/`);
 
     const loginRes = await fetch(`${BASE_URL}/member/loginAction`, {
       method: 'POST',
@@ -101,13 +89,11 @@ async function loginNowon(username: string, password: string): Promise<{ cookies
     });
 
     cookieManager.saveCookies(loginRes.headers);
-    console.log(`   응답: ${loginRes.status}`);
-    
+
     // 리다이렉트 처리
     if (loginRes.status === 302 || loginRes.status === 301 || loginRes.status === 303) {
       const location = loginRes.headers.get('location');
-      console.log(`   리다이렉트: ${location}`);
-      
+
       if (location) {
         const redirectUrl = location.startsWith('http') ? location : `${BASE_URL}${location}`;
         
@@ -120,14 +106,12 @@ async function loginNowon(username: string, password: string): Promise<{ cookies
           },
           redirect: 'follow'
         });
-        
+
         cookieManager.saveCookies(redirectRes.headers);
-        console.log(`   리다이렉트 후: ${redirectRes.status}, URL: ${redirectRes.url}`);
       }
     }
 
     // 3단계: 마이페이지 접근 - HTML 가져오기
-    console.log('\n3️⃣ 마이페이지 접근 확인...');
     const testRes = await fetch(`${BASE_URL}/mypage/apply_list`, {
       method: 'GET',
       headers: {
@@ -137,36 +121,28 @@ async function loginNowon(username: string, password: string): Promise<{ cookies
       },
       redirect: 'follow'
     });
-    
+
     cookieManager.saveCookies(testRes.headers);
-    console.log(`   응답: ${testRes.status}`);
-    console.log(`   최종 URL: ${testRes.url}`);
 
     const testHtml = await testRes.text();
-    console.log(`   HTML 길이: ${testHtml.length}`);
-    
+
     // 로그인 성공 확인
     const isLoginPage = testRes.url.includes('login') || testHtml.includes('mb_id') || testHtml.includes('member/login');
     const hasMypage = testHtml.includes('신청내역') || testHtml.includes('마이페이지');
-    
-    console.log(`   로그인 페이지: ${isLoginPage}`);
-    console.log(`   마이페이지 컨텐츠: ${hasMypage}`);
-    console.log(`   JSESSIONID 있음: ${cookieManager.hasCookie('JSESSIONID')}`);
 
     if (isLoginPage || !hasMypage) {
-      console.error('❌ 로그인 실패 - 세션 미확립');
-      console.log('   HTML 샘플:', testHtml.substring(0, 500));
+      console.error('로그인 실패 - 세션 미확립');
       return null;
     }
 
-    console.log('✅ 로그인 성공!');
+    console.log('노원구 로그인 성공');
     return {
       cookies: cookieManager.getCookieString(),
-      html: testHtml  // 👈 HTML도 반환
+      html: testHtml
     };
 
   } catch (error) {
-    console.error('❌ 로그인 중 오류:', error);
+    console.error('로그인 중 오류:', error);
     return null;
   }
 }
@@ -178,14 +154,10 @@ serve(async (req) => {
   }
 
   try {
-    console.log("\n" + "=".repeat(60));
-    console.log("🚀 노원구 예약 크롤러 시작");
-    console.log("=".repeat(60));
-
-    // 0️⃣ 요청에서 JWT 토큰 추출하여 사용자 ID 가져오기
+    // 요청에서 JWT 토큰 추출하여 사용자 ID 가져오기
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error("❌ Authorization 헤더 없음");
+      console.error("Authorization 헤더 없음");
       return new Response(JSON.stringify({ error: "Unauthorized" }), { 
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -194,22 +166,18 @@ serve(async (req) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
+
     if (userError || !user) {
-      console.error("❌ 사용자 인증 실패:", userError?.message);
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { 
+      console.error("사용자 인증 실패:", userError?.message);
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     const userId = user.id;
-    console.log("✅ 사용자 ID:", userId);
-    console.log("✅ 사용자 이메일:", user.email);
 
-    // 1️⃣ 로그인 정보 가져오기
-    console.log("\n🔍 프로필 조회 중...");
-    
+    // 로그인 정보 가져오기
     const { data: profile, error: profileError } = await supabase
       .from("tennis_reservation_profile")
       .select("nowon_id, nowon_pass")
@@ -217,51 +185,47 @@ serve(async (req) => {
       .maybeSingle();
 
     if (profileError) {
-      console.error("❌ 프로필 조회 오류:", profileError);
-      return new Response(JSON.stringify({ 
-        error: "Database error", 
-        details: profileError.message 
-      }), { 
+      console.error("프로필 조회 오류:", profileError);
+      return new Response(JSON.stringify({
+        error: "Database error",
+        details: profileError.message
+      }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     if (!profile || !profile.nowon_id || !profile.nowon_pass) {
-      console.error("❌ 프로필 정보 없음");
-      return new Response(JSON.stringify({ 
+      console.error("프로필 정보 없음");
+      return new Response(JSON.stringify({
         error: "Profile not found - please register your Nowon account in profile page"
-      }), { 
+      }), {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     const { nowon_id, nowon_pass } = profile;
-    console.log("✅ 계정 정보 확인:", nowon_id);
 
-    // 2️⃣ 노원구 로그인
+    // 노원구 로그인
     const loginResult = await loginNowon(nowon_id, nowon_pass);
-    
+
     if (!loginResult) {
-      console.error("❌ 로그인 실패");
-      return new Response(JSON.stringify({ 
-        error: "Login failed - please check your credentials" 
-      }), { 
+      console.error("로그인 실패");
+      return new Response(JSON.stringify({
+        error: "Login failed - please check your credentials"
+      }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     const { cookies, html } = loginResult;
-    console.log("✅ 로그인 성공, 쿠키 획득");
 
-    // 3️⃣ API로 예약 데이터 가져오기
-    console.log("\n📡 예약 데이터 API 호출...");
-    
+    // API로 예약 데이터 가져오기
     const apiPayload = new URLSearchParams({
       cp: '1',
-      rn: '100',  // 👈 더 많은 데이터 가져오기
+      rn: '100',
       op: '0',
       startDate: '',
       endDate: ''
@@ -279,20 +243,16 @@ serve(async (req) => {
       },
       body: apiPayload.toString()
     });
-    
-    console.log("📡 API 응답 상태:", apiRes.status);
-    
+
     if (!apiRes.ok) {
-      console.error("❌ API 호출 실패:", apiRes.status);
+      console.error("API 호출 실패:", apiRes.status);
       const errorText = await apiRes.text();
-      console.error("   에러 응답:", errorText.substring(0, 500));
+      console.error("에러 응답:", errorText.substring(0, 500));
       throw new Error(`API call failed: ${apiRes.status}`);
     }
 
     const apiData = await apiRes.json();
-    console.log("📦 API 응답 데이터 타입:", typeof apiData);
-    console.log("📦 API 응답 샘플:", JSON.stringify(apiData).substring(0, 500));
-    
+
     // API 응답 구조 파싱
     let rawList = [];
     
@@ -307,15 +267,9 @@ serve(async (req) => {
     } else if (apiData.applyList) {
       rawList = apiData.applyList;
     }
-    
-    console.log(`📊 원본 데이터 ${rawList.length}건 발견`);
-    
+
     // 데이터 변환 - 모든 항목 포함
     const dataList = rawList.map((item: any, index: number) => {
-      if (index < 3) {
-        console.log(`📦 ${index + 1}번째 원본 데이터:`, JSON.stringify(item).substring(0, 300));
-      }
-      
       return {
         no: item.seq || item.no || item.applyNo || index + 1,
         apply_date: item.insertDate || '',
@@ -325,37 +279,25 @@ serve(async (req) => {
         location: '',
         payment_amount: String(item.priceRefundTotalPricePay || 0),
         payment_status: item.pstat || '',
-        payment_method: item.payMethod || '',  // 👈 없어도 빈 문자열
+        payment_method: item.payMethod || '',
         cancel_status: item.rstat === 'C' ? '취소' : '-',
-        raw: item  // 👈 원본 데이터 전체 저장
+        raw: item
       };
     });
-    
-    console.log(`✅ 변환 완료: ${dataList.length}건`);
-    console.log(`📦 첫 번째 변환 데이터:`, JSON.stringify(dataList[0], null, 2));
-    
-    if (dataList.length === 0) {
-      console.warn("⚠️ 변환된 데이터가 없습니다!");
-    }
 
-    // 4️⃣ Storage에 저장
+    // Storage에 저장
     const storageData = {
       userId: userId,
       timestamp: new Date().toISOString(),
-      reservations: dataList,  // 👈 모든 데이터
-      count: dataList.length   // 👈 실제 개수
+      reservations: dataList,
+      count: dataList.length
     };
-    
-    console.log(`💾 Storage 저장 데이터 개수: ${storageData.count}`);
-    
+
     try {
       const fileName = `nowon-reservations-${userId}.json`;
       const fileContent = JSON.stringify(storageData, null, 2);
-      
-      console.log(`📝 JSON 크기: ${fileContent.length} bytes`);
-      
       const blob = new Blob([fileContent], { type: 'application/json' });
-      
+
       const { error: uploadError } = await supabase.storage
         .from('reservation-data')
         .upload(fileName, blob, {
@@ -364,25 +306,14 @@ serve(async (req) => {
         });
       
       if (uploadError) {
-        console.error('❌ Storage 업로드 오류:', uploadError);
+        console.error('Storage 업로드 오류:', uploadError);
         throw uploadError;
       }
-      
-      console.log(`✅ Storage 저장 완료: ${fileName}`);
-      
-      // 저장 확인
-      const { data: checkData } = await supabase.storage
-        .from('reservation-data')
-        .download(fileName);
-      
-      if (checkData) {
-        const checkContent = await checkData.text();
-        const checkJson = JSON.parse(checkContent);
-        console.log(`✅ Storage 확인: ${checkJson.reservations.length}건 저장됨`);
-      }
-      
+
+      console.log('Storage 저장 완료:', fileName);
+
     } catch (storageError: any) {
-      console.error('⚠️ Storage 저장 오류:', storageError.message);
+      console.error('Storage 저장 오류:', storageError.message);
       // Storage 실패해도 응답은 반환
     }
 
@@ -391,15 +322,15 @@ serve(async (req) => {
       message: dataList.length > 0 ? "Crawling completed successfully" : "No reservations found",
       count: dataList.length,
       userId: userId,
-      data: dataList  // 👈 응답에도 모든 데이터 포함
-    }), { 
+      data: dataList
+    }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 
   } catch (err: any) {
-    console.error("\n❌ 실행 중 오류:", err.message);
-    console.error("   스택:", err.stack);
+    console.error("실행 중 오류:", err.message);
+    console.error("스택:", err.stack);
     return new Response(JSON.stringify({ 
       error: "Internal server error",
       details: err.message 

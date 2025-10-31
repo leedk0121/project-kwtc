@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "../Auth/supabaseClient";
 import { withAdminAuth } from '../../services/adminHOC';
 import { AdminLayout } from './components';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './PostEditPage.css';
 
 interface Post {
@@ -106,7 +107,7 @@ function PostEditPage() {
   if (loading) {
     return (
       <div className="postedit-container">
-        <div className="loading-message">게시글을 불러오는 중...</div>
+        <LoadingSpinner message="게시글을 불러오는 중..." />
       </div>
     );
   }

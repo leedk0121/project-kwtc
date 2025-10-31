@@ -19,21 +19,23 @@
    Page Header
    ============================================ */
 .intro-page-header {
-  background: var(--color-white);
-  padding: var(--spacing-2xl) var(--spacing-lg);
+  background: #FFFFFF;
+  padding: 40px 20px;
   text-align: center;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .intro-page-title {
-  margin: 0 0 var(--spacing-md) 0;
+  margin: 0 0 12px 0;
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: #1a1a1a;
+  text-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
+  gap: 16px;
 }
 
 .intro-title-icon {
@@ -43,7 +45,7 @@
 .intro-page-subtitle {
   margin: 0;
   font-size: 16px;
-  color: var(--color-text-secondary);
+  color: #666666;
   font-weight: 400;
 }
 

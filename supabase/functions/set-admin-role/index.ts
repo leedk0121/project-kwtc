@@ -95,14 +95,12 @@ serve(async (req) => {
       .single()
 
     if (profileError || !userProfile?.is_admin) {
-      console.log(`⚠️ 관리자 권한 없음: ${user.email}`)
+      console.error(`관리자 권한 없음: ${user.email}`)
       return new Response(
         JSON.stringify({ success: false, message: '관리자 권한이 필요합니다.' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
-
-    console.log(`✅ 관리자 인증 성공: ${userProfile.email}`)
 
     // 요청 본문 파싱
     const { action, data } = await req.json()
@@ -115,9 +113,7 @@ serve(async (req) => {
       )
     }
 
-    console.log(`🚀 작업 시작: ${action}`)
-
-    // 🚀 관리자 작업 실행
+    // 관리자 작업 실행
     let result: any;
     let targetUserEmail: string | null = null;
 
@@ -349,7 +345,7 @@ serve(async (req) => {
 
     // 결과 확인
     if (result.error) {
-      console.error(`❌ 작업 실패 (${action}):`, result.error)
+      console.error(`작업 실패 (${action}):`, result.error)
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -360,7 +356,7 @@ serve(async (req) => {
       )
     }
 
-    console.log(`✅ 작업 완료 (${action})`)
+    console.log(`작업 완료: ${action}`)
 
     return new Response(
       JSON.stringify({ 
@@ -372,7 +368,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('❌ 예상치 못한 오류:', error)
+    console.error('예상치 못한 오류:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

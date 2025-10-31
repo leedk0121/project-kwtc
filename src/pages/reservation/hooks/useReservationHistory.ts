@@ -91,23 +91,14 @@ export function useReservationHistory() {
         throw new Error('로그인이 필요합니다');
       }
 
-      const functionUrl = `${supabase.supabaseUrl}/functions/v1/crawl-nowon-reservation`;
+      const { data, error } = await supabase.functions.invoke('crawl-nowon-reservation');
 
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ 응답 오류:', errorData);
-        throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
+      if (error) {
+        console.error('❌ Edge Function 오류:', error);
+        throw new Error(error.message || 'Edge Function 호출 실패');
       }
 
-      const result = await response.json();
+      const result = data;
 
       if (result.data && Array.isArray(result.data)) {
         setReservationHistory(result.data);
@@ -251,24 +242,16 @@ export function useReservationHistory() {
         return false;
       }
 
-      const functionUrl = `${supabase.supabaseUrl}/functions/v1/cancel-nowon-reservation`;
-
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('cancel-nowon-reservation', {
+        body: {
           inRseq: seq,
           totalPrice: totalPrice
-        })
+        }
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ 취소 오류:', errorData);
-        throw new Error(errorData.error || '예약 취소에 실패했습니다');
+      if (error) {
+        console.error('❌ 취소 오류:', error);
+        throw new Error(error.message || '예약 취소에 실패했습니다');
       }
 
       alert('예약이 취소되었습니다.');

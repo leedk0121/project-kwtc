@@ -1,9 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
 
+/* 모바일 스크롤 개선 - 전역 설정 */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
+    -webkit-overflow-scrolling: touch;
+}
+
 .page_content {
     height: calc(100vh - 200px);
     overflow-y: auto;
     font-family: 'Noto Sans KR', sans-serif;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* 전역 폰트 설정 (선택사항) */

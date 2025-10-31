@@ -9,10 +9,16 @@ function AdminPage() {
 
     const adminMenus = [
         {
-            title: '📊 랭킹 관리',
-            description: '팀 랭킹 정보를 수정하고 관리합니다',
+            title: '🎯 랭킹 순위 관리',
+            description: '드래그 앤 드롭으로 티어와 순위를 조정합니다',
             path: '/admin/rank-edit',
             color: '#3b82f6'
+        },
+        {
+            title: '👥 랭킹 참여자 관리',
+            description: '랭킹 참여자를 추가하거나 삭제합니다',
+            path: '/admin/rank-participant',
+            color: '#06b6d4'
         },
         {
             title: '📝 게시글 관리',

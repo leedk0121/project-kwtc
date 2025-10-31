@@ -15,7 +15,7 @@ export interface RankedUser {
   phone?: string;
 }
 
-type ListMode = 'ranked' | 'all';
+type ListMode = 'ranked' | 'all' | 'unranked';
 
 export function useRankedUsers() {
   const [users, setUsers] = useState<RankedUser[]>([]);
@@ -60,6 +60,36 @@ export function useRankedUsers() {
       setMode('all');
     } catch (error) {
       console.error('전체 사용자 조회 오류:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchUnrankedUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [profileRes, rankedRes] = await Promise.all([
+        supabase
+          .from('profile')
+          .select('id, name, birthday, phone, major, stnum, image_url'),
+        supabase
+          .from('ranked_user')
+          .select('id')
+      ]);
+
+      if (profileRes.error) throw profileRes.error;
+
+      const rankedUserIds = rankedRes.data?.map((u: any) => u.id) || [];
+      const unrankedUsers = (profileRes.data || []).filter(
+        (user: any) => !rankedUserIds.includes(user.id)
+      );
+
+      setUsers(unrankedUsers);
+      setRankedIds(rankedUserIds);
+      setMode('unranked');
+    } catch (error) {
+      console.error('미랭킹 사용자 조회 오류:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -229,6 +259,7 @@ export function useRankedUsers() {
     rankedIds,
     fetchRankedUsers,
     fetchAllUsers,
+    fetchUnrankedUsers,
     addUsersToRanking,
     deleteFromRanking,
     updateRankings,

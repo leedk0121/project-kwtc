@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEventActions } from './hooks';
-import { HOUR_OPTIONS, MINUTE_OPTIONS, formatTimeString, validateEventForm } from './utils';
+import { HOUR_OPTIONS, MINUTE_OPTIONS, TIER_OPTIONS, formatTimeString, validateEventForm } from './utils';
 import "./styles/event-shared.css";
 
 const EventAdd: React.FC = () => {
@@ -76,7 +76,7 @@ const EventAdd: React.FC = () => {
     };
 
     const handleCancel = () => {
-        navigate("/participate");
+        navigate("/event");
     };
 
     return (
@@ -196,15 +196,22 @@ const EventAdd: React.FC = () => {
 
                 <div className="field-group">
                     <label className="field-label">최소 티어 (선택사항)</label>
-                    <input
-                        type="number"
-                        placeholder="최소 티어를 입력하세요 (선택사항)"
+                    <select
                         value={minTier === null ? "" : minTier}
                         onChange={e => {
                             const val = e.target.value;
                             setMinTier(val === "" ? null : Number(val));
                         }}
-                    />
+                        className="event-add-tier-select"
+                    >
+                        <option value="">티어 제한 없음</option>
+                        {TIER_OPTIONS.map(tier => (
+                            <option key={tier.value} value={tier.value}>
+                                {tier.label}
+                            </option>
+                        ))}
+                    </select>
+                    <span className="tier-hint">선택한 티어 이상의 유저만 참여 가능합니다</span>
                 </div>
 
                 <div className="event-add-buttons">

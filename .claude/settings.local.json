@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if exist UnifiedreservationPage.tsx mv UnifiedreservationPage.tsx UnifiedreservationPage.old.tsx)",
+      "Bash(mkdir:*)",
+      "Bash(npm run build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

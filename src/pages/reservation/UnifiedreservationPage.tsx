@@ -1217,14 +1217,14 @@ function UnifiedreservationPage() {
 
         {loading && (
           <div className="progress-info">
-            <div>✅ 노원구: 완료 (불암산, 마들, 초안산)</div>
+            <div>✅ 노원구(불암산, 마들, 초안산): 완료</div>
             <div>🔄 도봉구(다락원): {crawlProgress.current}/{crawlProgress.total}</div>
           </div>
         )}
 
         {!loading && (
           <div className="tip-message">
-            💡 Tip: 마이페이지에서 내 예약 내역을 확인할 수 있습니다.
+            💡 Tip: 마이페이지에서 내 예약 내역을 확인 및 취소할 수 있습니다.
           </div>
         )}
       </div>

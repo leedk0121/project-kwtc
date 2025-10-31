@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { withAdminAuth } from '../../services/adminHOC';
 import { useLeaderProfiles } from './hooks';
 import { AdminLayout } from './components';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import type { Profile } from './hooks/useLeaderProfiles';
 import './LeadereditPage.css';
 
@@ -101,7 +102,7 @@ const LeadereditPage: React.FC = () => {
   if (loading) {
     return (
       <div className="leader-edit-container">
-        <div className="leader-edit-loading-message">데이터를 불러오는 중...</div>
+        <LoadingSpinner message="데이터를 불러오는 중..." />
       </div>
     );
   }

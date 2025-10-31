@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './Header';
 import BoardPage from './pages/Board/BoardPage.tsx';
-import RankingPage from './pages/RankingPage.tsx';
+import RankingPage from './pages/Ranking/RankingPage.tsx';
 import IntroPage from './pages/Intro/IntroPage.tsx';
 import EventPage from './pages/Event/EventPage.tsx';
 import HomePage from './pages/HomePage.tsx';
@@ -14,10 +14,11 @@ import UnifiedreservationPage from './pages/Reservation/UnifiedreservationPage.t
 import EventAdd from './pages/Event/EventAddPage.tsx';
 import ReservationProfile from './pages/Reservation/ReservationProfile.tsx';
 import AdminPage from './pages/Admin/AdminPage.tsx';
-import RankedEditPage from './pages/Admin/RankeditPage.tsx';
+import RankedEditPage from './pages/Admin/RankeditPageDnD.tsx';
+import RankParticipantPage from './pages/Admin/RankParticipantPage.tsx';
 import PostEditPage from './pages/Admin/PostEditPage.tsx';
 import LeadereditPage from './pages/Admin/LeadereditPage.tsx';
-import LoginApprove from './pages/Admin/Loginapprovepage.tsx';
+import LoginApprove from './pages/Admin/LoginApprovePage.tsx';
 import AdminRoleManager from './pages/Admin/AdminRoleManager.tsx';
 import MajorManagePage from './pages/Admin/MajorManagePage.tsx';
 import './App.css';
@@ -64,6 +65,7 @@ function App() {
                 <Route path="/admin/login-approve" element={<LoginApprove />} />
                 <Route path="/admin/manage" element={<AdminRoleManager />} />
                 <Route path="/admin/rank-edit" element={<RankedEditPage />} />
+                <Route path="/admin/rank-participant" element={<RankParticipantPage />} />
                 <Route path="/admin/post-edit" element={<PostEditPage />} />
                 <Route path="/admin/leader-edit" element={<LeadereditPage />} />
                 <Route path="/admin/major-manage" element={<MajorManagePage />} />
