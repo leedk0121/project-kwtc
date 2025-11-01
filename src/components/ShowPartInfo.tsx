@@ -35,13 +35,13 @@ function ShowPartInfo({ partInfo, onClose }: ShowPartInfoProps) {
         <div className="part-info-modal-date">{partInfo.date}</div>
         <ul>
           <li className="part-info-modal-info-item">
-            {hostName}님의 코트 - {partInfo.where} {partInfo.court_number} 번
+            {hostName}님의 코트 - {partInfo.where} : {partInfo.court_number}번 코트 
           </li>
         </ul>
 
         <div className='part-info-modal-info'>
           <div className="part-info-modal-info-item">
-            &#9654; {partInfo.start_time?.slice(0, 5)} ~ {partInfo.end_time?.slice(0, 5)}
+            &#9654; 시간: {partInfo.start_time?.slice(0, 5)} ~ {partInfo.end_time?.slice(0, 5)}
           </div>
 
           {partInfo.min_tier !== null && (
@@ -90,7 +90,6 @@ function ShowPartInfo({ partInfo, onClose }: ShowPartInfoProps) {
           </button>
           <button
             className="part-info-modal-cancel-btn"
-            style={{ marginLeft: '12px' }}
             onClick={handleCancel}
             disabled={loading}
           >

@@ -1,76 +1,279 @@
-.part-info-modal-info-item {
-    margin-bottom: 8px;
-}
-.part-info-modal-cancel-btn {
-    background: #fff;
-    color: #d32f2f;
-    border: 2px solid #d32f2f;
-    border-radius: 8px;
-    padding: 6px 32px;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: background 0.2s, color 0.2s, border 0.2s;
-}
-.part-info-modal-cancel-btn:hover {
-    background: #ffdada;
-    color: #b71c1c;
-    border-color: #b71c1c;
-}
-.part-info-modal-bottom-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 32px;
-}
-
-.part-info-modal-participate-btn {
-    background: #1976d2;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 32px;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: background 0.2s;
-}
-.part-info-modal-participate-btn:hover {
-    background: #1565c0;
-}
+/* 모달 오버레이 */
 .part-info-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 모달 컨텐츠 */
 .part-info-modal-content {
-    background: #fff;
-    padding: 16px;
-    border-radius: 12px;
-    min-width: 320px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 20px 18px;
+    border-radius: 16px;
+    width: 90vw;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     position: relative;
+    animation: slideUp 0.3s ease-out;
 }
 
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 날짜 헤더 */
 .part-info-modal-date {
-    font-weight: bold;
-    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
+.part-info-modal-date::before {
+    content: '📅';
+    font-size: 20px;
+}
+
+/* 코트 정보 리스트 */
+.part-info-modal-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px 0;
+}
+
+.part-info-modal-content ul li {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.part-info-modal-content ul li::before {
+    content: '🎾';
+    font-size: 16px;
+}
+
+/* 정보 섹션 */
+.part-info-modal-info {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 16px;
+}
+
+.part-info-modal-info-item {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #374151;
+    border-left: 3px solid #3b82f6;
+    transition: all 0.2s ease;
+}
+
+.part-info-modal-info-item:hover {
+    background: #e5e7eb;
+    transform: translateX(4px);
+}
+
+.part-info-modal-info-item:last-child {
+    margin-bottom: 0;
+}
+
+/* 닫기 버튼 */
 .part-info-modal-close-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    background: transparent;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.05);
     border: none;
-    font-size: 24px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #6b7280;
+}
+
+.part-info-modal-close-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* 버튼 컨테이너 */
+.part-info-modal-bottom-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+/* 참여하기 버튼 */
+.part-info-modal-participate-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+    width: 140px;
+}
+
+.part-info-modal-participate-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.part-info-modal-participate-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.part-info-modal-participate-btn:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 취소 버튼 */
+.part-info-modal-cancel-btn {
+    background: #fff;
+    color: #ef4444;
+    border: 2px solid #ef4444;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.1);
+    transition: all 0.3s ease;
+    width: 140px;
+}
+
+.part-info-modal-cancel-btn:hover:not(:disabled) {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+.part-info-modal-cancel-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.part-info-modal-cancel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 768px) {
+    .part-info-modal-content {
+        padding: 18px 16px;
+        border-radius: 14px;
+        width: 95vw;
+    }
+
+    .part-info-modal-date {
+        font-size: 16px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+    }
+
+    .part-info-modal-date::before {
+        font-size: 18px;
+    }
+
+    .part-info-modal-content ul li {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .part-info-modal-content ul li::before {
+        font-size: 14px;
+    }
+
+    .part-info-modal-info {
+        padding: 12px;
+    }
+
+    .part-info-modal-info-item {
+        padding: 7px 10px;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .part-info-modal-bottom-center {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .part-info-modal-participate-btn,
+    .part-info-modal-cancel-btn {
+        max-width: 100%;
+        width: 100%;
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+
+    .part-info-modal-close-btn {
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        font-size: 15px;
+    }
 }

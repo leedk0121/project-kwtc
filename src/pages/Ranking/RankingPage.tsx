@@ -94,6 +94,7 @@ function RankingPage() {
                                           <div
                                             key={user.id}
                                             className="member-card top-rank"
+                                            data-rank={user.rank_all}
                                             onClick={() => openProfile(user.id)}
                                             style={{ cursor: 'pointer' }}
                                           >

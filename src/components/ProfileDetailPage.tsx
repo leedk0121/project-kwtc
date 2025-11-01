@@ -101,7 +101,15 @@ function ProfileDetailPage({ id }: ProfileDetailPageProps) {
 
                 {/* Basic Info */}
                 <div className="profile-detail-basic-info">
-                    <h1 className="profile-detail-name">{profile.name}</h1>
+                    <div className="profile-detail-name-row">
+                        {profile.position && (
+                            <div className="profile-detail-position-badge">
+                                <span className="position-icon">{profile.leader_icon || '👑'}</span>
+                                <span className="position-text">{profile.position}</span>
+                            </div>
+                        )}
+                        <h1 className="profile-detail-name">{profile.name}</h1>
+                    </div>
                     <p className="profile-detail-major">{profile.major}</p>
                     <p className="profile-detail-student-id">학번: {profile.stnum}</p>
                 </div>

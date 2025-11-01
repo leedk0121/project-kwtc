@@ -60,10 +60,24 @@ function Showmember() {
                 ))}
             </ul>
             {modalVisible && (
-                <div className="showmember-modal-bg" style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.4)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                    <div className="showmember-modal-content" style={{background:'#fff',padding:'32px',borderRadius:'16px',position:'relative',maxWidth:'600px',width:'90vw',maxHeight:'90vh',overflowY:'auto'}}>
-                        <button style={{position:'absolute',top:12,right:12,fontSize:'1.5rem',background:'none',border:'none',cursor:'pointer'}} onClick={() => setModalVisible(false)}>×</button>
-                        <ProfileDetailPage id={selectedMemberId} />
+                <div
+                    className="profile-modal-overlay"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setModalVisible(false);
+                        }
+                    }}
+                >
+                    <div className="profile-modal-container">
+                        <button
+                            className="profile-modal-close"
+                            onClick={() => setModalVisible(false)}
+                        >
+                            ×
+                        </button>
+                        <div className="profile-modal-content">
+                            <ProfileDetailPage id={selectedMemberId} />
+                        </div>
                     </div>
                 </div>
             )}

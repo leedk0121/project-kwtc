@@ -252,11 +252,65 @@
   width: 100%;
 }
 
+.profile-detail-name-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 6px;
+  min-height: 36px;
+}
+
 .profile-detail-name {
   font-size: 24px;
   font-weight: 700;
   color: #2d3748 !important; /* 0f0f23 → 2d3748로 더 연하게 */
-  margin: 0 0 6px 0;
+  margin: 0;
+  grid-column: 2;
+}
+
+/* Position Badge */
+.profile-detail-position-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  animation: positionShine 2s ease-in-out infinite;
+  grid-column: 1;
+  justify-self: end;
+  margin-right: 10px;
+}
+
+.position-icon {
+  font-size: 16px;
+  animation: positionBounce 1.5s ease-in-out infinite;
+}
+
+.position-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes positionShine {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(251, 191, 36, 0.6);
+  }
+}
+
+@keyframes positionBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 .profile-detail-major {

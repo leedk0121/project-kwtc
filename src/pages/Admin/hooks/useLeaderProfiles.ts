@@ -14,6 +14,7 @@ export interface LeaderProfile {
   position: string;
   position_description: string;
   order_num: number;
+  leader_icon?: string;
 }
 
 export interface LeaderProfileWithDetails extends LeaderProfile {
@@ -43,7 +44,7 @@ export function useLeaderProfiles() {
     try {
       const { data, error } = await supabase
         .from('leader_profile')
-        .select('user_id, position, position_description, order_num')
+        .select('user_id, position, position_description, order_num, leader_icon')
         .order('order_num', { ascending: true });
 
       if (error) throw error;
@@ -67,7 +68,8 @@ export function useLeaderProfiles() {
     userId: string,
     position: string,
     positionDescription: string,
-    orderNum: number
+    orderNum: number,
+    leaderIcon?: string
   ) => {
     try {
       const { data, error } = await supabase
@@ -76,9 +78,10 @@ export function useLeaderProfiles() {
           user_id: userId,
           position,
           position_description: positionDescription,
-          order_num: orderNum
+          order_num: orderNum,
+          leader_icon: leaderIcon || null
         }])
-        .select('user_id, position, position_description, order_num');
+        .select('user_id, position, position_description, order_num, leader_icon');
 
       if (error) throw error;
 

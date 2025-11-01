@@ -24,7 +24,8 @@ const LeadereditPage: React.FC = () => {
   const [newRole, setNewRole] = useState({
     position: '',
     position_description: '',
-    order_num: 1
+    order_num: 0,
+    leader_icon: ''
   });
 
   useEffect(() => {
@@ -55,15 +56,21 @@ const LeadereditPage: React.FC = () => {
       return;
     }
 
+    if (!newRole.order_num || newRole.order_num < 1) {
+      alert('표시 순서를 입력해주세요. (1 이상의 숫자)');
+      return;
+    }
+
     const result = await addLeaderRole(
       selectedMember.id,
       newRole.position,
       newRole.position_description,
-      newRole.order_num
+      newRole.order_num,
+      newRole.leader_icon
     );
 
     if (result.success) {
-      setNewRole({ position: '', position_description: '', order_num: 1 });
+      setNewRole({ position: '', position_description: '', order_num: 0, leader_icon: '' });
       setSelectedMember(null);
       setSearchTerm('');
       setShowAddRoleForm(false);
@@ -80,7 +87,7 @@ const LeadereditPage: React.FC = () => {
   };
 
   const handleCancelAddRole = () => {
-    setNewRole({ position: '', position_description: '', order_num: 1 });
+    setNewRole({ position: '', position_description: '', order_num: 0, leader_icon: '' });
     setSelectedMember(null);
     setSearchTerm('');
     setShowAddRoleForm(false);
@@ -158,12 +165,32 @@ const LeadereditPage: React.FC = () => {
             <input
               className="leader-edit-input"
               type="number"
-              value={newRole.order_num}
-              onChange={(e) => setNewRole({ ...newRole, order_num: parseInt(e.target.value) || 1 })}
-              placeholder="표시 순서 (숫자가 낮을수록 위에 표시)"
+              value={newRole.order_num || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                setNewRole({ ...newRole, order_num: value === '' ? 0 : parseInt(value) });
+              }}
+              placeholder="표시 순서를 입력하세요"
               min="1"
             />
             <small className="leader-edit-input-help">숫자가 낮을수록 임원진 목록에서 위쪽에 표시됩니다.</small>
+          </div>
+
+          <div className="leader-edit-form-group">
+            <label className="leader-edit-label">리더 아이콘</label>
+            <input
+              className="leader-edit-input"
+              type="text"
+              value={newRole.leader_icon}
+              onChange={(e) => setNewRole({ ...newRole, leader_icon: e.target.value })}
+              placeholder="이모지 입력 (예: 👑, 🎯, ⚡)"
+            />
+            <small className="leader-edit-input-help">프로필에 표시될 아이콘 이모지를 입력하세요.</small>
+            {newRole.leader_icon && (
+              <div className="leader-edit-icon-preview">
+                미리보기: <span className="leader-edit-icon-large">{newRole.leader_icon}</span>
+              </div>
+            )}
           </div>
 
           <div className="leader-edit-form-group">

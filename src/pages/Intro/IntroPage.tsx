@@ -1,6 +1,7 @@
 import "./styles/intro-shared.css";
 import { useState, useEffect } from "react";
 import Showmember from '../../components/Showmember';
+import ProfileDetailPage from '../../components/ProfileDetailPage';
 import { useLeaders } from './hooks';
 import { getPositionBadgeClass, CLUB_INFO } from './utils';
 
@@ -8,6 +9,7 @@ type TabType = "club" | "leader" | "member";
 
 function IntroPage() {
     const [selected, setSelected] = useState<TabType>("club");
+    const [selectedLeaderId, setSelectedLeaderId] = useState<string | null>(null);
     const { leaders, loading, fetchLeaders } = useLeaders();
 
     useEffect(() => {
@@ -147,7 +149,12 @@ function IntroPage() {
                             ) : (
                                 <div className="leader-grid">
                                     {leaders.map((leader) => (
-                                        <div key={leader.user_id} className="leader-item">
+                                        <div
+                                            key={leader.user_id}
+                                            className="leader-item"
+                                            onClick={() => setSelectedLeaderId(leader.user_id)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             <div className="leader-avatar">
                                                 <img
                                                     src={leader.profile?.image_url || "https://via.placeholder.com/80"}
@@ -164,9 +171,6 @@ function IntroPage() {
                                                 <h4 className="leader-name">
                                                     {leader.profile?.name || '이름 없음'}
                                                 </h4>
-                                                <p className="leader-major">
-                                                    {leader.profile?.major || '전공 정보 없음'}
-                                                </p>
                                                 <p className="leader-description">
                                                     {leader.position_description || '설명이 없습니다.'}
                                                 </p>
@@ -198,6 +202,30 @@ function IntroPage() {
                     </div>
                 )}
             </div>
+
+            {/* 프로필 모달 */}
+            {selectedLeaderId && (
+                <div
+                    className="profile-modal-overlay"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setSelectedLeaderId(null);
+                        }
+                    }}
+                >
+                    <div className="profile-modal-container">
+                        <button
+                            className="profile-modal-close"
+                            onClick={() => setSelectedLeaderId(null)}
+                        >
+                            ×
+                        </button>
+                        <div className="profile-modal-content">
+                            <ProfileDetailPage id={selectedLeaderId} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

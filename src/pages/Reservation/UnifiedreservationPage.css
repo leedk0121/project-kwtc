@@ -2,6 +2,7 @@ body, html {
   width: 100vw;
   height: 100vh;
   overflow: auto; /* 페이지 전체에 스크롤바 표시 */
+  background-color: white !important;
 }
 
 .unified-reservation-container {

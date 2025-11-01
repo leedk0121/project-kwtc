@@ -1,5 +1,6 @@
 import './HomePage.css';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import HeaderRegister from '../components/HeaderRegister';
 
 interface NavLink {
@@ -16,6 +17,16 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 function HomePage() {
+  useEffect(() => {
+    // 홈 화면에서 스크롤 비활성화
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      // 다른 페이지로 이동 시 스크롤 복원
+      document.body.style.overflow = 'visible';
+    };
+  }, []);
+
   return (
     <div className="page_home">
       <img

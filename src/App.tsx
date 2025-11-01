@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Header from './Header';
+import ScrollToTop from './components/ScrollToTop';
 import BoardPage from './pages/Board/BoardPage';
 import RankingPage from './pages/Ranking/RankingPage';
 import IntroPage from './pages/Intro/IntroPage';
@@ -37,8 +39,38 @@ function LayoutWithHeader({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+    useEffect(() => {
+        // body의 unresolved 속성 제거 및 스크롤 강제 활성화
+        const enableScroll = () => {
+            document.body.removeAttribute('unresolved');
+            document.body.style.overflow = 'visible';
+            document.body.style.position = 'static';
+            document.documentElement.style.overflow = 'visible';
+        };
+
+        // 즉시 실행
+        enableScroll();
+
+        // MutationObserver로 속성 변경 감지 및 자동 제거
+        const observer = new MutationObserver(() => {
+            if (document.body.hasAttribute('unresolved')) {
+                enableScroll();
+            }
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['unresolved']
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
+
     return (
         <Router>
+            <ScrollToTop />
             <Routes>
                 {/* 홈페이지 - 레이아웃 없음 */}
                 <Route path="/" element={<HomePage />} />

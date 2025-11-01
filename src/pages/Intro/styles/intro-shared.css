@@ -54,12 +54,20 @@
    ============================================ */
 .intro-navigation {
   position: sticky;
-  top: 200px;
+  top: var(--total-header-height, 200px);
   background: var(--color-white);
   box-shadow: var(--shadow-md);
   z-index: 100;
   padding: 0;
   border-bottom: 1px solid var(--color-border);
+  transition: top 0.3s ease;
+}
+
+/* 모바일에서는 헤더 높이에 맞춰 조정 */
+@media (max-width: 768px) {
+  .intro-navigation {
+    top: calc(var(--header-height-mobile-scrolled, 120px) + var(--safe-area-top, 0px));
+  }
 }
 
 .nav-container {
@@ -365,6 +373,16 @@
 
 .leader-card {
   background: var(--color-white);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(165, 42, 42, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(165, 42, 42, 0.03) 0%, transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(165, 42, 42, 0.02) 2px,
+      rgba(165, 42, 42, 0.02) 4px
+    );
   border-radius: var(--radius-xl);
   padding: var(--spacing-2xl);
   box-shadow: var(--shadow-lg);
@@ -405,17 +423,20 @@
 }
 
 .leader-item {
-  background: var(--color-bg);
+  background: var(--color-white);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   text-align: center;
   transition: var(--transition-base);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .leader-item:hover {
   transform: translateY(-8px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 4px 8px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-primary);
+  border-width: 2px;
 }
 
 /* Leader Avatar */
@@ -426,8 +447,8 @@
 }
 
 .leader-avatar img {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--color-white);
@@ -474,24 +495,24 @@
 
 /* Leader Info */
 .leader-name {
-  margin: 0 0 6px 0;
-  font-size: 18px;
-  font-weight: 600;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--color-text-primary);
-}
-
-.leader-major {
-  margin: 0 0 var(--spacing-md) 0;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
 }
 
 .leader-description {
   margin: 0;
   font-size: 14px;
   color: var(--color-text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+.leader-major {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
 /* ============================================
@@ -499,6 +520,21 @@
    ============================================ */
 .member-section {
   animation: fadeInUp 0.6s ease-out;
+  background: var(--color-white);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(165, 42, 42, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(165, 42, 42, 0.03) 0%, transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(165, 42, 42, 0.02) 2px,
+      rgba(165, 42, 42, 0.02) 4px
+    );
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
 }
 
 .member-header {
@@ -593,6 +629,10 @@
   }
 
   .leader-card {
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .member-section {
     padding: var(--spacing-xl) var(--spacing-lg);
   }
 
@@ -695,5 +735,81 @@
 
   .club-tagline {
     font-size: 16px;
+  }
+}
+
+/* ============================================
+   Profile Modal
+   ============================================ */
+.profile-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-modal-container {
+  background: #fff;
+  padding: 32px;
+  border-radius: 16px;
+  position: relative;
+  max-width: 600px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.profile-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.profile-modal-close:hover {
+  color: #333;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.profile-modal-content {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .profile-modal-container {
+    width: 95vw;
+    padding: 24px;
+  }
+
+  .profile-modal-close {
+    top: 8px;
+    right: 8px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-modal-container {
+    width: 98vw;
+    padding: 20px;
+    border-radius: 12px;
   }
 }

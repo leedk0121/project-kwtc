@@ -1,14 +1,52 @@
 import './Header.css';
 import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import HeaderRegister from './components/HeaderRegister.tsx';
 
-function Header() { 
+function Header() {
     const location = useLocation();
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const width = window.innerWidth;
+            const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+
+            if (width <= 768) { // 모바일 환경
+                if (scrollY > 10) {
+                    setIsScrolled(true);
+                } else {
+                    setIsScrolled(false);
+                }
+            } else {
+                setIsScrolled(false); // 데스크톱에서는 항상 false
+            }
+        };
+
+        // 초기 실행
+        handleScroll();
+
+        // 여러 방식으로 스크롤 이벤트 감지
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        document.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            document.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
+    }, []);
+
+    // location 변경 시 스크롤 위치 리셋
+    useEffect(() => {
+        setIsScrolled(false);
+    }, [location.pathname]);
 
     let pageText = '';
     if (location.pathname.startsWith('/board')) {
         pageText = 'BOARD';
-    } 
+    }
     else if (location.pathname.startsWith('/event')) {
         pageText = 'PARTICIPATE';
     } else {
@@ -37,7 +75,7 @@ function Header() {
     }
 
     return (
-        <div className='header_container'>
+        <div className={`header_container ${isScrolled ? 'scrolled' : ''}`}>
             <div className='content_container'>
                 <img src='kwtc_initial_logo.png' className='logo' />
                 <div className="background_circle"></div>
@@ -57,7 +95,7 @@ function Header() {
                     {pageText === 'EDIT' && <span className="page_edit">EDIT</span>}
                 </div>
             </div>
-            <div className='Link_container'>
+            <div className={`Link_container ${isScrolled ? 'hidden' : ''}`}>
                 <Link className='action_link' id='board_button' to="/board">게시판</Link>
                 <Link className='action_link' id='ranking_button' to="/ranking">랭킹</Link>
                 <Link className='action_link' id='intro_button' to="/intro">소개</Link>

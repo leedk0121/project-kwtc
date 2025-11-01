@@ -1,17 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
 
+/* CSS 변수 정의 - 전역 높이 관리 */
+:root {
+    --header-height: 200px;
+    --header-height-mobile-scrolled: 120px;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+    --total-header-height: calc(var(--header-height) + var(--safe-area-top));
+}
+
 /* 모바일 스크롤 개선 - 전역 설정 */
 html {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     margin: 0;
     padding: 0;
+    /* 아이폰 safe area 배경색 설정 */
+    background-color: #A52A2A;
 }
 
 body {
     -webkit-overflow-scrolling: touch;
     margin: 0;
     padding: 0;
+    /* 아이폰 safe area padding 적용 */
+    padding-top: var(--safe-area-top);
+    padding-bottom: var(--safe-area-bottom);
+    /* 상단 배경색은 헤더 색상 */
+    background-color: #A52A2A;
+    /* 최소 높이를 뷰포트 높이로 설정 */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
 }
 
 .page_content {
