@@ -9,14 +9,14 @@ export function useTierScroll(tiersLength: number) {
   const scrollToTier = useCallback((tierIdx: number) => {
     const ref = tierRefs.current[tierIdx];
     if (ref) {
-      ref.scrollIntoView({ behavior: 'smooth' });
+      ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, []);
 
   const scrollToTerini = useCallback(() => {
     const terinSection = document.querySelector('.terini-section');
     if (terinSection) {
-      terinSection.scrollIntoView({ behavior: 'smooth' });
+      terinSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, []);
 

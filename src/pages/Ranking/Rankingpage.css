@@ -3,6 +3,7 @@
   background: linear-gradient(135deg, rgba(165, 42, 42, 0.1) 0%, rgba(139, 0, 0, 0.05) 100%);
   font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
   padding: 0;
+  padding-bottom: 40px;
 }
 
 .ranking-header {
@@ -145,6 +146,7 @@
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  scroll-margin-top: 290px; /* 헤더(200px) + 네비게이션 바 + 여유 공간 */
 }
 
 .tier-section:last-child {

@@ -582,6 +582,7 @@
 .event-add-form input[type="number"],
 .event-add-form select {
   width: 100%;
+  max-width: 100%;
   padding: var(--spacing-md) var(--spacing-md);
   border: 1px solid #d1d5db;
   border-radius: var(--radius-sm);
@@ -638,7 +639,8 @@
   background: var(--color-bg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .event-add-time-row select {
@@ -926,13 +928,22 @@
   }
 
   .event-add-time-row {
-    gap: 6px;
-    padding: var(--spacing-md);
+    gap: 4px;
+    padding: var(--spacing-sm);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .event-add-time-row select {
-    width: 70px;
-    padding: var(--spacing-sm) 6px;
+    width: 60px;
+    min-width: 60px;
+    padding: var(--spacing-sm) 4px;
+    font-size: 13px;
+  }
+
+  .event-add-time-row span {
+    font-size: 14px;
   }
 
   .event-add-options-row {
