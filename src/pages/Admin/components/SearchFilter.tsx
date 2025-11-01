@@ -19,22 +19,22 @@ export function SearchFilter({
   placeholder = '이름, 이메일, 학과, 학번으로 검색...'
 }: SearchFilterProps) {
   return (
-    <div className="search-filter-container">
-      <div className="search-box">
+    <div className="admin-search-filter-container">
+      <div className="admin-search-box">
         <input
           type="text"
           placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="search-input"
+          className="admin-search-input"
         />
       </div>
 
-      <div className="filter-buttons">
+      <div className="admin-filter-buttons">
         {filterOptions.map((option) => (
           <button
             key={option.value}
-            className={`filter-btn ${filterType === option.value ? 'active' : ''}`}
+            className={`admin-filter-btn ${filterType === option.value ? 'active' : ''}`}
             onClick={() => onFilterChange(option.value)}
           >
             {option.label}

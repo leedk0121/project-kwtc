@@ -27,8 +27,8 @@ export function UserTable({
 }: UserTableProps) {
   if (loading) {
     return (
-      <div className="table-loading">
-        <div className="spinner"></div>
+      <div className="admin-table-loading">
+        <div className="admin-spinner"></div>
         <p>데이터를 불러오는 중...</p>
       </div>
     );
@@ -36,7 +36,7 @@ export function UserTable({
 
   if (users.length === 0) {
     return (
-      <div className="table-empty">
+      <div className="admin-table-empty">
         <p>{emptyMessage}</p>
       </div>
     );
@@ -50,8 +50,8 @@ export function UserTable({
   };
 
   return (
-    <div className="user-table-wrapper">
-      <table className="user-table">
+    <div className="admin-user-table-wrapper">
+      <table className="admin-user-table">
         <thead>
           <tr>
             {columns.map((column, index) => (
@@ -63,27 +63,28 @@ export function UserTable({
                 {column.header}
               </th>
             ))}
-            {actions && <th className="actions-header">작업</th>}
+            {actions && <th className="admin-actions-header">작업</th>}
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
             <tr
               key={user.id}
-              className={updatingId === user.id ? 'updating' : ''}
+              className={updatingId === user.id ? 'admin-updating' : ''}
             >
               {columns.map((column, index) => (
                 <td
                   key={index}
                   className={column.className}
+                  data-label={column.header}
                 >
                   {getCellValue(user, column)}
                 </td>
               ))}
               {actions && (
-                <td className="actions-cell">
+                <td className="admin-actions-cell" data-label="작업">
                   {updatingId === user.id ? (
-                    <div className="action-spinner"></div>
+                    <div className="admin-action-spinner"></div>
                   ) : (
                     actions(user)
                   )}

@@ -7,7 +7,21 @@
       "Bash(git add:*)",
       "Bash(git rm:*)",
       "Bash(awk:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git mv:*)",
+      "Bash(find:*)",
+      "Bash(while read f)",
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(for css in AdminPage.css LeadereditPage.css MajorManagePage.css PostEditPage.css RankeditPage.css RankeditPageDnD.css RankParticipantPage.css)",
+      "Bash(do if [ -f \"src/pages/Admin/$css\" ])",
+      "Bash(then echo \"✓ $css\")",
+      "Bash(else echo \"✗ $css NOT FOUND\")",
+      "Bash(fi)",
+      "Bash(for dir in Board Event Intro Ranking Vote)",
+      "Bash(do echo \"=== $dir ===\")",
+      "Bash(ls:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

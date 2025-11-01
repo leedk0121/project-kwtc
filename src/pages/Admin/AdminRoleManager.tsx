@@ -85,7 +85,7 @@ function AdminRoleManager() {
     {
       header: '권한',
       accessor: (user: AdminUser) => (
-        <span className={user.is_admin ? 'badge badge-admin' : 'badge'}>
+        <span className={user.is_admin ? 'admin-badge admin-badge-admin' : 'admin-badge'}>
           {user.is_admin ? '👑 관리자' : '일반 사용자'}
         </span>
       ),
@@ -98,18 +98,18 @@ function AdminRoleManager() {
       title="👑 관리자 권한 관리"
       subtitle="사용자의 관리자 권한 부여 및 해제"
     >
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-value">{stats.total}</div>
-          <div className="stat-label">전체 사용자</div>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-value">{stats.total}</div>
+          <div className="admin-stat-label">전체 사용자</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.admins}</div>
-          <div className="stat-label">관리자</div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-value">{stats.admins}</div>
+          <div className="admin-stat-label">관리자</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.users}</div>
-          <div className="stat-label">일반 사용자</div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-value">{stats.users}</div>
+          <div className="admin-stat-label">일반 사용자</div>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ function AdminRoleManager() {
         emptyMessage="조건에 맞는 사용자가 없습니다."
         actions={(user) => (
           <button
-            className={user.is_admin ? 'action-btn action-btn-danger' : 'action-btn action-btn-primary'}
+            className={user.is_admin ? 'admin-action-btn admin-action-btn-danger' : 'admin-action-btn admin-action-btn-primary'}
             onClick={() => handleToggleAdmin(user)}
             disabled={updating === user.id}
           >

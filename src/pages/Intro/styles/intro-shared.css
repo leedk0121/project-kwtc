@@ -54,7 +54,7 @@
    ============================================ */
 .intro-navigation {
   position: sticky;
-  top: 0;
+  top: 198px;
   background: var(--color-white);
   box-shadow: var(--shadow-md);
   z-index: 100;

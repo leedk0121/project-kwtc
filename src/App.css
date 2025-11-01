@@ -11,10 +11,8 @@ body {
 }
 
 .page_content {
-    height: calc(100vh - 200px);
-    overflow-y: auto;
+    min-height: calc(100vh - 200px);
     font-family: 'Noto Sans KR', sans-serif;
-    -webkit-overflow-scrolling: touch;
 }
 
 /* 전역 폰트 설정 (선택사항) */

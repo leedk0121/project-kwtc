@@ -106,7 +106,7 @@ function PostEditPage() {
 
   if (loading) {
     return (
-      <div className="postedit-container">
+      <div className="admin-postedit-container">
         <LoadingSpinner message="게시글을 불러오는 중..." />
       </div>
     );
@@ -118,30 +118,30 @@ function PostEditPage() {
       subtitle={`총 ${posts.length}개의 게시글`}
       backPath="/admin"
     >
-      <div className="postedit-controls">
-        <form onSubmit={handleSearch} className="search-form">
+      <div className="admin-postedit-controls">
+        <form onSubmit={handleSearch} className="admin-search-form">
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="제목으로 검색..."
-            className="search-input"
+            className="admin-search-input"
           />
-          <button type="submit" className="search-btn">🔍 검색</button>
+          <button type="submit" className="admin-search-btn">🔍 검색</button>
         </form>
 
-        <div className="action-buttons">
+        <div className="admin-action-buttons">
           <button
             type="button"
             onClick={handleSelectAll}
-            className="select-all-btn"
+            className="admin-select-all-btn"
           >
             {isAllSelected ? '✓ 전체 해제' : '☑ 전체 선택'}
           </button>
           <button
             type="button"
             onClick={handleDelete}
-            className="delete-btn"
+            className="admin-delete-btn"
             disabled={checkedIds.length === 0}
           >
             🗑️ 삭제 ({checkedIds.length})
@@ -150,19 +150,19 @@ function PostEditPage() {
       </div>
 
       {posts.length === 0 ? (
-        <div className="empty-state">
+        <div className="admin-empty-state">
           <p>게시글이 없습니다.</p>
         </div>
       ) : (
-        <div className="posts-list">
+        <div className="admin-posts-list">
           {posts.map(post => {
             const typeInfo = getPostTypeLabel(post.post_type);
             return (
               <div
                 key={post.id}
-                className={`post-card ${checkedIds.includes(post.id) ? 'selected' : ''}`}
+                className={`admin-post-card ${checkedIds.includes(post.id) ? 'selected' : ''}`}
               >
-                <div className="post-checkbox">
+                <div className="admin-post-checkbox">
                   <input
                     type="checkbox"
                     checked={checkedIds.includes(post.id)}
@@ -172,11 +172,11 @@ function PostEditPage() {
                   <label htmlFor={`check-${post.id}`}></label>
                 </div>
 
-                <div className="post-content">
-                  <div className="post-header">
-                    <h3 className="post-title">{post.title}</h3>
+                <div className="admin-post-content">
+                  <div className="admin-post-header">
+                    <h3 className="admin-post-title">{post.title}</h3>
                     <span
-                      className="post-type-badge"
+                      className="admin-post-type-badge"
                       style={{
                         background: `${typeInfo.color}15`,
                         color: typeInfo.color,
@@ -187,11 +187,11 @@ function PostEditPage() {
                     </span>
                   </div>
 
-                  <div className="post-meta">
-                    <span className="meta-item">
+                  <div className="admin-post-meta">
+                    <span className="admin-meta-item">
                       👤 {post.user_name}
                     </span>
-                    <span className="meta-item">
+                    <span className="admin-meta-item">
                       📅 {new Date(post.created_at).toLocaleDateString('ko-KR', {
                         year: 'numeric',
                         month: 'long',

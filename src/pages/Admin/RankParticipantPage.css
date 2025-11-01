@@ -7,12 +7,13 @@
 .rank-participant-notice {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  font-size: 14px;
-  line-height: 1.8;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  padding: 1em 1.5em;
+  border-radius: 0.75em;
+  margin-bottom: 1.5em;
+  font-size: 0.875em;
+  line-height: 1.6;
+  box-shadow: 0 0.25em 0.75em rgba(102, 126, 234, 0.3);
+  word-break: keep-all;
 }
 
 .rank-participant-notice strong {
@@ -66,11 +67,13 @@
 
 .rank-participant-search-input {
   width: 100%;
+  max-width: 100%;
   padding: 12px 40px 12px 16px;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .rank-participant-search-input:focus {
@@ -290,40 +293,129 @@
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .rank-participant-container {
-    padding: 16px;
+    padding: 10px;
+  }
+
+  .rank-participant-notice {
+    padding: 0.75em 0.875em;
+    font-size: 0.75em;
+    margin-bottom: 1em;
+    line-height: 1.5;
+  }
+
+  .rank-participant-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    margin-bottom: 16px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .rank-participant-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rank-participant-tab {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    font-size: 15px;
+    white-space: nowrap;
   }
 
   .rank-participant-actions {
     flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
   .rank-participant-search {
     width: 100%;
+    min-width: auto;
+  }
+
+  .rank-participant-search-input {
+    padding: 14px 40px 14px 16px;
+    font-size: 16px;
   }
 
   .rank-participant-action-buttons {
     width: 100%;
     flex-direction: column;
+    gap: 10px;
   }
 
   .rank-participant-select-all-btn,
   .rank-participant-add-btn,
   .rank-participant-remove-btn {
     width: 100%;
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+
+  .rank-participant-list {
+    padding: 15px;
+    min-height: 300px;
+  }
+
+  .rank-participant-empty {
+    padding: 60px 20px;
+  }
+
+  .rank-participant-empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .rank-participant-empty p {
+    font-size: 14px;
   }
 
   .rank-participant-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .rank-participant-tabs {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .rank-participant-card {
+    padding: 14px;
+    gap: 10px;
   }
 
-  .rank-participant-tab {
-    flex-shrink: 0;
-    padding: 12px 16px;
-    font-size: 14px;
+  .rank-participant-checkbox input[type='checkbox'] {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rank-participant-image {
+    width: 52px;
+    height: 52px;
+  }
+
+  .rank-participant-name {
+    font-size: 15px;
+  }
+
+  .rank-participant-details {
+    font-size: 13px;
+  }
+
+  .rank-participant-stnum {
+    font-size: 12px;
+  }
+
+  .rank-participant-stats {
+    margin-top: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  /* 터치 친화적인 상호작용 */
+  .rank-participant-card {
+    -webkit-tap-highlight-color: transparent;
+    min-height: 76px;
+  }
+
+  .rank-participant-card:active {
+    transform: scale(0.98);
   }
 }

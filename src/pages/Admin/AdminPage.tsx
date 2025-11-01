@@ -57,14 +57,26 @@ function AdminPage() {
             <div className="admin-header">
                 <h1 className="admin-title">⚙️ 관리자 페이지</h1>
                 <p className="admin-subtitle">시스템 관리 및 설정</p>
+                <p className="admin-contact">
+                    버그 및 기타 문의는{' '}
+                    <a
+                        href="https://www.instagram.com/leedk0121"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-contact-link"
+                    >
+                        @leedk0121
+                    </a>
+                    로 해주세요
+                </p>
             </div>
 
             <div className="admin-menu-grid">
                 {adminMenus.map((menu, index) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className="admin-menu-card"
-                        onClick={() => window.open(menu.path, '_blank')}
+                        onClick={() => navigate(menu.path)}
                         style={{ borderTopColor: menu.color }}
                     >
                         <div className="menu-icon" style={{ background: `${menu.color}15` }}>

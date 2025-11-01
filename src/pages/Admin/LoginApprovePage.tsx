@@ -108,7 +108,7 @@ function LoginApprove() {
     {
       header: '상태',
       accessor: (user: AdminUser) => (
-        <span className={user.approved ? 'badge badge-approved' : 'badge badge-pending'}>
+        <span className={user.approved ? 'admin-badge admin-badge-approved' : 'admin-badge admin-badge-pending'}>
           {user.approved ? '승인됨' : '대기중'}
         </span>
       ),
@@ -126,18 +126,18 @@ function LoginApprove() {
       title="✅ 사용자 승인 관리"
       subtitle="신규 회원 가입 승인 및 사용자 관리"
     >
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-value">{stats.total}</div>
-          <div className="stat-label">전체 사용자</div>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-value">{stats.total}</div>
+          <div className="admin-stat-label">전체 사용자</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.approved}</div>
-          <div className="stat-label">승인된 사용자</div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-value">{stats.approved}</div>
+          <div className="admin-stat-label">승인된 사용자</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.pending}</div>
-          <div className="stat-label">대기중인 사용자</div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-value">{stats.pending}</div>
+          <div className="admin-stat-label">대기중인 사용자</div>
         </div>
       </div>
 
@@ -158,14 +158,14 @@ function LoginApprove() {
         actions={(user) => (
           <>
             <button
-              className={user.approved ? 'action-btn action-btn-secondary' : 'action-btn action-btn-success'}
+              className={user.approved ? 'admin-action-btn admin-action-btn-secondary' : 'admin-action-btn admin-action-btn-success'}
               onClick={() => handleToggleApproval(user)}
               disabled={updating === user.id}
             >
               {user.approved ? '승인 취소' : '승인'}
             </button>
             <button
-              className="action-btn action-btn-danger"
+              className="admin-action-btn admin-action-btn-danger"
               onClick={() => handleDeleteUser(user)}
               disabled={updating === user.id}
             >

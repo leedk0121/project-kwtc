@@ -23,7 +23,7 @@ export function AdminLayout({
       <div className="admin-page-header">
         <div className="header-left">
           <button
-            className="back-btn"
+            className="admin-back-btn"
             onClick={() => navigate(backPath)}
           >
             ← 뒤로

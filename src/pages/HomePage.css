@@ -1,6 +1,9 @@
 .page_home {
     background-color: brown;
-    height: 100vh;
+    min-height: 100vh;
+    min-height: 100dvh; /* 동적 뷰포트 높이 (최신 브라우저) */
+    position: relative;
+    overflow: hidden;
 }
 
 #Homepage-kwtclogo {

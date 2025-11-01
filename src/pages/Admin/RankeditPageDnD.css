@@ -212,40 +212,99 @@
 
 /* 모바일 반응형 */
 @media (max-width: 768px) {
+  .dnd-rankedit-container {
+    padding: 10px;
+  }
+
+  .dnd-rankedit-notice {
+    padding: 14px 16px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
   .dnd-tier-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
   }
 
   .dnd-rankedit-actions {
     flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
   }
 
   .dnd-save-btn,
   .dnd-reset-btn {
     width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+
+  .dnd-tier-container {
+    border-width: 2px;
+  }
+
+  .dnd-tier-header {
+    padding: 14px 16px;
+  }
+
+  .dnd-tier-header h3 {
+    font-size: 16px;
+  }
+
+  .dnd-tier-count {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+
+  .dnd-tier-dropzone {
+    padding: 10px;
+    min-height: 80px;
+  }
+
+  .dnd-empty-tier {
+    min-height: 120px;
+    font-size: 13px;
   }
 
   .dnd-user-card {
-    padding: 10px 12px;
+    padding: 12px 14px;
+    gap: 10px;
+    margin-bottom: 10px;
   }
 
   .dnd-user-image {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .dnd-user-rank {
     min-width: 36px;
     height: 36px;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .dnd-user-name {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .dnd-user-details {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .dnd-drag-handle {
+    font-size: 18px;
+  }
+
+  /* 모바일에서 터치 친화적으로 */
+  .dnd-user-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dnd-user-card:active {
+    transform: scale(0.98);
   }
 }
 

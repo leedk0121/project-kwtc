@@ -23,6 +23,27 @@
   font-size: 18px;
   opacity: 0.9;
   font-weight: 300;
+  margin-bottom: 8px;
+}
+
+.admin-contact {
+  font-size: 14px;
+  opacity: 0.85;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-contact-link {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.admin-contact-link:hover {
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
 }
 
 .admin-menu-grid {
@@ -138,6 +159,10 @@
 
   .admin-subtitle {
     font-size: 14px;
+  }
+
+  .admin-contact {
+    font-size: 12px;
   }
 
   .admin-menu-grid {
