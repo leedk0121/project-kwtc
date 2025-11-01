@@ -52,7 +52,7 @@
 
 .tier-navigation {
   position: sticky;
-  top: 198px;
+  top: 200px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(15px);
   z-index: 1000;
