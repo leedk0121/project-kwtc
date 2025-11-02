@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import './Showpartinfo.css';
 import { useMyTier, useParticipantsInfo, useHostName, useParticipation, type PartInfo } from './ShowPartInfo/hooks';
 import { ParticipantCard } from './ShowPartInfo/components';
@@ -29,13 +30,13 @@ function ShowPartInfo({ partInfo, onClose }: ShowPartInfoProps) {
     return tier ? tier.label : `${tierValue} Tier`;
   };
 
-  return (
+  const modalContent = (
     <div className="part-info-modal-overlay">
       <div className="part-info-modal-content">
         <div className="part-info-modal-date">{partInfo.date}</div>
         <ul>
           <li className="part-info-modal-info-item">
-            {hostName}님의 코트 - {partInfo.where} : {partInfo.court_number}번 코트 
+            {hostName}님의 코트 - {partInfo.where} : {partInfo.court_number}번 코트
           </li>
         </ul>
 
@@ -99,6 +100,8 @@ function ShowPartInfo({ partInfo, onClose }: ShowPartInfoProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 export default ShowPartInfo;

@@ -18,12 +18,16 @@ const NAV_LINKS: NavLink[] = [
 
 function HomePage() {
   useEffect(() => {
-    // 홈 화면에서 스크롤 비활성화
+    // 홈 화면에서 스크롤 비활성화 및 배경색 변경
     document.body.style.overflow = 'hidden';
+    document.body.style.backgroundColor = '#A52A2A';
+    document.documentElement.style.backgroundColor = '#A52A2A';
 
     return () => {
-      // 다른 페이지로 이동 시 스크롤 복원
+      // 다른 페이지로 이동 시 스크롤 복원 및 배경색 복원
       document.body.style.overflow = 'visible';
+      document.body.style.backgroundColor = 'white';
+      document.documentElement.style.backgroundColor = 'white';
     };
   }, []);
 
