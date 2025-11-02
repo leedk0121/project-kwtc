@@ -355,7 +355,7 @@ export default function ReservationProfile() {
         throw new Error('로그인이 필요합니다');
       }
 
-      const PROXY_URL = 'http://kwtc.dothome.co.kr/get_reservation_list.php';
+      const PROXY_URL = 'https://kwtc.dothome.co.kr/get_reservation_list.php';
 
       const response = await fetch(PROXY_URL, {
         method: 'POST',
@@ -638,7 +638,7 @@ export default function ReservationProfile() {
         return;
       }
 
-      const CANCEL_URL = 'http://kwtc.dothome.co.kr/cancel_dobong_reservation.php';
+      const CANCEL_URL = 'https://kwtc.dothome.co.kr/cancel_dobong_reservation.php';
 
       const payload: any = {
         action: 'cancel_reservation',

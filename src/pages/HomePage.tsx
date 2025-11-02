@@ -18,16 +18,20 @@ const NAV_LINKS: NavLink[] = [
 
 function HomePage() {
   useEffect(() => {
-    // 홈 화면에서 스크롤 비활성화 및 배경색 변경
+    // 홈 화면에서만 html, body 배경색을 브라운으로 변경
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalOverflow = document.body.style.overflow;
+
     document.body.style.overflow = 'hidden';
-    document.body.style.backgroundColor = '#A52A2A';
-    document.documentElement.style.backgroundColor = '#A52A2A';
+    document.documentElement.style.setProperty('background-color', '#A52A2A', 'important');
+    document.body.style.setProperty('background-color', '#A52A2A', 'important');
 
     return () => {
-      // 다른 페이지로 이동 시 스크롤 복원 및 배경색 복원
-      document.body.style.overflow = 'visible';
-      document.body.style.backgroundColor = 'white';
-      document.documentElement.style.backgroundColor = 'white';
+      // 다른 페이지로 이동 시 원래대로 복원
+      document.body.style.overflow = originalOverflow || 'visible';
+      document.documentElement.style.backgroundColor = originalHtmlBg || 'white';
+      document.body.style.backgroundColor = originalBodyBg || 'white';
     };
   }, []);
 

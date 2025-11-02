@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { SelectedReservation } from './useReservationSelection';
 import { TennisAccount } from './useReservationAccounts';
 
-const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
+const PROXY_URL = 'https://kwtc.dothome.co.kr/proxy.php';
 
 type ReservationResult = {
   court: string;

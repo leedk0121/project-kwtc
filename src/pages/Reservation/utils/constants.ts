@@ -1,5 +1,5 @@
 // Proxy URL for court crawling
-export const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
+export const PROXY_URL = 'https://kwtc.dothome.co.kr/proxy.php';
 
 // Payment URLs
 export const NOWON_PAYMENT_URL = 'https://reservation.nowonsc.kr/';

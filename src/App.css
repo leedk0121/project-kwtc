@@ -22,7 +22,7 @@ html {
     min-height: 100%;
     overflow-x: hidden;
     /* 기본 배경색은 흰색 */
-    background-color: white !important;
+    background-color: white;
     /* 오버스크롤 방지 */
     overscroll-behavior: none;
 }
@@ -37,9 +37,9 @@ body {
     min-height: -webkit-fill-available;
     /* 아이폰 safe area padding 적용 */
     padding-top: env(safe-area-inset-top);
-    padding-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom);
     /* 기본 배경색은 흰색 */
-    background-color: white !important;
+    background-color: white;
     /* 오버스크롤 방지 */
     overscroll-behavior: none;
     /* 터치 액션 제어 */
@@ -49,7 +49,7 @@ body {
 #root {
     min-height: 100vh;
     min-height: -webkit-fill-available;
-    background-color: white;
+    background-color: transparent;
 }
 
 .page_content {

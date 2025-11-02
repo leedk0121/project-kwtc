@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Reservation, MonthData } from './useReservationData';
 import { TennisAccount } from './useReservationAccounts';
 
-const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
+const PROXY_URL = 'https://kwtc.dothome.co.kr/proxy.php';
 
 export function useCourtCrawler(tennisAccount: TennisAccount) {
   const [crawlProgress, setCrawlProgress] = useState({ current: 0, total: 0 });

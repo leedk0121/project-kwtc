@@ -226,7 +226,7 @@ function UnifiedreservationPage() {
   };
 
   const crawlDobong = async (dateStr: string): Promise<Reservation[]> => {
-    const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
+    const PROXY_URL = 'https://kwtc.dothome.co.kr/proxy.php';
     
     try {
       const response = await fetch(PROXY_URL, {
@@ -958,7 +958,7 @@ function UnifiedreservationPage() {
 
   const handleDobongReservation = async (reservations: SelectedReservation[]) => {
     try {
-      const PROXY_URL = 'http://kwtc.dothome.co.kr/get_rent_no.php';
+      const PROXY_URL = 'https://kwtc.dothome.co.kr/get_rent_no.php';
 
       // Supabase에서 생년월일과 전화번호 가져오기
       const { data: { user } } = await supabase.auth.getUser();

@@ -1,6 +1,6 @@
 // src/services/dobongCrawler.ts
 
-const PROXY_URL = 'http://kwtc.dothome.co.kr/proxy.php';
+const PROXY_URL = 'https://kwtc.dothome.co.kr/proxy.php';
 
 interface DobongCrawlResult {
   success: boolean;
