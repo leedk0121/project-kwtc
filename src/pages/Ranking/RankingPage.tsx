@@ -1,6 +1,5 @@
 import React from "react";
 import ProfileDetailPage from "../../components/ProfileDetailPage";
-import LoadingSpinner from "../../components/LoadingSpinner";
 import "./Rankingpage.css";
 import { useRankingData, useProfileModal, useTierScroll } from './hooks';
 import { TIER_INFO, TIERS, TERINI_TIER, getRankMedal, getDefaultProfileImage } from './utils';
@@ -13,7 +12,10 @@ function RankingPage() {
     if (loading) {
         return (
             <div className="ranking-page">
-                <LoadingSpinner message="랭킹 정보를 불러오는 중..." />
+                <div className="ranking-loading-wrapper">
+                    <div className="ranking-loading-spinner"></div>
+                    <p>랭킹 정보를 불러오는 중...</p>
+                </div>
             </div>
         );
     }

@@ -1,9 +1,41 @@
 .ranking-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(165, 42, 42, 0.1) 0%, rgba(139, 0, 0, 0.05) 100%);
+  background: #EFE4E4;
   font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
   padding: 0;
   padding-bottom: 40px;
+}
+
+/* 로딩 스타일 (게시판과 동일) */
+.ranking-loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #64748b;
+}
+
+.ranking-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-left: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: rankingspin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.ranking-loading-wrapper p {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  color: #64748b;
+}
+
+@keyframes rankingspin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .ranking-header {
@@ -780,7 +812,7 @@
   font-size: 18px;
   font-weight: bold;
   margin-right: 5px;
-  font-family: 'Paperlogy';
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 #member-rank-detail {
@@ -793,7 +825,7 @@
   font-size: 25px;
   font-weight: bold;
   z-index: 1;
-  font-family: 'Paperlogy';
+  font-family: 'Noto Sans KR', sans-serif;
   color: black;
 }
 
@@ -822,12 +854,15 @@
 }
 
 
+/* Paperlogy 폰트 파일에 문제가 있어 주석처리
 @font-face {
     font-family: 'Paperlogy';
-    src: url('../fonts/Paperlogy-8ExtraBold.ttf') format('woff2');
+    src: url('../../fonts/Paperlogy-8ExtraBold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
+*/
 
 .tier-color-bar {
     display: inline-block;
@@ -999,12 +1034,12 @@
 .rank-medal-number {
   position: absolute;
   top: 8px;
-  left: 0;
+  left: 2px;
   width: 100%;
   text-align: center;
   font-weight: 900;
   font-size: 3.2rem;
-  font-family: 'Paperlogy', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Noto Sans KR', 'Segoe UI', Arial, sans-serif;
   letter-spacing: 3px;
   line-height: 1.05;
   z-index: 2;
@@ -1041,6 +1076,7 @@
     0 0 10px #ffe06688,
     0 2px 8px #bfa90044,
     0 0 2px #bfa90044;
+  left: 1px; /* Override general left: 2px for rank 1 */
 }
 
 /* 2등: 은색 그라데이션 + glow + 부드러운 테두리 */

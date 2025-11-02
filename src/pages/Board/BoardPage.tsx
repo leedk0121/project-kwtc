@@ -2,7 +2,7 @@ import {PostList} from "./Postlist";
 
 function BoardPage() {
     return (
-        <div>
+        <div className="board-page">
             <PostList />
         </div>
     );

@@ -69,25 +69,25 @@
 }
 
 .Home_action_link:nth-child(1) {
-    left: 13%;
-    top: 25%;
-    transform: translate(-50%, -50%) rotate(-45deg);
+    left: 16%;
+    top: 20%;
+    transform: translate(-50%, -50%) rotate(-30deg);
 }
 .Home_action_link:nth-child(2) {
     letter-spacing: 10pt;
-    left: 35%;
-    top: 11%;
-    transform: translate(-50%, -50%) rotate(-19deg);
+    left: 40%;
+    top: 10.7%;
+    transform: translate(-50%, -50%) rotate(-11deg);
 }
 .Home_action_link:nth-child(3) {
     letter-spacing: 10pt;
-    left: 65%;
+    left: 64%;
     top: 11%;
-    transform: translate(-50%, -50%) rotate(19deg);
+    transform: translate(-50%, -50%) rotate(13deg);
 }
 .Home_action_link:nth-child(4) {
     letter-spacing: 10pt;
-    left: 87%;
-    top: 25%;
-    transform: translate(-50%, -50%) rotate(45deg);
+    left: 85.5%;
+    top: 21.5%;
+    transform: translate(-50%, -50%) rotate(34deg);
 }

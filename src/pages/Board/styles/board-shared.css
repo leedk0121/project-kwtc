@@ -5,8 +5,23 @@
 
 @import url('../../../styles/shared.css');
 
+/* === Board Page Container === */
+.board-page {
+  min-height: 100vh;
+  background: #EFE4E4;
+  padding: 0;
+  padding-bottom: 40px;
+}
+
 /* === Board List Container === */
 .board-list-container {
+  min-height: 100vh;
+  background: #EFE4E4;
+  padding: 0;
+  padding-bottom: 40px;
+}
+
+.board-list-content {
   max-width: 1000px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-md);
@@ -51,6 +66,9 @@
   gap: var(--spacing-md);
   justify-content: center;
   margin-bottom: var(--spacing-xl);
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md) var(--spacing-xl) var(--spacing-md);
 }
 
 .board-search-toggle-btn,
@@ -92,8 +110,11 @@
   background: var(--color-white);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-md);
+  max-width: 1000px;
+  margin: 0 auto var(--spacing-xl) auto;
+  margin-left: var(--spacing-md);
+  margin-right: var(--spacing-md);
 }
 
 .board-search-form {
