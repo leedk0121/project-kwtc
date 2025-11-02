@@ -5,6 +5,12 @@ body, html {
   background-color: white !important;
 }
 
+/* Reservation 페이지 전체 래퍼 */
+.page_content:has(.unified-reservation-container) {
+  background-color: white !important;
+  padding-bottom: env(safe-area-inset-bottom) !important;
+}
+
 .unified-reservation-container {
   max-width: 100%;
   margin: 11px auto;

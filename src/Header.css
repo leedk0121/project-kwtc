@@ -69,6 +69,8 @@ body {
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+    /* 블러 처리를 위한 isolation 제거 */
+    isolation: auto;
 }
 
 /* 모바일에서 스크롤 시 헤더 축소 */

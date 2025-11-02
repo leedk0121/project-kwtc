@@ -37,7 +37,7 @@ body {
     min-height: -webkit-fill-available;
     /* 아이폰 safe area padding 적용 */
     padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: 0;
     /* 상단 배경색은 헤더 색상 */
     background-color: #A52A2A !important;
     /* 오버스크롤 방지 */
@@ -49,12 +49,14 @@ body {
 #root {
     min-height: 100vh;
     min-height: -webkit-fill-available;
-    background-color: #A52A2A;
+    background-color: transparent;
 }
 
 .page_content {
-    min-height: calc(100vh - 200px);
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
     font-family: 'Noto Sans KR', sans-serif;
+    background-color: white;
 }
 
 /* 전역 폰트 설정 (선택사항) */
