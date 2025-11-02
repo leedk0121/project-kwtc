@@ -743,16 +743,24 @@
    ============================================ */
 .profile-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: calc(-1 * env(safe-area-inset-top));
+  left: calc(-1 * env(safe-area-inset-left));
+  right: calc(-1 * env(safe-area-inset-right));
+  bottom: calc(-1 * env(safe-area-inset-bottom));
   width: 100vw;
   height: 100vh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .profile-modal-container {
