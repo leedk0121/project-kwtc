@@ -85,7 +85,7 @@ body {
 
     /* 클럽 이름 위치 조정 */
     .header_container.scrolled #header_club_name {
-        top: 75%;
+        top: 80%;
         left: 25%;
     }
 
@@ -101,7 +101,7 @@ body {
 
     /* 현재 페이지 텍스트 조정 */
     .header_container.scrolled #current_page {
-        top: 75%;
+        top: 80%;
         font-size: 16px;
         letter-spacing: 6px;
     }

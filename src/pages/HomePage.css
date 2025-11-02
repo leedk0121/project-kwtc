@@ -1,14 +1,21 @@
 .page_home {
     background-color: #A52A2A;
-    min-height: 100vh;
-    min-height: 100dvh; /* 동적 뷰포트 높이 (최신 브라우저) */
-    position: relative;
+    height: 100vh;
+    height: 100dvh; /* 동적 뷰포트 높이 (최신 브라우저) */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow: hidden;
     /* 아이폰 safe area padding */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+    /* 터치 스크롤 방지 */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
 }
 
 #Homepage-kwtclogo {

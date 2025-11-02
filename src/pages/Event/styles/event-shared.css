@@ -594,6 +594,26 @@
   min-width: 0;
 }
 
+/* 날짜 입력 필드 - 모바일 최적화 */
+.event-add-form input[type="date"] {
+  position: relative;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* 날짜 선택기 팝업이 화면 내에 위치하도록 */
+.event-add-form input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+}
+
+.field-group {
+  position: relative;
+  z-index: 1;
+}
+
 .event-add-form input:focus,
 .event-add-form select:focus {
   outline: none;
@@ -914,6 +934,17 @@
     padding: var(--spacing-xl) var(--spacing-lg);
     width: calc(100% - 30px);
     max-width: calc(100% - 30px);
+    overflow: visible;
+  }
+
+  /* 날짜 필드 모바일 개선 */
+  .event-add-form input[type="date"] {
+    font-size: 16px; /* iOS zoom 방지 */
+    min-height: 44px; /* 터치 타겟 최소 크기 */
+  }
+
+  .field-group {
+    overflow: visible;
   }
 
   .event-add-place-row {
@@ -1012,6 +1043,14 @@
     padding: var(--spacing-lg) var(--spacing-md);
     width: calc(100% - 20px);
     max-width: calc(100% - 20px);
+    overflow: visible;
+  }
+
+  /* 날짜 필드 소형 모바일 */
+  .event-add-form input[type="date"] {
+    font-size: 16px;
+    min-height: 48px;
+    padding: var(--spacing-md);
   }
 
   .event-add-submit-btn,
