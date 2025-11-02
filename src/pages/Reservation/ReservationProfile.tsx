@@ -1068,7 +1068,7 @@ export default function ReservationProfile() {
                               className="toggle-details-btn"
                               onClick={() => toggleDetails(raw.seq || index)}
                             >
-                              {isExpanded ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
+                              {isExpanded ? '▲ 상세 정보 / 취소 접기' : '▼ 상세 정보 / 취소 보기'}
                             </button>
                           </div>
 
@@ -1244,25 +1244,6 @@ export default function ReservationProfile() {
                       >
                         {expandedDobongItems.has(-1) ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
                       </button>
-                      {/* 취소하기 버튼 - 결제대기 상태일 때만 노출 */}
-                      {dobongHeaders.pending[9] === '예약대기' && dobongHeaders.pending[8] && (
-                        <button
-                          className="cancel-reservation-btn-detail"
-                          onClick={() => handleDobongCancelReservation({
-                            type: 'pending',
-                            column_1: dobongHeaders.pending[8],
-                            column_2: dobongHeaders.pending[9],
-                            column_3: dobongHeaders.pending[10],
-                            column_5: dobongHeaders.pending[12],
-                            column_6: dobongHeaders.pending[13],
-                            column_7: dobongHeaders.pending[14]
-                          })}
-                          style={{ marginLeft: '12px' }}
-                        >
-                          <span className="cancel-icon">🗑️</span>
-                          <span>취소하기</span>
-                        </button>
-                      )}
                     </div>
                     {/* 상세 정보 */}
                     {expandedDobongItems.has(-1) && (
@@ -1275,8 +1256,12 @@ export default function ReservationProfile() {
                           <span className="detail-label">신청일자:</span>
                           <span className="detail-value">{dobongHeaders.pending[10]}</span>
                         </div>
-                        {/* 예약 취소하기 버튼 - 결제대기 상태일 때만 노출 */}
-                        {dobongHeaders.pending[9] === '예약대기' && dobongHeaders.pending[8] && (
+                        <div className="detail-row">
+                          <span className="detail-label">상태:</span>
+                          <span className="detail-value">{dobongHeaders.pending[9]}</span>
+                        </div>
+                        {/* 예약 취소하기 버튼 - 취소 상태가 아닐 때만 노출 */}
+                        {dobongHeaders.pending[8] && !dobongHeaders.pending[9]?.includes('취소') && (
                           <div className="detail-actions">
                             <button
                               className="cancel-reservation-btn-detail"
@@ -1357,11 +1342,11 @@ export default function ReservationProfile() {
 
                         {/* 상세정보 접기/펼치기 버튼을 상세정보 바로 위로 이동 */}
                         <div className="history-item-actions">
-                          <button 
+                          <button
                             className="toggle-details-btn"
                             onClick={() => toggleDobongDetails(index)}
                           >
-                            {isExpanded ? '▲ 상세 정보 접기' : '▼ 상세 정보 보기'}
+                            {isExpanded ? '▲ 상세 정보 / 취소 접기' : '▼ 상세 정보 / 취소 보기'}
                           </button>
                         </div>
 
